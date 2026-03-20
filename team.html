@@ -181,11 +181,42 @@
   .coming-card .coming-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
   .coming-card .coming-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
 
+  /* Priority row */
+  .priority-row {
+    display: flex; gap: 24px; padding: 0 32px 8px;
+    flex-wrap: wrap;
+  }
+  .priority-list {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 4px 0; max-height: 320px; overflow-y: auto;
+  }
+  .priority-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 18px; border-bottom: 1px solid var(--glass-border);
+    font-size: 13px; line-height: 1.5;
+  }
+  .priority-item:last-child { border-bottom: none; }
+  .priority-num {
+    flex-shrink: 0; width: 24px; height: 24px; border-radius: 8px;
+    background: var(--glass); display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--gold); margin-top: 1px;
+  }
+  .priority-item.bug .priority-num { color: var(--amber); }
+  .priority-text { color: var(--text); }
+  .priority-text strong { color: var(--text); font-weight: 600; }
+  .priority-tag {
+    display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px;
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+  }
+  .priority-tag.critical { background: rgba(248,113,113,0.15); color: var(--red); }
+  .priority-tag.needs-verify { background: rgba(251,191,36,0.15); color: var(--amber); }
+
   @media (max-width: 700px) {
     .header { padding: 16px; }
     .hero { padding: 16px; }
     .section { padding: 0 16px 24px; }
     .features-grid, .coming-grid { grid-template-columns: 1fr; }
+    .priority-row { padding: 0 16px 8px; flex-direction: column; }
   }
 </style>
 </head>
@@ -200,9 +231,9 @@
     </div>
   </div>
   <div class="header-meta">
-    <span><span class="live-dot"></span>Auto-updates</span>
+    <span style="display:flex;align-items:center;"><span class="live-dot"></span>Auto-updates</span>
     <span id="lastUpdate">Loading...</span>
-    <a href="index.html" style="color:var(--text-dim);text-decoration:none;font-weight:500;font-size:12px;">Dev View →</a>
+    <a href="index.html" style="color:var(--text-dim);text-decoration:none;font-weight:500;font-size:12px;padding:4px 10px;border:1px solid var(--glass-border);border-radius:6px;">Dev View →</a>
   </div>
 </div>
 
@@ -227,6 +258,17 @@
       <div class="label">Coming Soon</div>
       <div class="val amber" id="featuresPlanned">—</div>
     </div>
+  </div>
+</div>
+
+<div class="priority-row">
+  <div class="section" style="flex:1;min-width:280px;">
+    <div class="section-title">🎯 Up Next</div>
+    <div id="upNextList" class="priority-list"></div>
+  </div>
+  <div class="section" style="flex:1;min-width:280px;">
+    <div class="section-title">🐛 Open Issues</div>
+    <div id="openBugsList" class="priority-list"></div>
   </div>
 </div>
 
@@ -334,6 +376,34 @@ function parseRoadmap(content) {
   return { phases, bugs, session_log: sessionLog };
 }
 
+// Translate dev bugs/tasks to marketer-friendly language
+const TRANSLATIONS = {
+  'Chat freezes 2-3+ minutes during ad generation': { text: 'Chat goes quiet during long tasks — no progress updates shown', tag: 'critical' },
+  'Images may still disappear after streaming ends': { text: 'Generated ad images sometimes vanish after the chat loads', tag: 'needs-verify' },
+  'Ads may still lack product photos composited in': { text: 'Some generated ads missing the actual product photo', tag: 'needs-verify' },
+  'Team page Three Pillars shows placeholder values': { text: 'CPA / AOV / LTV metrics on Team page showing placeholder data' },
+  'Team page stats cards show placeholder values': { text: 'Team member stats (tasks, cost) showing placeholder numbers' },
+  'Team page agent status is static': { text: 'Team member statuses not updating in real-time' },
+  'Chat page doesn\'t render generated ad images': { text: 'Ad images not displaying inline in the chat' },
+  'Planner approval cards not wired': { text: 'Approve/Reject buttons on task cards not functional yet' },
+  'No error handling in cockpit store': { text: 'Asset Cockpit needs better error messages' },
+  'Worker service not deployed': { text: 'Background task runner not deployed yet' },
+  'No Supabase Realtime subscriptions': { text: 'Task board doesn\'t update in real-time (requires refresh)' },
+  'Offer metrics view will show empty': { text: 'Offer performance metrics not syncing from Meta yet' },
+};
+
+const NEXT_ITEMS = [
+  { text: 'Wire Team page to real performance data', priority: 1 },
+  { text: 'Make Approve/Reject buttons work on task cards', priority: 2 },
+  { text: 'Test full flow: Chat → generate ads → view in Cockpit → approve', priority: 3 },
+  { text: 'Live task updates without refreshing the page', priority: 4 },
+  { text: 'Build remaining AI team SOPs (landing pages, email, monitoring)', priority: 5 },
+  { text: 'Auto-generate Brand Brain from Shopify store data', priority: 6 },
+  { text: 'Deploy background task runner for scheduled work', priority: 7 },
+  { text: 'Daily ad metrics sync from Meta Ads', priority: 8 },
+  { text: '"While you were gone" — catch-up summary when you log in', priority: 9 },
+];
+
 function render(data) {
   const totalDone = data.phases.reduce((s, p) => s + p.done, 0);
   const totalItems = data.phases.reduce((s, p) => s + p.total, 0);
@@ -344,6 +414,33 @@ function render(data) {
   document.getElementById('featuresLive').textContent = FEATURE_MAP.live.length;
   document.getElementById('featuresBuilding').textContent = FEATURE_MAP.building.length;
   document.getElementById('featuresPlanned').textContent = FEATURE_MAP.coming.length;
+
+  // Up Next
+  document.getElementById('upNextList').innerHTML = NEXT_ITEMS.map(item => `
+    <div class="priority-item">
+      <div class="priority-num">${item.priority}</div>
+      <div class="priority-text">${esc(item.text)}</div>
+    </div>
+  `).join('');
+
+  // Open Bugs — translate from roadmap data
+  const openBugs = data.bugs.filter(b => !b.done);
+  const translatedBugs = openBugs.map((bug, i) => {
+    // Find a matching translation
+    const key = Object.keys(TRANSLATIONS).find(k => bug.text.toLowerCase().includes(k.toLowerCase()));
+    const translated = key ? TRANSLATIONS[key] : { text: bug.text };
+    return { ...translated, num: i + 1 };
+  });
+
+  document.getElementById('openBugsList').innerHTML = translatedBugs.map(bug => `
+    <div class="priority-item bug">
+      <div class="priority-num">${bug.num}</div>
+      <div class="priority-text">
+        ${esc(bug.text)}
+        ${bug.tag ? `<span class="priority-tag ${bug.tag}">${bug.tag === 'critical' ? '⚠ Critical' : '🔍 Needs Verify'}</span>` : ''}
+      </div>
+    </div>
+  `).join('') || '<div class="priority-item"><div class="priority-text" style="color:var(--green)">No open bugs! 🎉</div></div>';
 
   // Live features
   document.getElementById('liveFeatures').innerHTML = FEATURE_MAP.live.map(f => `
