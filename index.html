@@ -572,7 +572,8 @@ let lastRawContent = '';
 // === CONFIG ===
 // When hosted on GitHub Pages, fetch ROADMAP.md from the main repo.
 // When running locally via server.py, use the /api/roadmap endpoint.
-const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/xscale-team/odyssey-x/main/ROADMAP.md';
+// Fetches from the PUBLIC dashboard repo (odyssey-x is private, so raw.githubusercontent won't work)
+const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/xscale-team/odyssey-dashboard/main/ROADMAP.md';
 const LOCAL_API = '/api/roadmap';
 const isGitHubPages = location.hostname.includes('github.io') || location.hostname.includes('pages.dev');
 const REFRESH_INTERVAL = isGitHubPages ? 30000 : 3000; // 30s for GitHub (rate limits), 3s for local
