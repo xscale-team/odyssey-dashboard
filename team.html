@@ -258,6 +258,11 @@
       <div class="label">Coming Soon</div>
       <div class="val amber" id="featuresPlanned">—</div>
     </div>
+    <div class="hero-stat">
+      <div class="label">Dev Sessions</div>
+      <div class="val" style="color:var(--purple);" id="sessionCount">—</div>
+      <div id="sessionDates" style="font-size:11px;color:var(--text-dim);margin-top:2px;"></div>
+    </div>
   </div>
 </div>
 
@@ -414,6 +419,15 @@ function render(data) {
   document.getElementById('featuresLive').textContent = FEATURE_MAP.live.length;
   document.getElementById('featuresBuilding').textContent = FEATURE_MAP.building.length;
   document.getElementById('featuresPlanned').textContent = FEATURE_MAP.coming.length;
+
+  // Sessions
+  const sessionCount = data.session_log.length;
+  document.getElementById('sessionCount').textContent = sessionCount;
+  const uniqueDates = [...new Set(data.session_log.map(s => s.date.replace(/\s*\(Session \d+\)/, '').trim()))];
+  const totalSessionHours = sessionCount; // rough estimate: ~1 session ≈ 1 hour
+  document.getElementById('sessionDates').innerHTML = uniqueDates.length > 0
+    ? uniqueDates.map(d => `<span style="display:inline-block;margin-right:6px;padding:1px 6px;background:rgba(167,139,250,0.1);border-radius:4px;font-size:10px;">${esc(d)}</span>`).join('')
+    : '';
 
   // Up Next
   document.getElementById('upNextList').innerHTML = NEXT_ITEMS.map(item => `
