@@ -181,6 +181,35 @@
   .coming-card .coming-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
   .coming-card .coming-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
 
+  /* Dev activity cards */
+  .dev-summary {
+    display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; width: 100%;
+  }
+  .dev-summary .hero-stat { flex: 1; min-width: 140px; }
+  .session-cards { display: flex; gap: 14px; flex-wrap: wrap; width: 100%; }
+  .session-card {
+    flex: 1; min-width: 200px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 18px; position: relative; overflow: hidden;
+  }
+  .session-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--purple), var(--blue));
+  }
+  .session-card .session-date {
+    font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 10px;
+  }
+  .session-card .session-time {
+    font-size: 24px; font-weight: 800; color: var(--purple); margin-bottom: 4px;
+  }
+  .session-card .session-range {
+    font-size: 11px; color: var(--text-dim); margin-bottom: 8px;
+  }
+  .session-card .session-meta {
+    display: flex; gap: 12px; font-size: 12px; color: var(--text-dim);
+  }
+  .session-card .session-meta span { display: flex; align-items: center; gap: 4px; }
+
   /* Priority row */
   .priority-row {
     display: flex; gap: 24px; padding: 0 32px 8px;
@@ -258,12 +287,12 @@
       <div class="label">Coming Soon</div>
       <div class="val amber" id="featuresPlanned">—</div>
     </div>
-    <div class="hero-stat">
-      <div class="label">Dev Sessions</div>
-      <div class="val" style="color:var(--purple);" id="sessionCount">—</div>
-      <div id="sessionDates" style="font-size:11px;color:var(--text-dim);margin-top:2px;"></div>
-    </div>
   </div>
+</div>
+
+<div class="section">
+  <div class="section-title">⏱️ Dev Activity</div>
+  <div id="devActivity" style="display:flex;gap:14px;flex-wrap:wrap;"></div>
 </div>
 
 <div class="priority-row">
@@ -420,14 +449,8 @@ function render(data) {
   document.getElementById('featuresBuilding').textContent = FEATURE_MAP.building.length;
   document.getElementById('featuresPlanned').textContent = FEATURE_MAP.coming.length;
 
-  // Sessions
-  const sessionCount = data.session_log.length;
-  document.getElementById('sessionCount').textContent = sessionCount;
-  const uniqueDates = [...new Set(data.session_log.map(s => s.date.replace(/\s*\(Session \d+\)/, '').trim()))];
-  const totalSessionHours = sessionCount; // rough estimate: ~1 session ≈ 1 hour
-  document.getElementById('sessionDates').innerHTML = uniqueDates.length > 0
-    ? uniqueDates.map(d => `<span style="display:inline-block;margin-right:6px;padding:1px 6px;background:rgba(167,139,250,0.1);border-radius:4px;font-size:10px;">${esc(d)}</span>`).join('')
-    : '';
+  // Dev Activity (from stats.json)
+  renderDevActivity(data);
 
   // Up Next
   document.getElementById('upNextList').innerHTML = NEXT_ITEMS.map(item => `
@@ -524,9 +547,77 @@ function render(data) {
 
 function esc(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
+
+function formatTime12(timeStr) {
+  const [h, m] = timeStr.split(':');
+  const hr = parseInt(h);
+  const ampm = hr >= 12 ? 'PM' : 'AM';
+  const hr12 = hr % 12 || 12;
+  return `${hr12}:${m} ${ampm}`;
+}
+
+function renderDevActivity(data) {
+  const el = document.getElementById('devActivity');
+  if (!window._statsData) {
+    el.innerHTML = '<div style="color:var(--text-dim);font-size:13px;">Loading git stats...</div>';
+    return;
+  }
+  const stats = window._statsData;
+
+  el.innerHTML = `
+    <div class="dev-summary">
+      <div class="hero-stat">
+        <div class="label">Total Dev Time</div>
+        <div class="val" style="color:var(--purple);">${stats.total_hours}h</div>
+      </div>
+      <div class="hero-stat">
+        <div class="label">Sessions</div>
+        <div class="val" style="color:var(--purple);">${stats.sessions.length}</div>
+      </div>
+      <div class="hero-stat">
+        <div class="label">Commits</div>
+        <div class="val" style="color:var(--cyan);">${stats.total_commits}</div>
+      </div>
+      <div class="hero-stat">
+        <div class="label">Lines Written</div>
+        <div class="val" style="color:var(--green);">${(stats.lines_added / 1000).toFixed(0)}K</div>
+      </div>
+    </div>
+    <div class="session-cards">
+      ${stats.sessions.map((s, i) => `
+        <div class="session-card">
+          <div class="session-date">${formatDate(s.date)}</div>
+          <div class="session-time">${s.hours}h</div>
+          <div class="session-range">${formatTime12(s.start)} → ${formatTime12(s.end)}</div>
+          <div class="session-meta">
+            <span>📝 ${s.commits} commits</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
 let lastRaw = '';
+async function fetchStats() {
+  try {
+    const statsUrl = isGitHubPages
+      ? 'https://raw.githubusercontent.com/xscale-team/odyssey-dashboard/main/stats.json?t=' + Date.now()
+      : '/api/stats';
+    const resp = await fetch(statsUrl);
+    if (resp.ok) {
+      window._statsData = await resp.json();
+    }
+  } catch(e) { console.warn('Stats fetch failed:', e); }
+}
+
 async function fetchData() {
   try {
+    await fetchStats();
     let content;
     if (isGitHubPages) {
       const resp = await fetch(GITHUB_RAW_URL + '?t=' + Date.now());
@@ -534,7 +625,6 @@ async function fetchData() {
     } else {
       const resp = await fetch(LOCAL_API);
       const json = await resp.json();
-      // For local mode, reconstruct — but we just re-render with same feature map
       render(json);
       document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
       return;
