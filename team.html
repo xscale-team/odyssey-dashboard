@@ -557,7 +557,7 @@ function formatTime12(timeStr) {
   const hr = parseInt(h);
   const ampm = hr >= 12 ? 'PM' : 'AM';
   const hr12 = hr % 12 || 12;
-  return `${hr12}:${m} ${ampm}`;
+  return `${hr12}:${m} ${ampm} EST`;
 }
 
 function renderDevActivity(data) {
