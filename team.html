@@ -54,7 +54,7 @@
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
   .header-sub { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
-  .header-meta { font-size: 12px; color: var(--text-dim); }
+  .header-meta { font-size: 12px; color: var(--text-dim); display: flex; align-items: center; gap: 16px; }
   .live-dot {
     width: 8px; height: 8px; background: var(--green); border-radius: 50%;
     display: inline-block; animation: pulse 2s ease-in-out infinite; margin-right: 6px;
@@ -200,7 +200,9 @@
     </div>
   </div>
   <div class="header-meta">
-    <span class="live-dot"></span>Auto-updates &middot; <span id="lastUpdate">Loading...</span>
+    <span><span class="live-dot"></span>Auto-updates</span>
+    <span id="lastUpdate">Loading...</span>
+    <a href="index.html" style="color:var(--text-dim);text-decoration:none;font-weight:500;font-size:12px;">Dev View →</a>
   </div>
 </div>
 
@@ -258,16 +260,19 @@ const REFRESH_INTERVAL = isGitHubPages ? 30000 : 3000;
 // Maps technical roadmap items → user-friendly feature descriptions
 const FEATURE_MAP = {
   live: [
-    { name: 'User Accounts & Login', desc: 'Sign up, log in, secure sessions with JWT authentication.', emoji: '🔐' },
-    { name: 'Shopify Integration', desc: 'Connect your Shopify store. Products, orders, and revenue data sync automatically.', emoji: '🛍️' },
-    { name: 'Meta Ads Integration', desc: 'Connect Meta (Facebook/Instagram) ads account. Pull campaign data and performance metrics.', emoji: '📱' },
-    { name: 'AI Chat Interface', desc: 'Talk to your AI marketing team in real-time. Messages stream live with agent activity visible.', emoji: '💬' },
-    { name: 'Ad Image Generation', desc: '10 ad formats generated automatically — Problem Callout, Testimonial, Hero Product, Us vs Them, and more.', emoji: '🎨' },
-    { name: 'Asset Management (Cockpit)', desc: 'View, approve, reject, and manage all generated ads, copy, emails, and landing pages in one place.', emoji: '📦' },
-    { name: 'Task Planner (Kanban)', desc: 'Visual kanban board showing queued, running, and completed tasks. Create tasks and see live progress.', emoji: '📋' },
-    { name: 'AI Team Dashboard', desc: 'See your 11-member AI team — who they are, what they do, and their specialties.', emoji: '👥' },
-    { name: 'Offer Management', desc: 'Create and manage offers — the atomic unit that ties products, pricing, ads, and metrics together.', emoji: '🎯' },
-    { name: 'Auto-Deploy Pipeline', desc: 'Push code → frontend deploys to Cloudflare, backend deploys to Railway. Fully automated.', emoji: '🚀' },
+    { name: 'Autonomous AI Agent System', desc: 'A full agentic AI loop running inside a secure cloud VM (E2B Sandbox). The agent thinks, decides which tools to use, executes them, and responds — just like a real employee.', emoji: '🤖' },
+    { name: '11-Member AI Marketing Team', desc: 'One powerful AI presenting as 11 specialists — Strategist, Writer, Designer, Media Buyer, Email Expert, and more. Each has trained SOPs (skill files) defining exactly how they work.', emoji: '👥' },
+    { name: 'Live Chat with Agent Activity', desc: 'Talk to your AI team in real-time. Watch which team member is working, what tools they\'re using, and see results stream in live — like looking over their shoulder.', emoji: '💬' },
+    { name: 'Ad Creative Generation (10 Formats)', desc: 'AI generates professional ad images using Pillow — Problem Callout, Testimonial, Hero Product, Us vs Them, Ingredient Breakdown, Lifestyle, Advertorial, Before/After, Meme, and Offer formats.', emoji: '🎨' },
+    { name: 'Shopify Integration', desc: 'Full OAuth connection to your Shopify store. Products, images, pricing, orders, and revenue data all pulled automatically and used by the AI team.', emoji: '🛍️' },
+    { name: 'Meta Ads Integration', desc: 'OAuth connection to Meta Business. Pull all campaign, ad set, and ad-level performance data — CPA, ROAS, CTR, spend.', emoji: '📱' },
+    { name: 'Asset Cockpit', desc: 'Central hub for all AI-generated content — ads, copy, emails, landing pages. View, approve, reject, and manage everything from one dashboard.', emoji: '📦' },
+    { name: 'Task Planner (Kanban Board)', desc: 'Visual task board showing what the AI is working on. Queued, running, and completed tasks with live progress during execution.', emoji: '📋' },
+    { name: 'Offer Management System', desc: 'Create and manage Offers — the atomic unit. Every ad, campaign, landing page, and metric traces back to an offer. This is how the AI thinks about your business.', emoji: '🎯' },
+    { name: 'Image Upload & Storage', desc: 'Generated ad images automatically uploaded to cloud storage (Supabase). Persistent URLs that work across sessions — ads don\'t disappear.', emoji: '☁️' },
+    { name: 'ODY Naming Convention', desc: 'Every campaign, ad set, and ad follows a structured naming system (ODY-1.1, ODY-2.3) so the AI can track performance by angle, persona, format, and awareness level.', emoji: '🏷️' },
+    { name: 'Secure Auth & Accounts', desc: 'Full signup/login flow with JWT tokens, session management, and row-level security — every user only sees their own data.', emoji: '🔐' },
+    { name: 'Auto-Deploy Pipeline', desc: 'Code pushes auto-deploy: frontend to Cloudflare Pages, backend to Railway. Zero-downtime continuous delivery.', emoji: '🚀' },
   ],
   building: [
     { name: 'Chat Reliability', desc: 'Fixing the chat freezing issue during ad generation. Adding real-time progress updates so you always see what the AI is working on.', emoji: '⚡' },
