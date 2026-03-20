@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odyssey X — Dev Dashboard</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a25;
+    --border: #2a2a3a;
+    --text: #e0e0e8;
+    --text-dim: #8888a0;
+    --gold: #f0b429;
+    --gold-dim: #c99a1e;
+    --green: #34d399;
+    --green-dim: #10b981;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --purple: #a78bfa;
+    --cyan: #22d3ee;
+    --pink: #f472b6;
+    --amber: #fbbf24;
+    --orange: #fb923c;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* === HEADER === */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .header-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    color: #0a0a0f;
+  }
+
+  .header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--text), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 2s ease-in-out infinite;
+    margin-right: 6px;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(52,211,153,0.5); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(52,211,153,0); }
+  }
+
+  /* === OVERALL STATS BAR === */
+  .stats-bar {
+    display: flex;
+    gap: 12px;
+    padding: 16px 32px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .stat-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    min-width: 150px;
+    flex-shrink: 0;
+  }
+
+  .stat-card .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .stat-card .value {
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .stat-card .value.gold { color: var(--gold); }
+  .stat-card .value.green { color: var(--green); }
+  .stat-card .value.blue { color: var(--blue); }
+  .stat-card .value.red { color: var(--red); }
+
+  .stat-card .sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* === TABS === */
+  .tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 32px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .tab {
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  /* === KANBAN BOARD === */
+  .kanban-container {
+    padding: 24px 32px;
+  }
+
+  .kanban-board {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 24px;
+    align-items: flex-start;
+  }
+
+  .kanban-column {
+    min-width: 300px;
+    max-width: 340px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .column-header {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .column-header h3 {
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .column-count {
+    font-size: 12px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 2px 8px;
+    color: var(--text-dim);
+  }
+
+  .column-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 65vh;
+    overflow-y: auto;
+  }
+
+  .column-body::-webkit-scrollbar { width: 4px; }
+  .column-body::-webkit-scrollbar-track { background: transparent; }
+  .column-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* === TASK CARDS === */
+  .task-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    cursor: default;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .task-card:hover {
+    border-color: rgba(255,255,255,0.12);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .task-card.done {
+    opacity: 0.5;
+  }
+
+  .task-card.done .task-text {
+    text-decoration: line-through;
+    color: var(--text-dim);
+  }
+
+  .task-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 2px solid var(--border);
+    margin-right: 10px;
+    flex-shrink: 0;
+    font-size: 11px;
+  }
+
+  .task-card.done .task-check {
+    background: var(--green);
+    border-color: var(--green);
+    color: #000;
+  }
+
+  .task-text {
+    font-size: 13px;
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .task-row {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .task-section {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 6px;
+    padding-left: 28px;
+  }
+
+  /* === PHASE PROGRESS === */
+  .phase-progress {
+    margin-top: 8px;
+    padding: 0 16px 14px;
+  }
+
+  .progress-bar-bg {
+    height: 4px;
+    background: var(--glass);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .progress-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    text-align: right;
+  }
+
+  /* === SIDE PANELS === */
+  .panels-container {
+    padding: 0 32px 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 14px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .panel-body {
+    padding: 12px 16px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .panel-body::-webkit-scrollbar { width: 4px; }
+  .panel-body::-webkit-scrollbar-track { background: transparent; }
+  .panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* Bugs */
+  .bug-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--glass-border);
+    font-size: 13px;
+  }
+
+  .bug-item:last-child { border-bottom: none; }
+
+  .bug-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+  }
+
+  .bug-icon.open { background: rgba(248,113,113,0.15); color: var(--red); }
+  .bug-icon.fixed { background: rgba(52,211,153,0.15); color: var(--green); }
+
+  .bug-item.fixed { opacity: 0.5; text-decoration: line-through; }
+
+  /* What's Next */
+  .next-item {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--glass-border);
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .next-item:last-child { border-bottom: none; }
+
+  .next-num {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .next-section-divider {
+    padding: 12px 0 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Session Log */
+  .session-entry {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .session-entry:last-child { border-bottom: none; }
+
+  .session-date {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+
+  .session-items {
+    list-style: none;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .session-items li {
+    padding: 2px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .session-items li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--text-dim);
+  }
+
+  /* Quick Status */
+  .quick-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .quick-table th {
+    text-align: left;
+    padding: 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .quick-table td {
+    padding: 8px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .status-badge.done { background: rgba(52,211,153,0.15); color: var(--green); }
+  .status-badge.active { background: rgba(96,165,250,0.15); color: var(--blue); }
+  .status-badge.partial { background: rgba(251,191,36,0.15); color: var(--amber); }
+  .status-badge.planned { background: rgba(136,136,160,0.15); color: var(--text-dim); }
+
+  /* === VIEW TOGGLE === */
+  .view-content { display: none; }
+  .view-content.active { display: block; }
+
+  /* === LOADING === */
+  .loading-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--glass-border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 900px) {
+    .panels-container { grid-template-columns: 1fr; }
+    .stats-bar { padding: 12px 16px; }
+    .kanban-container { padding: 16px; }
+    .header { padding: 12px 16px; }
+    .tabs { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo">O</div>
+    <h1>Odyssey X — Dev Dashboard</h1>
+  </div>
+  <div class="header-meta">
+    <span><span class="live-dot"></span>Live — auto-refreshes</span>
+    <span id="lastUpdate">Loading...</span>
+  </div>
+</div>
+
+<div id="statsBar" class="stats-bar"></div>
+
+<div class="tabs">
+  <div class="tab active" data-view="kanban">📋 Kanban Board</div>
+  <div class="tab" data-view="status">📊 Phase Status</div>
+  <div class="tab" data-view="bugs">🐛 Bugs & Debt</div>
+  <div class="tab" data-view="log">📝 Session Log</div>
+</div>
+
+<div id="kanbanView" class="view-content active">
+  <div class="kanban-container">
+    <div id="kanbanBoard" class="kanban-board">
+      <div class="loading-overlay">
+        <div class="spinner"></div>
+        <span style="color:var(--text-dim);font-size:14px;">Loading ROADMAP.md...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="statusView" class="view-content">
+  <div class="kanban-container" id="statusContent"></div>
+</div>
+
+<div id="bugsView" class="view-content">
+  <div class="panels-container" id="bugsContent" style="padding-top:24px;"></div>
+</div>
+
+<div id="logView" class="view-content">
+  <div class="panels-container" id="logContent" style="padding-top:24px;"></div>
+</div>
+
+<script>
+let lastData = null;
+let activeView = 'kanban';
+let lastRawContent = '';
+
+// === CONFIG ===
+// When hosted on GitHub Pages, fetch ROADMAP.md from the main repo.
+// When running locally via server.py, use the /api/roadmap endpoint.
+const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/xscale-team/odyssey-x/main/ROADMAP.md';
+const LOCAL_API = '/api/roadmap';
+const isGitHubPages = location.hostname.includes('github.io') || location.hostname.includes('pages.dev');
+const REFRESH_INTERVAL = isGitHubPages ? 30000 : 3000; // 30s for GitHub (rate limits), 3s for local
+
+// === Tab switching ===
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+    tab.classList.add('active');
+    const view = tab.dataset.view;
+    activeView = view;
+    document.getElementById(view + 'View').classList.add('active');
+  });
+});
+
+// === Parse ROADMAP.md client-side (mirrors server.py logic) ===
+function parseRoadmap(content) {
+  const phases = [];
+  const bugs = [];
+  const quickStatus = [];
+  const sessionLog = [];
+  const whatNext = [];
+  let currentPhase = null;
+  let currentSection = null;
+  let inSessionLog = false;
+  let inWhatNext = false;
+
+  for (const line of content.split('\n')) {
+    const stripped = line.trim();
+
+    // Quick status table
+    if (stripped.includes('| Phase') && stripped.includes('Status')) continue;
+    if (stripped.startsWith('|') && !stripped.includes('Progress') && !stripped.includes('---')) {
+      const match = stripped.match(/\|\s*Phase \d+:\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|/);
+      if (match) {
+        quickStatus.push({ name: match[1].trim(), status: match[2].trim(), progress: match[3].trim() });
+      }
+    }
+
+    // Phase headers
+    if (stripped.startsWith('## Phase')) {
+      inSessionLog = false;
+      inWhatNext = false;
+      const m = stripped.match(/## Phase (\d+):\s*(.+)/);
+      if (m) {
+        currentPhase = { number: parseInt(m[1]), name: m[2], sections: [], done: 0, total: 0 };
+        phases.push(currentPhase);
+        currentSection = null;
+      }
+    }
+    // Section headers within phases
+    else if (stripped.startsWith('### ') && currentPhase) {
+      const sectionName = stripped.slice(4);
+      currentSection = sectionName;
+      currentPhase.sections.push({ name: sectionName, items: [] });
+    }
+    // Known Bugs
+    else if (stripped === '## Known Bugs & Technical Debt') {
+      currentPhase = null;
+      currentSection = 'bugs';
+      inSessionLog = false;
+      inWhatNext = false;
+    }
+    // Session Log
+    else if (stripped === '## Session Log') {
+      currentPhase = null;
+      currentSection = null;
+      inSessionLog = true;
+      inWhatNext = false;
+    }
+    // What To Do Next
+    else if (stripped === '## What To Do Next') {
+      currentPhase = null;
+      currentSection = null;
+      inSessionLog = false;
+      inWhatNext = true;
+    }
+    // Session log entries
+    else if (inSessionLog) {
+      if (stripped.startsWith('### ')) {
+        sessionLog.push({ date: stripped.slice(4), items: [] });
+      } else if (stripped.startsWith('- ') && sessionLog.length > 0) {
+        sessionLog[sessionLog.length - 1].items.push(stripped.slice(2));
+      }
+    }
+    // What to do next
+    else if (inWhatNext) {
+      if (/^\d+\.\s/.test(stripped)) {
+        whatNext.push(stripped.replace(/^\d+\.\s*/, ''));
+      } else if (stripped.startsWith('### ')) {
+        whatNext.push('--- ' + stripped.slice(4) + ' ---');
+      }
+    }
+    // Checkbox items
+    else if (stripped.startsWith('- [x] ') || stripped.startsWith('- [ ] ')) {
+      const done = stripped.startsWith('- [x]');
+      const text = stripped.slice(6);
+      if (currentSection === 'bugs') {
+        bugs.push({ text, done });
+      } else if (currentPhase) {
+        if (currentPhase.sections.length > 0) {
+          currentPhase.sections[currentPhase.sections.length - 1].items.push({ text, done });
+        }
+        if (done) currentPhase.done++;
+        currentPhase.total++;
+      }
+    }
+  }
+
+  return { phases, bugs, quick_status: quickStatus, session_log: sessionLog, what_next: whatNext, timestamp: Date.now() / 1000 };
+}
+
+// === Fetch data (dual mode) ===
+async function fetchData() {
+  try {
+    let data;
+    if (isGitHubPages) {
+      // GitHub Pages mode: fetch raw markdown, parse client-side
+      const resp = await fetch(GITHUB_RAW_URL + '?t=' + Date.now());
+      const content = await resp.text();
+      if (content === lastRawContent) {
+        document.getElementById('lastUpdate').textContent = 'Updated ' + new Date().toLocaleTimeString();
+        return;
+      }
+      lastRawContent = content;
+      data = parseRoadmap(content);
+    } else {
+      // Local mode: fetch pre-parsed JSON from server.py
+      const resp = await fetch(LOCAL_API);
+      data = await resp.json();
+    }
+    if (JSON.stringify(data) !== JSON.stringify(lastData)) {
+      lastData = data;
+      render(data);
+    }
+    document.getElementById('lastUpdate').textContent =
+      'Updated ' + new Date().toLocaleTimeString() + (isGitHubPages ? ' (from GitHub)' : '');
+  } catch (e) {
+    console.error('Fetch error:', e);
+    document.getElementById('lastUpdate').textContent = 'Error fetching — retrying...';
+  }
+}
+
+// === Render everything ===
+function render(data) {
+  renderStats(data);
+  renderKanban(data);
+  renderStatus(data);
+  renderBugs(data);
+  renderLog(data);
+}
+
+// === Stats Bar ===
+function renderStats(data) {
+  const totalDone = data.phases.reduce((s, p) => s + p.done, 0);
+  const totalItems = data.phases.reduce((s, p) => s + p.total, 0);
+  const totalBugs = data.bugs.length;
+  const fixedBugs = data.bugs.filter(b => b.done).length;
+  const openBugs = totalBugs - fixedBugs;
+  const pct = totalItems > 0 ? Math.round((totalDone / totalItems) * 100) : 0;
+
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-card">
+      <div class="label">Overall Progress</div>
+      <div class="value gold">${pct}%</div>
+      <div class="sub">${totalDone} / ${totalItems} tasks</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Phases</div>
+      <div class="value blue">${data.phases.length}</div>
+      <div class="sub">${data.phases.filter(p => p.done === p.total && p.total > 0).length} complete</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Open Bugs</div>
+      <div class="value ${openBugs > 0 ? 'red' : 'green'}">${openBugs}</div>
+      <div class="sub">${fixedBugs} fixed</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">What's Next</div>
+      <div class="value purple">${data.what_next.filter(w => !w.startsWith('---')).length}</div>
+      <div class="sub">action items</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Sessions Logged</div>
+      <div class="value cyan">${data.session_log.length}</div>
+      <div class="sub">${data.session_log.length > 0 ? data.session_log[0].date : 'none'}</div>
+    </div>
+  `;
+}
+
+// === Kanban Board ===
+function renderKanban(data) {
+  const board = document.getElementById('kanbanBoard');
+
+  // Group items into columns — Done on the far right
+  const columns = {
+    next: { title: '🎯 Up Next', items: [], color: 'var(--gold)' },
+    bugs: { title: '🐛 Open Bugs', items: [], color: 'var(--red)' },
+    todo: { title: '📋 To Do', items: [], color: 'var(--text-dim)' },
+    inProgress: { title: '🔨 In Progress', items: [], color: 'var(--blue)' },
+    done: { title: '✅ Done', items: [], color: 'var(--green)' },
+  };
+
+  data.phases.forEach(phase => {
+    phase.sections.forEach(section => {
+      section.items.forEach(item => {
+        const entry = {
+          text: item.text,
+          phase: `Phase ${phase.number}: ${phase.name}`,
+          section: section.name,
+          done: item.done,
+        };
+        if (item.done) {
+          columns.done.items.push(entry);
+        } else {
+          columns.todo.items.push(entry);
+        }
+      });
+    });
+  });
+
+  data.bugs.forEach(bug => {
+    if (!bug.done) {
+      columns.bugs.items.push({ text: bug.text, done: false });
+    }
+  });
+
+  data.what_next.forEach((item, i) => {
+    if (!item.startsWith('---')) {
+      columns.next.items.push({ text: item, num: i + 1 });
+    }
+  });
+
+  board.innerHTML = Object.entries(columns).map(([key, col]) => `
+    <div class="kanban-column">
+      <div class="column-header">
+        <h3>${col.title}</h3>
+        <span class="column-count">${col.items.length}</span>
+      </div>
+      <div class="column-body">
+        ${col.items.map(item => {
+          if (key === 'next') {
+            return `<div class="task-card">
+              <div class="task-row">
+                <span class="next-num">${item.num}</span>
+                <span class="task-text" style="margin-left:8px">${escHtml(item.text)}</span>
+              </div>
+            </div>`;
+          }
+          if (key === 'bugs') {
+            return `<div class="task-card">
+              <div class="task-row">
+                <span class="bug-icon open">🐛</span>
+                <span class="task-text">${escHtml(item.text)}</span>
+              </div>
+            </div>`;
+          }
+          return `<div class="task-card ${item.done ? 'done' : ''}">
+            <div class="task-row">
+              <span class="task-check">${item.done ? '✓' : ''}</span>
+              <span class="task-text">${escHtml(item.text)}</span>
+            </div>
+            ${item.phase ? `<div class="task-section">${escHtml(item.phase)} → ${escHtml(item.section)}</div>` : ''}
+          </div>`;
+        }).join('')}
+        ${col.items.length === 0 ? '<div style="text-align:center;padding:24px;color:var(--text-dim);font-size:13px;">No items</div>' : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// === Phase Status ===
+function renderStatus(data) {
+  const el = document.getElementById('statusContent');
+  el.innerHTML = data.phases.map(phase => {
+    const pct = phase.total > 0 ? Math.round((phase.done / phase.total) * 100) : 0;
+    const barColor = pct === 100 ? 'var(--green)' :
+                     pct > 50 ? 'var(--blue)' :
+                     pct > 0 ? 'var(--amber)' : 'var(--text-dim)';
+    return `
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="column-header">
+          <h3>Phase ${phase.number}: ${escHtml(phase.name)}</h3>
+          <span class="column-count">${phase.done}/${phase.total} — ${pct}%</span>
+        </div>
+        <div class="phase-progress">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width:${pct}%;background:${barColor};"></div>
+          </div>
+        </div>
+        <div class="panel-body">
+          ${phase.sections.map(section => `
+            <div style="margin-bottom:12px;">
+              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;">
+                ${escHtml(section.name)}
+              </div>
+              ${section.items.map(item => `
+                <div class="task-card ${item.done ? 'done' : ''}" style="margin-bottom:4px;">
+                  <div class="task-row">
+                    <span class="task-check">${item.done ? '✓' : ''}</span>
+                    <span class="task-text">${escHtml(item.text)}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Quick status table
+  if (data.quick_status && data.quick_status.length > 0) {
+    el.innerHTML = `
+      <div class="panel" style="margin-bottom:24px;">
+        <div class="panel-header">📊 Quick Status</div>
+        <div class="panel-body">
+          <table class="quick-table">
+            <thead><tr><th>Phase</th><th>Status</th><th>Progress</th></tr></thead>
+            <tbody>
+              ${data.quick_status.map(qs => {
+                let cls = 'planned';
+                const s = qs.status.toLowerCase();
+                if (s.includes('done') || s.includes('✅')) cls = 'done';
+                else if (s.includes('active') || s.includes('🔨') || s.includes('progress')) cls = 'active';
+                else if (s.includes('partial')) cls = 'partial';
+                return `<tr>
+                  <td>${escHtml(qs.name)}</td>
+                  <td><span class="status-badge ${cls}">${escHtml(qs.status)}</span></td>
+                  <td>${escHtml(qs.progress)}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    ` + el.innerHTML;
+  }
+}
+
+// === Bugs Panel ===
+function renderBugs(data) {
+  const el = document.getElementById('bugsContent');
+  const openBugs = data.bugs.filter(b => !b.done);
+  const fixedBugs = data.bugs.filter(b => b.done);
+
+  el.innerHTML = `
+    <div class="panel">
+      <div class="panel-header">🔴 Open Bugs (${openBugs.length})</div>
+      <div class="panel-body">
+        ${openBugs.map(bug => `
+          <div class="bug-item">
+            <span class="bug-icon open">!</span>
+            <span>${escHtml(bug.text)}</span>
+          </div>
+        `).join('')}
+        ${openBugs.length === 0 ? '<div style="text-align:center;padding:24px;color:var(--green);font-size:14px;">🎉 No open bugs!</div>' : ''}
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">✅ Fixed (${fixedBugs.length})</div>
+      <div class="panel-body">
+        ${fixedBugs.map(bug => `
+          <div class="bug-item fixed">
+            <span class="bug-icon fixed">✓</span>
+            <span>${escHtml(bug.text)}</span>
+          </div>
+        `).join('')}
+        ${fixedBugs.length === 0 ? '<div style="text-align:center;padding:24px;color:var(--text-dim);font-size:14px;">No fixed bugs yet</div>' : ''}
+      </div>
+    </div>
+  `;
+}
+
+// === Session Log ===
+function renderLog(data) {
+  const el = document.getElementById('logContent');
+  el.innerHTML = `
+    <div class="panel" style="grid-column: span 2;">
+      <div class="panel-header">📝 Session Log (${data.session_log.length} sessions)</div>
+      <div class="panel-body">
+        ${data.session_log.map(entry => `
+          <div class="session-entry">
+            <div class="session-date">${escHtml(entry.date)}</div>
+            <ul class="session-items">
+              ${entry.items.map(item => `<li>${escHtml(item)}</li>`).join('')}
+            </ul>
+          </div>
+        `).join('')}
+        ${data.session_log.length === 0 ? '<div style="text-align:center;padding:24px;color:var(--text-dim);">No sessions logged yet</div>' : ''}
+      </div>
+    </div>
+    <div class="panel" style="grid-column: span 2;">
+      <div class="panel-header">🎯 What To Do Next</div>
+      <div class="panel-body">
+        ${data.what_next.map((item, i) => {
+          if (item.startsWith('---')) {
+            const title = item.replace(/^---\s*/, '').replace(/\s*---$/, '');
+            return `<div class="next-section-divider">${escHtml(title)}</div>`;
+          }
+          return `<div class="next-item">
+            <span class="next-num">${i + 1}</span>
+            <span>${escHtml(item)}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// === Utility ===
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// === Init ===
+fetchData();
+setInterval(fetchData, REFRESH_INTERVAL);
+if (isGitHubPages) {
+  document.querySelector('.header-meta span:first-child').innerHTML =
+    '<span class="live-dot"></span>Live — refreshes every 30s from GitHub';
+}
+</script>
+
+</body>
+</html>
