@@ -1,6 +1,6 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-03-23 (Session 6)**
+> **Last updated: 2026-03-23 (Session 7)**
 > Goal-driven, not timeline-driven. Ship MVP when ad generation → launch → monitoring pipeline is bulletproof.
 
 ---
@@ -13,7 +13,7 @@ The MVP is ready when a user can:
 3. ✅ See full funnel flow (impressions → clicks → content views → checkout → purchase)
 4. ✅ See subscription LTV/churn per product from Loop
 5. 🟡 Generate production-quality ads with Gemini AI
-6. ⬜ Approve ads → auto-push to Meta Ads Manager as new ad set
+6. ✅ Approve ads → auto-push to Meta Ads Manager as new ad set
 7. ⬜ Agent monitors performance daily, kills losers, scales winners (with approval at user's autonomy level)
 8. ⬜ Agent proactively plans next batch based on what's working
 9. ⬜ Guided onboarding flow
@@ -30,7 +30,7 @@ The MVP is ready when a user can:
 | Subscription Metrics (Loop) | ✅ Done | LTV, churn, MRR per selling plan |
 | Three Pillars (CPA/AOV/LTV) | ✅ Live | All 3 showing real data |
 | Security Fixes | ✅ Done | RLS, token headers, encryption |
-| Ad Launch to Meta | 🟡 Partially Built | Endpoint exists, needs approval → auto-push |
+| Ad Launch to Meta | ✅ Done | Full pipeline: approve batch → launch to Meta with ODY naming |
 | Watcher (Kill/Scale) | ⬜ Not Started | Next priority |
 | Background Autonomy | ⬜ Not Started | Daily health checks, weekly planning |
 | Onboarding Flow | ⬜ Not Started | After features complete |
@@ -87,16 +87,18 @@ The MVP is ready when a user can:
 
 ## What's Next — Priority Order
 
-### Priority 1: Ad Launch Pipeline (Agent → Meta)
+### Priority 1: Ad Launch Pipeline (Agent → Meta) ✅ DONE
 When user approves a batch, agent auto-pushes to Meta Ads Manager.
 
-- [ ] **Approval → auto-launch flow**: approve batch → creates ad set in existing winning campaign → uploads images → creates ads (PAUSED) → activates
-- [ ] Wire Planner approval cards to backend approve/reject endpoints
-- [ ] On approve: call `/api/integrations/meta/launch-batch` with approved asset IDs
-- [ ] Agent asks user which campaign to add the ad set to (or creates Testing campaign)
-- [ ] Naming convention enforced: campaign, ad set, and ad names follow ODY format
-- [ ] Status updates: approved → launching → published (with Meta ad IDs stored)
-- [ ] Error handling: if Meta API fails, show error, don't lose the creative
+- [x] **Approval → auto-launch flow**: approve batch → creates ad set in existing winning campaign → uploads images → creates ads (PAUSED)
+- [x] Wire Planner approval cards to backend approve/reject endpoints
+- [x] On approve: call `/api/integrations/meta/launch-batch` with approved asset IDs
+- [x] User selects reference ad set to copy targeting/pixel from (launch modal with search)
+- [x] Naming convention enforced: ad set and ad names follow ODY format exactly
+- [x] Status updates: draft → approved → published (with Meta ad IDs stored in offer_ads)
+- [x] Error handling: if Meta API fails, show error, don't lose the creative (failed assets tracked separately)
+- [x] Batch operations: approve all, reject all, launch batch from Cockpit
+- [x] Offer detail page shows published ads with Meta links
 
 ### Priority 2: Watcher Agent (Kill/Scale/Monitor)
 Daily monitoring that takes action based on user's autonomy level.
@@ -231,6 +233,17 @@ Build the week before opening signups.
 ### 2026-03-22 (Session 4)
 - Fixed duplicate terminal entries, sandbox hanging, font installation
 - Started Pillow renderer improvements (7/10 formats updated)
+
+### 2026-03-23 (Session 7)
+- **Ad Launch Pipeline**: Complete approve → push to Meta flow
+  - Fixed launch-batch bug (undefined `campaign_name`)
+  - ODY naming convention enforced for ad sets and ads
+  - Meta IDs stored back in offer_ad_sets / offer_ads tables
+  - Batch approve/reject/launch endpoints added
+  - Planner approval auto-triggers Meta launch for ad_batch_launch type
+  - Cockpit: batch grouping, approve all, launch modal with ad set search
+  - Asset card: wired "Push to Meta" button, format/awareness badges
+  - Offer detail: approve all, launch button, published ads with Meta links
 
 ### 2026-03-23 (Sessions 5-6) — MASSIVE session
 - **Ad System**: Replaced Pillow with Gemini AI (full composition, product images, 10 formats)
