@@ -240,64 +240,6 @@
   .priority-tag.critical { background: rgba(248,113,113,0.15); color: var(--red); }
   .priority-tag.needs-verify { background: rgba(251,191,36,0.15); color: var(--amber); }
 
-  /* Modal */
-  .modal-overlay {
-    display: none; position: fixed; inset: 0; z-index: 999;
-    background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
-    align-items: center; justify-content: center;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
-    padding: 32px; width: 90%; max-width: 480px; position: relative;
-  }
-  .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-  .modal .modal-sub { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; }
-  .modal-close {
-    position: absolute; top: 16px; right: 16px; background: none; border: none;
-    color: var(--text-dim); font-size: 20px; cursor: pointer; padding: 4px 8px;
-  }
-  .modal-close:hover { color: var(--text); }
-  .modal label { display: block; font-size: 12px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
-  .modal input, .modal textarea, .modal select {
-    width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
-    padding: 10px 14px; color: var(--text); font-size: 14px; font-family: inherit;
-    margin-bottom: 16px; outline: none; transition: border-color 0.15s;
-  }
-  .modal input:focus, .modal textarea:focus, .modal select:focus { border-color: var(--gold); }
-  .modal textarea { resize: vertical; min-height: 80px; }
-  .modal select { appearance: none; cursor: pointer; }
-  .modal-submit {
-    width: 100%; padding: 12px; border: none; border-radius: 10px;
-    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
-    color: #0a0a0f; font-size: 14px; font-weight: 700; cursor: pointer;
-    transition: opacity 0.15s;
-  }
-  .modal-submit:hover { opacity: 0.9; }
-  .modal-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-  .modal-success { text-align: center; padding: 20px 0; }
-  .modal-success .checkmark { font-size: 48px; margin-bottom: 12px; }
-  .modal-success p { color: var(--text-dim); font-size: 14px; }
-
-  /* Request cards */
-  .requests-grid { display: flex; flex-direction: column; gap: 10px; }
-  .request-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start;
-  }
-  .request-card .req-type {
-    flex-shrink: 0; padding: 3px 10px; border-radius: 6px;
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-  }
-  .request-card .req-type.feature { background: rgba(96,165,250,0.15); color: var(--blue); }
-  .request-card .req-type.bug { background: rgba(248,113,113,0.15); color: var(--red); }
-  .request-card .req-type.idea { background: rgba(167,139,250,0.15); color: var(--purple); }
-  .request-card .req-type.improvement { background: rgba(52,211,153,0.15); color: var(--green); }
-  .request-card .req-body { flex: 1; }
-  .request-card .req-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
-  .request-card .req-desc { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
-  .request-card .req-meta { font-size: 11px; color: var(--text-dim); margin-top: 6px; opacity: 0.7; }
-
   @media (max-width: 700px) {
     .header { padding: 16px; }
     .hero { padding: 16px; }
@@ -321,7 +263,6 @@
     <a href="https://demo.runodyssey.io" target="_blank" style="color:var(--green);text-decoration:none;font-weight:600;font-size:12px;padding:5px 12px;border:1px solid rgba(52,211,153,0.3);border-radius:8px;display:flex;align-items:center;gap:6px;">
       <span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;"></span>Live Site
     </a>
-    <button onclick="openRequestModal()" style="background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:#0a0a0f;border:none;padding:5px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">+ Request / Idea</button>
     <span style="display:flex;align-items:center;"><span class="live-dot"></span>Auto-updates</span>
     <span id="lastUpdate">Loading...</span>
     <a href="index.html" style="color:var(--text-dim);text-decoration:none;font-size:12px;">Dev View &rarr;</a>
@@ -384,49 +325,10 @@
 </div>
 
 <div class="section">
-  <div class="section-title" style="justify-content:space-between;">
-    <span>💡 Requests & Ideas</span>
-    <button onclick="openRequestModal()" style="background:var(--glass);border:1px solid var(--glass-border);color:var(--gold);padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">+ Add</button>
-  </div>
-  <div id="requestsList" class="requests-grid">
-    <div style="text-align:center;padding:20px;color:var(--text-dim);font-size:13px;">No requests yet. Click "+ Request / Idea" to submit one.</div>
-  </div>
-</div>
-
-<div class="section">
   <div class="section-title">📝 Recent Updates</div>
   <div id="recentUpdates" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;"></div>
 </div>
 
-<!-- Request Modal -->
-<div class="modal-overlay" id="requestModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeRequestModal()">&times;</button>
-    <div id="modalForm">
-      <h2>Submit a Request or Idea</h2>
-      <div class="modal-sub">Your team will see this on the dashboard.</div>
-      <label>Your Name</label>
-      <input type="text" id="reqName" placeholder="e.g. Austin">
-      <label>Type</label>
-      <select id="reqType">
-        <option value="idea">💡 Idea</option>
-        <option value="feature">🔧 Feature Request</option>
-        <option value="improvement">✨ Improvement</option>
-        <option value="bug">🐛 Bug Report</option>
-      </select>
-      <label>Title</label>
-      <input type="text" id="reqTitle" placeholder="Short summary">
-      <label>Details (optional)</label>
-      <textarea id="reqDetails" placeholder="Describe what you're thinking..."></textarea>
-      <button class="modal-submit" onclick="submitRequest()">Submit</button>
-    </div>
-    <div id="modalSuccess" class="modal-success" style="display:none;">
-      <div class="checkmark">&#10003;</div>
-      <h2 style="margin-bottom:8px;">Submitted!</h2>
-      <p>Your request has been added to the dashboard.</p>
-    </div>
-  </div>
-</div>
 
 <script>
 const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/xscale-team/odyssey-dashboard/main/ROADMAP.md';
@@ -742,83 +644,6 @@ async function fetchData() {
 fetchData();
 setInterval(fetchData, REFRESH_INTERVAL);
 
-// === Requests System (localStorage-backed) ===
-const REQUESTS_KEY = 'odyssey_requests';
-
-function getRequests() {
-  try { return JSON.parse(localStorage.getItem(REQUESTS_KEY) || '[]'); }
-  catch { return []; }
-}
-
-function saveRequests(reqs) {
-  localStorage.setItem(REQUESTS_KEY, JSON.stringify(reqs));
-}
-
-function renderRequests() {
-  const reqs = getRequests();
-  const el = document.getElementById('requestsList');
-  if (reqs.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:13px;">No requests yet. Click "+ Request / Idea" to submit one.</div>';
-    return;
-  }
-  el.innerHTML = reqs.slice().reverse().map(r => `
-    <div class="request-card">
-      <span class="req-type ${esc(r.type)}">${esc(r.type)}</span>
-      <div class="req-body">
-        <div class="req-title">${esc(r.title)}</div>
-        ${r.details ? `<div class="req-desc">${esc(r.details)}</div>` : ''}
-        <div class="req-meta">${esc(r.name)} &middot; ${esc(r.date)}</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function openRequestModal() {
-  document.getElementById('requestModal').classList.add('open');
-  document.getElementById('modalForm').style.display = 'block';
-  document.getElementById('modalSuccess').style.display = 'none';
-}
-
-function closeRequestModal() {
-  document.getElementById('requestModal').classList.remove('open');
-}
-
-function submitRequest() {
-  const name = document.getElementById('reqName').value.trim();
-  const type = document.getElementById('reqType').value;
-  const title = document.getElementById('reqTitle').value.trim();
-  const details = document.getElementById('reqDetails').value.trim();
-
-  if (!name || !title) { alert('Please fill in your name and a title.'); return; }
-
-  const reqs = getRequests();
-  reqs.push({
-    name, type, title, details,
-    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-    timestamp: Date.now()
-  });
-  saveRequests(reqs);
-
-  // Show success
-  document.getElementById('modalForm').style.display = 'none';
-  document.getElementById('modalSuccess').style.display = 'block';
-
-  // Clear form
-  document.getElementById('reqName').value = '';
-  document.getElementById('reqTitle').value = '';
-  document.getElementById('reqDetails').value = '';
-
-  renderRequests();
-  setTimeout(closeRequestModal, 1500);
-}
-
-// Close modal on overlay click
-document.getElementById('requestModal').addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) closeRequestModal();
-});
-
-// Initial render
-renderRequests();
 </script>
 </body>
 </html>
