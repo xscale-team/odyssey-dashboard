@@ -1,11 +1,12 @@
 {
-  "total_commits": 132,
-  "lines_added": 201726,
-  "lines_deleted": 5275,
-  "sessions": [
-    {"date": "2026-03-18", "start": "17:32:03", "end": "23:54:44", "hours": 6.4, "commits": 19},
-    {"date": "2026-03-19", "start": "00:03:22", "end": "20:46:24", "hours": 20.7, "commits": 78},
-    {"date": "2026-03-20", "start": "13:39:34", "end": "19:34:55", "hours": 5.9, "commits": 35}
-  ],
-  "total_hours": 33.0
+  "generated_at": "2026-03-23T11:32:25 EDT",
+  "timezone": "America/New_York (EST)",
+  "total_commits": 183,
+  "total_lines_added": 209990,
+  "total_lines_removed": 12599,
+  "total_sessions": 7,
+  "total_hours": 36.9,
+  "first_commit": "2026-03-18T17:32:03-04:00",
+  "last_commit": "2026-03-23T11:32:00-04:00",
+  "sessions": [{"date": "2026-03-18", "commits": 51, "hours": 10.7, "start": "17:32", "end": "04:16"}, {"date": "2026-03-19", "commits": 46, "hours": 8.6, "start": "12:09", "end": "20:46"}, {"date": "2026-03-20", "commits": 58, "hours": 10.6, "start": "13:39", "end": "00:14"}, {"date": "2026-03-21", "commits": 2, "hours": 0.5, "start": "13:30", "end": "14:01"}, {"date": "2026-03-22", "commits": 14, "hours": 2.4, "start": "00:46", "end": "03:13"}, {"date": "2026-03-22", "commits": 8, "hours": 3.5, "start": "15:00", "end": "18:28"}, {"date": "2026-03-23", "commits": 4, "hours": 0.6, "start": "10:55", "end": "11:32"}]
 }

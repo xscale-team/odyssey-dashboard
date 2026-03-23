@@ -434,12 +434,21 @@
 - [x] Discovery module referenced non-existent columns — fixed 2026-03-20
 - [x] CHECK constraint mismatch (old vs new offer_type values) — fixed 2026-03-20
 - [x] Path resolution breaks on Railway (skills, prompts, supplement-ad-creator) — fixed 2026-03-20
-- [ ] **Chat freezes 2-3+ minutes during ad generation** — terminal panel goes silent, user thinks app is broken. Need granular emit() progress events throughout executor.py long operations (Claude API calls, tool execution, image generation). THIS IS THE #1 BUG.
-- [ ] Images may still disappear after streaming ends — fix pushed (session 2) but not verified in browser
-- [ ] Ads may still lack product photos composited in — fix pushed (session 2) but not verified in browser
-- [ ] Team page Three Pillars shows placeholder values (not wired to real data)
-- [ ] Team page stats cards show placeholder values (not wired to real data)
-- [ ] Team page agent status is static (not pulling from live task data)
+- [x] **Chat freezes 2-3+ minutes during ad generation** — fixed: added error reporting, 240s timeout, progress events
+- [x] Duplicate terminal entries (2-4x per action) — fixed: removed duplicate emits in executor.py + SSE mapper
+- [x] Sandbox stuck with no error feedback — fixed: error + done events on crash, 240s timeout
+- [x] Ads ugly/tiny text — fixed: replaced Pillow renderer with Gemini AI full composition
+- [x] Images disappear after streaming — fixed with creatives_grid SSE event
+- [x] Ads lack product photos — fixed: product image sent to Gemini for composition
+- [x] Team page Three Pillars — wired to live Meta CPA + Shopify AOV
+- [x] Team page stats cards — wired to per-agent task/asset counts
+- [x] Debug endpoints exposed API keys — removed
+- [x] .single() crashes on missing data — fixed all 10 callsites
+- [x] Meta tokens in URL params — moved to Authorization header
+- [x] Message delete missing ownership check — fixed
+- [x] Token decryption crashes on bad data — graceful error handling
+- [ ] Agent invents insane angles (fertility for thyroid supplement) — partially fixed with guardrails
+- [ ] Shopify product fetch incomplete (pagination/status filter) — fixed but needs verification
 - [ ] Chat page doesn't render generated ad images inline in messages
 - [ ] Planner approval cards not wired to backend approve/reject endpoints
 - [ ] No error handling in cockpit store API calls
@@ -526,21 +535,26 @@
 > Updated each session. This is the "pick up here" section.
 
 ### Immediate Priority (Current Sprint)
-1. **Wire Team page to real data** — stats cards + Three Pillars pulling from actual DB
+1. ~~Wire Team page to real data~~ ✅ Done (session 6)
 2. **Wire Planner approval actions** — approve/reject buttons call backend endpoints
-3. **Test full flow end-to-end**: Chat → ask for ads → see them generate → find them in Cockpit → approve
-4. **Supabase Realtime** — live task updates on Planner (no polling)
+3. **Ad click-to-expand + download button** on generated creatives
+4. **Creatives grid during streaming** — show ads in grid as they generate, not full-width
+5. **"While you were gone" system** — summarize what happened since last login
 
 ### Next Up
-5. Build remaining 5 agent prompts (landing page, email, ad monitor, brand intel, offer architect)
-6. Brand brain auto-generation from Shopify data
-7. Deploy worker service on Railway
-8. Metrics sync (daily pull from Meta → offer_metrics_daily)
-9. "While you were gone" system
+6. **Supabase Realtime** — live task updates on Planner (no polling)
+7. **User feedback system** — rate ads, flag issues, continuous improvement loop
+8. Deploy worker service on Railway
+9. Metrics sync (daily pull from Meta → offer_metrics_daily)
+10. Watcher kill/scale logic (NEVER auto-kill, always require approval)
 
-### Quality Focus
-10. Glass card / glass button / glass input reusable components
-11. Chat message styling (gold user bubbles, glass assistant cards)
-12. Loading skeletons everywhere
+### Pre-Launch (build the week before signups)
+11. **Rate limiting** — 5 req/min on chat, 3 on sandbox, 60 on everything else. Exempt SSE streams.
+12. **Credit enforcement** — atomic check + reserve before execution, refund overage, env toggle for rollback
 13. Error handling in all stores
 14. Mobile responsive pass
+
+### Quality Focus
+15. Glass card / glass button / glass input reusable components
+16. Chat message styling (gold user bubbles, glass assistant cards)
+17. Loading skeletons everywhere

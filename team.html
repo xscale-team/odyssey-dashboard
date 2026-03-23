@@ -584,7 +584,7 @@ function renderDevActivity(data) {
       </div>
       <div class="hero-stat">
         <div class="label">Lines Written</div>
-        <div class="val" style="color:var(--green);">${(stats.lines_added / 1000).toFixed(0)}K</div>
+        <div class="val" style="color:var(--green);">${((stats.total_lines_added || 0) / 1000).toFixed(0)}K</div>
       </div>
     </div>
     <div class="session-cards">
