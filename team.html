@@ -338,65 +338,81 @@ const REFRESH_INTERVAL = isGitHubPages ? 30000 : 3000;
 
 // === Simplified feature map ===
 // Maps technical roadmap items → user-friendly feature descriptions
-const LIVE_URL = 'https://demo.runodyssey.io';
 const FEATURE_MAP = {
   live: [
-    { name: 'Autonomous AI Agent System', desc: 'A full agentic AI loop running inside a secure cloud VM (E2B Sandbox). The agent thinks, decides which tools to use, executes them, and responds — just like a real employee.', emoji: '🤖', link: LIVE_URL + '/chat' },
-    { name: '11-Member AI Marketing Team', desc: 'One powerful AI presenting as 11 specialists — Strategist, Writer, Designer, Media Buyer, Email Expert, and more. Each has trained SOPs (skill files) defining exactly how they work.', emoji: '👥', link: LIVE_URL + '/team' },
-    { name: 'Live Chat with Agent Activity', desc: 'Talk to your AI team in real-time. Watch which team member is working, what tools they\'re using, and see results stream in live — like looking over their shoulder.', emoji: '💬', link: LIVE_URL + '/chat' },
-    { name: 'Ad Creative Generation (10 Formats)', desc: 'AI generates professional ad images using Pillow — Problem Callout, Testimonial, Hero Product, Us vs Them, Ingredient Breakdown, Lifestyle, Advertorial, Before/After, Meme, and Offer formats.', emoji: '🎨', link: LIVE_URL + '/chat' },
+    { name: 'Autonomous AI Agent System', desc: 'A full agentic AI loop running inside a secure cloud VM (E2B Sandbox). The agent thinks, decides which tools to use, executes them, and responds — just like a real employee.', emoji: '🤖' },
+    { name: '11-Member AI Marketing Team', desc: 'One powerful AI presenting as 11 specialists — Strategist, Writer, Designer, Media Buyer, Email Expert, and more. Each has trained SOPs (skill files) defining exactly how they work.', emoji: '👥' },
+    { name: 'Live Chat with Agent Activity', desc: 'Talk to your AI team in real-time. Watch which team member is working, what tools they\'re using, and see results stream in live — like looking over their shoulder.', emoji: '💬' },
+    { name: 'Gemini AI Ad Generation (10 Formats)', desc: 'AI generates production-quality ad images using Google Gemini — full composition with real product photos. 10 formats: Problem Callout, Testimonial, Hero Product, Us vs Them, Ingredient Breakdown, Lifestyle, Advertorial, Before/After, Meme, and Offer.', emoji: '🎨' },
     { name: 'Shopify Integration', desc: 'Full OAuth connection to your Shopify store. Products, images, pricing, orders, and revenue data all pulled automatically and used by the AI team.', emoji: '🛍️' },
-    { name: 'Meta Ads Integration', desc: 'OAuth connection to Meta Business. Pull all campaign, ad set, and ad-level performance data — CPA, ROAS, CTR, spend.', emoji: '📱' },
-    { name: 'Asset Cockpit', desc: 'Central hub for all AI-generated content — ads, copy, emails, landing pages. View, approve, reject, and manage everything from one dashboard.', emoji: '📦', link: LIVE_URL + '/planner' },
-    { name: 'Task Planner (Kanban Board)', desc: 'Visual task board showing what the AI is working on. Queued, running, and completed tasks with live progress during execution.', emoji: '📋', link: LIVE_URL + '/planner' },
-    { name: 'Offer Management System', desc: 'Create and manage Offers — the atomic unit. Every ad, campaign, landing page, and metric traces back to an offer. This is how the AI thinks about your business.', emoji: '🎯', link: LIVE_URL + '/offers' },
-    { name: 'Image Upload & Storage', desc: 'Generated ad images automatically uploaded to cloud storage (Supabase). Persistent URLs that work across sessions — ads don\'t disappear.', emoji: '☁️' },
-    { name: 'ODY Naming Convention', desc: 'Every campaign, ad set, and ad follows a structured naming system (ODY-1.1, ODY-2.3) so the AI can track performance by angle, persona, format, and awareness level.', emoji: '🏷️' },
-    { name: 'Secure Auth & Accounts', desc: 'Full signup/login flow with JWT tokens, session management, and row-level security — every user only sees their own data.', emoji: '🔐', link: LIVE_URL },
-    { name: 'Auto-Deploy Pipeline', desc: 'Code pushes auto-deploy: frontend to Cloudflare Pages, backend to Railway. Zero-downtime continuous delivery.', emoji: '🚀' },
+    { name: 'Meta Ads Integration', desc: 'OAuth connection to Meta Business. Pull all campaign, ad set, and ad-level performance data — CPA, ROAS, CTR, spend, impressions, content views.', emoji: '📱' },
+    { name: 'Loop Subscriptions Integration', desc: 'Connect your Loop account to track subscription metrics — LTV, churn rate, MRR, active subs per selling plan. Feeds the LTV pillar.', emoji: '🔄' },
+    { name: 'Offer Discovery & Funnel', desc: 'Auto-discover your offers from Meta Ads data. See the full funnel: impressions → clicks → content views → checkouts → purchases. Group entry points by destination.', emoji: '🎯' },
+    { name: 'Three Pillars Dashboard', desc: 'CPA (from Meta), AOV (from Shopify), LTV (from Loop) — all live, all real. The scorecard for your entire business.', emoji: '📈' },
+    { name: 'Task Planner (Kanban Board)', desc: 'Visual task board showing what the AI is working on. Queued, running, and completed tasks with live progress during execution.', emoji: '📋' },
+    { name: 'Security & RLS', desc: 'Row-level security on every table, encrypted API tokens, ownership checks, removed debug endpoints. Every user only sees their own data.', emoji: '🔐' },
+    { name: 'Auto-Deploy Pipeline', desc: 'Code pushes auto-deploy: frontend to Cloudflare Pages, backend + worker to Railway. Zero-downtime continuous delivery.', emoji: '🚀' },
   ],
   building: [
-    { name: 'Chat Reliability', desc: 'Fixing the chat freezing issue during ad generation. Adding real-time progress updates so you always see what the AI is working on.', emoji: '⚡' },
-    { name: 'Image Persistence', desc: 'Generated ad images stay visible after the chat finishes loading — no more disappearing images.', emoji: '🖼️' },
-    { name: 'Product Photos in Ads', desc: 'Every generated ad will have your actual product photo composited in — not just generic backgrounds.', emoji: '📸' },
-    { name: 'Live Team Stats', desc: 'Team page showing real data — actual tasks completed, ads generated, AI costs — instead of placeholder numbers.', emoji: '📊' },
-    { name: 'Approval Workflow', desc: 'Approve or reject AI-generated content directly from the Planner. Human-in-the-loop before anything goes live.', emoji: '✅' },
-    { name: 'Three Pillars Dashboard', desc: 'CPA, AOV, and LTV metrics pulling from real ad performance data. The scorecard for everything.', emoji: '📈' },
+    { name: 'Ad Launch to Meta', desc: 'Approve a batch → agent auto-creates ad set in Meta, uploads images, creates ads with ODY naming — ready to go live.', emoji: '📡' },
+    { name: 'Approval Workflow', desc: 'Approve or reject AI-generated ads directly from the Planner. Human-in-the-loop before anything goes live on Meta.', emoji: '✅' },
+    { name: 'Ad Prompt Refinement', desc: 'Improving Gemini prompts for better ad quality — cleaner layouts, stronger hooks, more professional compositions.', emoji: '✍️' },
+    { name: 'Agent Intelligence', desc: 'Agent reads past performance data before creating ads. Correlates angles, formats, and hooks with actual CPA/ROAS results.', emoji: '🧠' },
+    { name: 'Inline Ad Previews', desc: 'See generated ad images right in the chat and on task cards — not just download links.', emoji: '🖼️' },
+    { name: 'Realtime Task Updates', desc: 'Task board updates live via Supabase Realtime — no more refreshing to see progress.', emoji: '⚡' },
   ],
   coming: [
-    { name: 'Continuous Monitoring', desc: 'AI watches your ad performance 24/7. Auto-pauses bad ads, scales winners, detects fatigue — all while you sleep.', emoji: '👁️' },
-    { name: 'Autonomy Controls', desc: 'Choose how much freedom your AI team has. From "approve everything" to "full auto" — changeable anytime.', emoji: '🎚️' },
-    { name: 'Brand Brain', desc: 'AI auto-learns your brand voice, visual identity, and product positioning from your Shopify store and website.', emoji: '🧠' },
-    { name: 'Smart Onboarding', desc: '9-step setup: connect accounts, hire your AI team, set autonomy level, and get your first ad batch — all guided.', emoji: '🎓' },
-    { name: 'Campaign Launcher', desc: 'AI creates, structures, and launches Meta ad campaigns with proper naming, targeting, and budgets.', emoji: '🚀' },
-    { name: 'Landing Page Builder', desc: 'AI generates high-converting landing pages and pushes them directly to your Shopify store.', emoji: '🏗️' },
-    { name: 'Klaviyo Email Flows', desc: 'AI creates email sequences for welcome, abandoned cart, post-purchase, and win-back — connected to your Klaviyo.', emoji: '📧' },
-    { name: 'Learning Loop', desc: 'Each batch of ads gets smarter. AI correlates which formats, angles, and audiences perform best for YOUR brand.', emoji: '🔄' },
+    { name: 'Watcher Agent (Kill/Scale)', desc: 'Daily monitoring scans all active ads. Auto-pauses losers (CPA > 2x target), scales winners (ROAS > 2.5x for 72h). Respects your autonomy level.', emoji: '👁️' },
+    { name: 'Background Autonomy', desc: 'Agent creates its own work — daily health checks, weekly batch planning, competitor scans — all showing in your Planner.', emoji: '🤖' },
+    { name: 'Autonomy Controls', desc: 'Choose how much freedom your AI team has: Supervised → Guided → Autonomous → Full Auto. Changeable anytime.', emoji: '🎚️' },
+    { name: '"While You Were Gone"', desc: 'Log in and see everything the agent did overnight — paused ads, scaled winners, new recommendations waiting for approval.', emoji: '📬' },
+    { name: 'Smart Onboarding', desc: '9-step guided setup: connect accounts, discover offers, set autonomy level, generate your first ad batch.', emoji: '🎓' },
+    { name: 'Learning Loop', desc: 'Each batch gets smarter. Agent correlates which formats, angles, and audiences perform best for YOUR brand over time.', emoji: '📊' },
     { name: 'Competitor Intelligence', desc: 'AI scans competitor ads on Meta Ad Library, analyzes strategies, and suggests counter-moves.', emoji: '🔍' },
-    { name: 'Billing & Credits', desc: 'Free tier with limited credits. Pro ($199/mo) with always-on AI, continuous monitoring, and unlimited stores.', emoji: '💳' },
+    { name: 'Klaviyo Email Flows', desc: 'AI creates email sequences for welcome, abandoned cart, post-purchase, and win-back — connected to your Klaviyo.', emoji: '📧' },
+    { name: 'Billing & Credits', desc: 'Free tier with limited usage. Pro ($199/mo) with always-on AI, continuous monitoring, and unlimited stores.', emoji: '💳' },
   ]
 };
 
 function parseRoadmap(content) {
-  const phases = []; const bugs = []; const quickStatus = [];
-  const sessionLog = []; const whatNext = [];
-  let currentPhase = null, currentSection = null;
-  let inSessionLog = false, inWhatNext = false;
+  const phases = []; const bugs = []; const sessionLog = [];
+  let currentSection = null;
+  let currentPhase = null;
+  let inSessionLog = false;
 
   for (const line of content.split('\n')) {
     const stripped = line.trim();
-    if (stripped.startsWith('## Phase')) {
-      inSessionLog = false; inWhatNext = false;
-      const m = stripped.match(/## Phase (\d+):\s*(.+)/);
-      if (m) { currentPhase = { number: parseInt(m[1]), name: m[2], sections: [], done: 0, total: 0 }; phases.push(currentPhase); currentSection = null; }
+
+    // Detect major sections
+    if (stripped === '## What\'s Done (Sessions 3-6)' || stripped.startsWith('## What\'s Done')) {
+      currentPhase = { number: 1, name: 'Completed', sections: [], done: 0, total: 0 };
+      phases.push(currentPhase); currentSection = null; inSessionLog = false;
+    }
+    else if (stripped.startsWith('## What\'s Next')) {
+      currentPhase = { number: 2, name: 'Up Next', sections: [], done: 0, total: 0 };
+      phases.push(currentPhase); currentSection = null; inSessionLog = false;
+    }
+    else if (stripped.startsWith('### Priority')) {
+      // e.g. "### Priority 1: Ad Launch Pipeline (Agent → Meta)"
+      const m = stripped.match(/### Priority \d+:\s*(.+)/);
+      if (m && currentPhase) {
+        currentSection = m[1];
+        currentPhase.sections.push({ name: currentSection, items: [] });
+      }
     }
     else if (stripped.startsWith('### ') && currentPhase) {
       currentSection = stripped.slice(4);
       currentPhase.sections.push({ name: currentSection, items: [] });
     }
-    else if (stripped === '## Known Bugs & Technical Debt') { currentPhase = null; currentSection = 'bugs'; inSessionLog = false; inWhatNext = false; }
-    else if (stripped === '## Session Log') { currentPhase = null; currentSection = null; inSessionLog = true; inWhatNext = false; }
-    else if (stripped === '## What To Do Next') { currentPhase = null; currentSection = null; inSessionLog = false; inWhatNext = true; }
+    else if (stripped === '## Known Bugs & Technical Debt') {
+      currentPhase = null; currentSection = 'bugs'; inSessionLog = false;
+    }
+    else if (stripped === '## Session Log') {
+      currentPhase = null; currentSection = null; inSessionLog = true;
+    }
+    else if (stripped.startsWith('## Integration Status') || stripped.startsWith('## Deployment Status') || stripped.startsWith('## Architecture Notes')) {
+      currentPhase = null; currentSection = null; inSessionLog = false;
+    }
     else if (inSessionLog) {
       if (stripped.startsWith('### ')) sessionLog.push({ date: stripped.slice(4), items: [] });
       else if (stripped.startsWith('- ') && sessionLog.length > 0) sessionLog[sessionLog.length-1].items.push(stripped.slice(2));
@@ -417,30 +433,27 @@ function parseRoadmap(content) {
 
 // Translate dev bugs/tasks to marketer-friendly language
 const TRANSLATIONS = {
-  'Chat freezes 2-3+ minutes during ad generation': { text: 'Chat goes quiet during long tasks — no progress updates shown', tag: 'critical' },
-  'Images may still disappear after streaming ends': { text: 'Generated ad images sometimes vanish after the chat loads', tag: 'needs-verify' },
-  'Ads may still lack product photos composited in': { text: 'Some generated ads missing the actual product photo', tag: 'needs-verify' },
-  'Team page Three Pillars shows placeholder values': { text: 'CPA / AOV / LTV metrics on Team page showing placeholder data' },
-  'Team page stats cards show placeholder values': { text: 'Team member stats (tasks, cost) showing placeholder numbers' },
-  'Team page agent status is static': { text: 'Team member statuses not updating in real-time' },
-  'Chat page doesn\'t render generated ad images': { text: 'Ad images not displaying inline in the chat' },
-  'Planner approval cards not wired': { text: 'Approve/Reject buttons on task cards not functional yet' },
-  'No error handling in cockpit store': { text: 'Asset Cockpit needs better error messages' },
-  'Worker service not deployed': { text: 'Background task runner not deployed yet' },
-  'No Supabase Realtime subscriptions': { text: 'Task board doesn\'t update in real-time (requires refresh)' },
-  'Offer metrics view will show empty': { text: 'Offer performance metrics not syncing from Meta yet' },
+  'Agent sometimes invents unsupported angles': { text: 'AI occasionally suggests off-brand angles — guardrails partially in place', tag: 'needs-verify' },
+  'Shopify product fetch may miss products': { text: 'Some Shopify products may not sync (pagination fix applied, needs verify)', tag: 'needs-verify' },
+  'Chat doesn\'t render ad images inline': { text: 'Ad images not displaying inline in chat messages' },
+  'No Supabase Realtime subscriptions': { text: 'Task board requires manual refresh to see updates' },
+  'Worker service deployed but not doing scheduled work': { text: 'Background worker running but no scheduled jobs yet' },
+  'offer endpoints still use global': { text: 'Some data queries may bypass user permissions — fix in progress' },
+  'Ad blocker blocks': { text: 'Ad blockers may interfere with some API calls — workaround applied' },
+  'Loop sync rate limited': { text: 'Loop subscription sync can be slow with large accounts' },
+  'offer_metrics_daily only populated on import': { text: 'Offer performance metrics not auto-updating daily from Meta yet' },
 };
 
 const NEXT_ITEMS = [
-  { text: 'Wire Team page to real performance data', priority: 1 },
-  { text: 'Make Approve/Reject buttons work on task cards', priority: 2 },
-  { text: 'Test full flow: Chat → generate ads → view in Cockpit → approve', priority: 3 },
-  { text: 'Live task updates without refreshing the page', priority: 4 },
-  { text: 'Build remaining AI team SOPs (landing pages, email, monitoring)', priority: 5 },
-  { text: 'Auto-generate Brand Brain from Shopify store data', priority: 6 },
-  { text: 'Deploy background task runner for scheduled work', priority: 7 },
-  { text: 'Daily ad metrics sync from Meta Ads', priority: 8 },
-  { text: '"While you were gone" — catch-up summary when you log in', priority: 9 },
+  { text: 'Ad Launch Pipeline — approve batch → auto-push to Meta Ads Manager', priority: 1 },
+  { text: 'Wire Planner approval buttons to backend approve/reject endpoints', priority: 2 },
+  { text: 'Watcher Agent — daily monitoring, kill losers, scale winners', priority: 3 },
+  { text: 'Background Autonomy — agent creates its own daily/weekly tasks', priority: 4 },
+  { text: 'Agent reads past performance data before generating new ads', priority: 5 },
+  { text: 'User feedback on ads (thumbs up/down) informs future batches', priority: 6 },
+  { text: 'Autonomy level controls (Supervised → Full Auto)', priority: 7 },
+  { text: '"While you were gone" summary of agent actions', priority: 8 },
+  { text: 'Guided onboarding flow (9 steps)', priority: 9 },
 ];
 
 function render(data) {
