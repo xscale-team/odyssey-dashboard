@@ -139,17 +139,64 @@ Agent creates its own work without being asked.
 - [ ] pg_cron or ARQ schedules trigger tasks
 - [ ] All background work shows in Planner as task cards
 
-### Priority 4: Agent Intelligence Improvements
+### Priority 4: Competitor Intelligence System
+Deep competitive research that powers smarter ad creation across all users in a niche.
+
+**Why:** Brands shouldn't test from scratch. They should rebuild what's ALREADY working for competitors, then iterate. This is the unfair advantage.
+
+#### 4a: Competitor Data Infrastructure
+- [ ] **`competitor_brands` table**: brand name, domain, Meta page ID, Ad Library URL, niche, status
+- [ ] **`competitor_ads` table**: ad ID, brand_id, image_url, primary_text, headline, landing_page_url, first_seen, last_seen, days_active, format_detected, awareness_detected
+- [ ] **`competitor_landing_pages` table**: URL, brand_id, screenshot_url, headline, offer_text, pricing, CTA, entry_point_type (direct/quiz/VSL/advertorial)
+- [ ] **`competitor_offers` table**: brand_id, offer_name, pricing, discount, bundles, subscription options, guarantee
+- [ ] **`niche_competitors` table**: niche_id, competitor_brand_id (maps niches to their shared competitor list)
+- [ ] Supabase Storage for ad screenshots and landing page captures
+
+#### 4b: Research Agent (Deep Research per Competitor)
+- [ ] **Full dossier per brand**: Meta Ad Library scrape (all active ads), website scrape (homepage, product pages, about), landing page capture (screenshot + copy extraction), offer structure analysis, pricing strategy, review sentiment
+- [ ] **Ad analysis**: detect format (PC/TEST/UVT/HP/etc), awareness level (TOF/MOF/BOF), angle, hook, CTA
+- [ ] **Landing page analysis**: entry point type, headline, offer stack, social proof, urgency elements
+- [ ] **Trend tracking**: which ads survive 2+ weeks (winners), creative rotation patterns, seasonal changes, new product launches
+- [ ] Agent uses Claude Sonnet 4.6 for analysis, stores structured results in Supabase
+- [ ] Initial niche: **Supplements** with 10+ brands (AG1, Seed, Ritual, LMNT, Bloom Nutrition, Onnit, Momentous, Athletic Greens, Garden of Life, Ancient Nutrition, Thorne, NOW Foods)
+
+#### 4c: Background Competitor Monitoring
+- [ ] **pg_cron triggers ARQ worker weekly**: snapshots each competitor's active ads from Ad Library
+- [ ] **Longevity tracking**: compare snapshots to identify survivors (2+ weeks = winners) and new ads
+- [ ] **On-demand refresh**: user can trigger "Update competitor data" from Settings
+- [ ] **Diff reports**: "3 new ads from AG1 this week, 2 ads killed, 1 running 6+ weeks (winner)"
+
+#### 4d: Niche Libraries (Shared Across Users)
+- [ ] **Global niche library**: we maintain competitor profiles per niche (supplements, skincare, fitness, etc.)
+- [ ] **Auto-suggest**: when user sets their niche to "Supplements", auto-add the 10+ shared competitors
+- [ ] **Per-user private competitors**: users can add their own competitors (visible only to them)
+- [ ] **Settings UI**: manage competitor list (add/remove/refresh), see last updated date per competitor
+- [ ] All users in a niche benefit from shared research (updated weekly)
+
+#### 4e: Data-Driven Batch Creation Walkthrough
+- [ ] **Guided batch creation flow** (replaces current "just hit Launch"):
+  1. Select offer (auto-selects product)
+  2. Choose strategy: **"Based on my winners"** / **"Based on competitor winners"** / **"New angle ideas"**
+  3. Agent auto-plans batch using real data:
+     - "My winners" → pulls best-performing angles/formats from your ad account via ODY naming
+     - "Competitor winners" → pulls longest-running competitor ads, analyzes their angles/hooks/formats
+     - "New angles" → agent proposes fresh ideas informed by both your data and competitor gaps
+  4. Agent presents plan: angles, personas, awareness mix, formats, number of ads, with data backing each decision
+  5. User confirms → generation starts
+- [ ] **Competitor ad picker**: optional gallery where user can pick specific competitor ads as inspiration
+- [ ] Agent references competitor data in copywriter prompt (hooks that work, angles that convert)
+- [ ] All generated ads trace back to their strategy source (competitor inspiration, own winner, new idea)
+
+### Priority 5: Agent Intelligence Improvements
 Make the agent's creative decisions better over time.
 
 - [ ] Agent reads Meta performance data BEFORE creating ads (already partially done)
 - [ ] Agent parses ad names using naming convention to correlate angle/format/hook with CPA
 - [ ] Agent asks user to verify decisions at key points (product selection, angle choice)
 - [ ] User feedback on generated ads (thumbs up/down) → stored → informs future batches
-- [ ] Competitor ad analysis feeds into creative strategy
 - [ ] Performance-based prompt: "Last batch's Problem Callout got 1.2x ROAS, try Ingredient Breakdown this time"
 
-### Priority 5: Planner & Approval UX
+### Priority 6: Planner & Approval UX
 Make the task management and approval flow smooth.
 
 - [ ] Wire approve/reject buttons to backend endpoints
@@ -244,6 +291,15 @@ Build the week before opening signups.
   - Cockpit: batch grouping, approve all, launch modal with ad set search
   - Asset card: wired "Push to Meta" button, format/awareness badges
   - Offer detail: approve all, launch button, published ads with Meta links
+
+### 2026-03-23 (Session 7) — Ad Launch Pipeline + Copywriter + Competitor Planning
+- **Ad Launch Pipeline**: Full end-to-end working. Approve batch → select ad set → push to Meta as PAUSED
+- **Sonnet 4.6 Copywriter**: Generates 5 primary text + 5 headline variations per ad at launch time. Tailored to angle/persona/awareness/format. No em dashes.
+- **CBO Detection**: Auto-detects Campaign Budget Optimization, hides budget field, skips ad set budget
+- **New Batch / Add to Batch**: Toggle in launch modal. New creates ad set, Add puts ads in existing ODY batch
+- **Planner UI**: Decline All button, TOF/MOF/BOF awareness badges on batch cards, expanded review with large images + format badges + copy preview, click-to-zoom modal with full ad details
+- **Meta API Learnings**: No nested subqueries, no filtering param, simple fields+limit only, filter in Python
+- **Competitor Intelligence System**: Fully scoped and added to roadmap as Priority 4. Deep research per competitor, shared niche libraries, weekly auto-monitoring, data-driven batch creation walkthrough
 
 ### 2026-03-23 (Sessions 5-6) — MASSIVE session
 - **Ad System**: Replaced Pillow with Gemini AI (full composition, product images, 10 formats)
