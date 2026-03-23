@@ -338,20 +338,21 @@ const REFRESH_INTERVAL = isGitHubPages ? 30000 : 3000;
 
 // === Simplified feature map ===
 // Maps technical roadmap items → user-friendly feature descriptions
+const LIVE_URL = 'https://demo.runodyssey.io';
 const FEATURE_MAP = {
   live: [
-    { name: 'Autonomous AI Agent System', desc: 'A full agentic AI loop running inside a secure cloud VM (E2B Sandbox). The agent thinks, decides which tools to use, executes them, and responds — just like a real employee.', emoji: '🤖' },
-    { name: '11-Member AI Marketing Team', desc: 'One powerful AI presenting as 11 specialists — Strategist, Writer, Designer, Media Buyer, Email Expert, and more. Each has trained SOPs (skill files) defining exactly how they work.', emoji: '👥' },
-    { name: 'Live Chat with Agent Activity', desc: 'Talk to your AI team in real-time. Watch which team member is working, what tools they\'re using, and see results stream in live — like looking over their shoulder.', emoji: '💬' },
-    { name: 'Ad Creative Generation (10 Formats)', desc: 'AI generates professional ad images using Pillow — Problem Callout, Testimonial, Hero Product, Us vs Them, Ingredient Breakdown, Lifestyle, Advertorial, Before/After, Meme, and Offer formats.', emoji: '🎨' },
+    { name: 'Autonomous AI Agent System', desc: 'A full agentic AI loop running inside a secure cloud VM (E2B Sandbox). The agent thinks, decides which tools to use, executes them, and responds — just like a real employee.', emoji: '🤖', link: LIVE_URL + '/chat' },
+    { name: '11-Member AI Marketing Team', desc: 'One powerful AI presenting as 11 specialists — Strategist, Writer, Designer, Media Buyer, Email Expert, and more. Each has trained SOPs (skill files) defining exactly how they work.', emoji: '👥', link: LIVE_URL + '/team' },
+    { name: 'Live Chat with Agent Activity', desc: 'Talk to your AI team in real-time. Watch which team member is working, what tools they\'re using, and see results stream in live — like looking over their shoulder.', emoji: '💬', link: LIVE_URL + '/chat' },
+    { name: 'Ad Creative Generation (10 Formats)', desc: 'AI generates professional ad images using Pillow — Problem Callout, Testimonial, Hero Product, Us vs Them, Ingredient Breakdown, Lifestyle, Advertorial, Before/After, Meme, and Offer formats.', emoji: '🎨', link: LIVE_URL + '/chat' },
     { name: 'Shopify Integration', desc: 'Full OAuth connection to your Shopify store. Products, images, pricing, orders, and revenue data all pulled automatically and used by the AI team.', emoji: '🛍️' },
     { name: 'Meta Ads Integration', desc: 'OAuth connection to Meta Business. Pull all campaign, ad set, and ad-level performance data — CPA, ROAS, CTR, spend.', emoji: '📱' },
-    { name: 'Asset Cockpit', desc: 'Central hub for all AI-generated content — ads, copy, emails, landing pages. View, approve, reject, and manage everything from one dashboard.', emoji: '📦' },
-    { name: 'Task Planner (Kanban Board)', desc: 'Visual task board showing what the AI is working on. Queued, running, and completed tasks with live progress during execution.', emoji: '📋' },
-    { name: 'Offer Management System', desc: 'Create and manage Offers — the atomic unit. Every ad, campaign, landing page, and metric traces back to an offer. This is how the AI thinks about your business.', emoji: '🎯' },
+    { name: 'Asset Cockpit', desc: 'Central hub for all AI-generated content — ads, copy, emails, landing pages. View, approve, reject, and manage everything from one dashboard.', emoji: '📦', link: LIVE_URL + '/planner' },
+    { name: 'Task Planner (Kanban Board)', desc: 'Visual task board showing what the AI is working on. Queued, running, and completed tasks with live progress during execution.', emoji: '📋', link: LIVE_URL + '/planner' },
+    { name: 'Offer Management System', desc: 'Create and manage Offers — the atomic unit. Every ad, campaign, landing page, and metric traces back to an offer. This is how the AI thinks about your business.', emoji: '🎯', link: LIVE_URL + '/offers' },
     { name: 'Image Upload & Storage', desc: 'Generated ad images automatically uploaded to cloud storage (Supabase). Persistent URLs that work across sessions — ads don\'t disappear.', emoji: '☁️' },
     { name: 'ODY Naming Convention', desc: 'Every campaign, ad set, and ad follows a structured naming system (ODY-1.1, ODY-2.3) so the AI can track performance by angle, persona, format, and awareness level.', emoji: '🏷️' },
-    { name: 'Secure Auth & Accounts', desc: 'Full signup/login flow with JWT tokens, session management, and row-level security — every user only sees their own data.', emoji: '🔐' },
+    { name: 'Secure Auth & Accounts', desc: 'Full signup/login flow with JWT tokens, session management, and row-level security — every user only sees their own data.', emoji: '🔐', link: LIVE_URL },
     { name: 'Auto-Deploy Pipeline', desc: 'Code pushes auto-deploy: frontend to Cloudflare Pages, backend to Railway. Zero-downtime continuous delivery.', emoji: '🚀' },
   ],
   building: [
@@ -491,6 +492,7 @@ function render(data) {
         <span class="badge live"><span class="dot"></span>Live</span>
       </div>
       <div class="feature-desc">${esc(f.desc)}</div>
+      ${f.link ? `<a href="${f.link}" target="_blank" style="display:inline-block;margin-top:10px;font-size:12px;color:var(--green);text-decoration:none;font-weight:600;">View Live &rarr;</a>` : ''}
     </div>
   `).join('');
 
@@ -502,6 +504,7 @@ function render(data) {
         <span class="badge building"><span class="dot"></span>Building</span>
       </div>
       <div class="feature-desc">${esc(f.desc)}</div>
+      ${f.link ? `<a href="${f.link}" target="_blank" style="display:inline-block;margin-top:10px;font-size:12px;color:var(--blue);text-decoration:none;font-weight:600;">View Live &rarr;</a>` : ''}
     </div>
   `).join('');
 
