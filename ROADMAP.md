@@ -216,14 +216,19 @@ Reviewer agent that checks ad quality before presenting to user.
 - [ ] Weak ads auto-regenerated before presenting
 - [ ] Quality score shown on each ad card
 
-### Priority 3: Self-Improving Prompts
+### Priority 3: Self-Improving Prompts ✅ DONE
 Agent learns from real performance data over time.
 
-- [ ] After campaign sync, extract insights from Meta performance
-- [ ] Correlate ad names (ODY naming convention) with CPA/ROAS/CTR
-- [ ] Auto-update learnings.md: "Energy angle averaged 2.1% CTR vs 1.5% benchmark"
-- [ ] Performance-based prompt injection: "Last batch's Problem Callout got 1.2x ROAS"
-- [ ] Track which angles/formats/personas produce best results per brand
+- [x] After campaign sync, extract insights from Meta performance
+- [x] Correlate ad names (ODY naming convention) with CPA/ROAS/CTR
+- [x] `performance_insights` table: stores angle/format/persona/awareness winners + losers
+- [x] Performance-based prompt injection: agent reads insights before every generation
+- [x] Track which angles/formats/personas produce best results per brand
+- [x] `POST /api/integrations/meta/sync-insights` — on-demand refresh
+- [x] `GET /api/integrations/meta/insights` — view stored insights
+- [x] `POST /api/watcher/cron/sync-insights` — weekly cron for all users
+- [x] `performance_sync` background task type in worker
+- [x] DB migration: `012_performance_insights.sql` (run in Supabase dashboard)
 
 ### Priority 4: Competitive Response Alerts
 Automated insights from weekly competitor scrapes.
@@ -341,6 +346,7 @@ Build the week before opening signups.
 | weekly-competitor-ad-scrape | Monday 6 AM UTC | Scrapes Ad Library for all competitor brands |
 | weekly-classify-competitor-ads | Monday 8 AM UTC | Classifies new unclassified ads with Sonnet |
 | daily-watcher-health-check | Daily 8 AM UTC | Pulls metrics, kills losers, scales winners for all users |
+| weekly-performance-sync | Monday 10 AM UTC | Syncs performance insights (angle/format/persona winners) for all users |
 
 ---
 
@@ -379,6 +385,17 @@ Build the week before opening signups.
 - **Planner**: 3-column Kanban, batch cards, compact Done column
 - **Chat**: Titles, timestamps, grouping, delete, overloaded retry
 - **Entry Points**: Auto-detect from Meta, sync button, active filtering
+
+### 2026-03-25 (Session 12)
+- **Self-Improving Prompts** (Priority 3 complete): Performance learner pulls Meta Ads data, parses ODY naming conventions, and stores learned patterns in `performance_insights` table.
+- **Performance Insights DB**: `012_performance_insights.sql` migration with `upsert_performance_insight` and `clear_performance_insights` SECURITY DEFINER RPCs.
+- **Performance Learner**: `backend/app/integrations/meta/performance_learner.py` — fetches 30-day metrics for all ODY-named ad sets/ads, groups by angle/persona/format/awareness, classifies tiers (winner/average/loser), stores in DB.
+- **Agent Context Injection**: `_build_business_context()` in executor.py now calls `get_performance_context()` and injects PERFORMANCE INSIGHTS section into every agent system prompt. Agent sees which angles are winning, which formats drive CTR, which personas convert best.
+- **Endpoints**: `POST /api/integrations/meta/sync-insights` (on-demand) + `GET /api/integrations/meta/insights` (view stored).
+- **Weekly Cron**: `POST /api/watcher/cron/sync-insights` runs for all Meta-connected users.
+- **Background Worker**: `performance_sync` task type added to task_processor.py.
+- TypeScript: tsc -b passes clean.
+- DB migration: `012_performance_insights.sql` (run manually in Supabase dashboard).
 
 ### 2026-03-25 (Session 11)
 - **Watcher Agent**: Full kill/scale/monitor engine. 5 kill rules + 2 scale rules + fatigue detection. 4 autonomy levels (supervised/guided/autonomous/full_auto). User preferences stored in new `user_preferences` table. Daily health checks via `/api/watcher/cron`. Background worker handles `health_check` task type. DB: `watcher_reports` + `watcher_actions` tables with SECURITY DEFINER RPCs.
