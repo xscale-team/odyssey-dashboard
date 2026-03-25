@@ -230,14 +230,16 @@ Agent learns from real performance data over time.
 - [x] `performance_sync` background task type in worker
 - [x] DB migration: `012_performance_insights.sql` (run in Supabase dashboard)
 
-### Priority 4: Competitive Response Alerts
+### Priority 4: Competitive Response Alerts ✅ DONE
 Automated insights from weekly competitor scrapes.
 
-- [ ] Compare each week's scrape against previous week
-- [ ] Detect: new ads launched, ads killed, format shifts, angle changes
-- [ ] Auto-generate alerts: "AG1 launched 5 new Ingredient Breakdown ads"
-- [ ] Suggest responses: "Your competitors are shifting to IB format. Consider testing it."
-- [ ] Show in Planner as "Intel Update" task cards
+- [x] Compare each week's scrape against previous week (diff_engine.py)
+- [x] Detect: new ads launched, ads killed, format shifts, angle changes
+- [x] Auto-generate alerts: "AG1 launched 5 new Ingredient Breakdown ads"
+- [x] Suggest responses: "Your competitors are shifting to IB format. Consider testing it."
+- [x] Show in Intel tab as collapsible "Intel Update" banner
+- [x] Weekly cron: Monday 10 AM UTC (after scrape at 6am, classify at 8am)
+- [x] DB migration: 013_competitor_diff_reports.sql (run in Supabase dashboard)
 
 ### Priority 5: Background Autonomy
 Agent creates its own work without being asked.
@@ -246,7 +248,7 @@ Agent creates its own work without being asked.
 - [ ] **Weekly batch planning**: draft strategy for user to approve
 - [x] **Weekly competitor scan**: pg_cron auto-scrapes Ad Library
 - [x] **Auto-classify**: new ads classified after each scrape
-- [ ] **Diff reports**: new ads, killed ads, winners per competitor
+- [x] **Diff reports**: new ads, killed ads, format/angle shifts per week
 - [ ] All background work shows in Planner as task cards
 
 ### Priority 6: Agent Intelligence Improvements
@@ -347,6 +349,7 @@ Build the week before opening signups.
 | weekly-classify-competitor-ads | Monday 8 AM UTC | Classifies new unclassified ads with Sonnet |
 | daily-watcher-health-check | Daily 8 AM UTC | Pulls metrics, kills losers, scales winners for all users |
 | weekly-performance-sync | Monday 10 AM UTC | Syncs performance insights (angle/format/persona winners) for all users |
+| weekly-competitor-diff-report | Monday 10 AM UTC | Generates diff report: new ads, killed ads, format/angle shifts per niche |
 
 ---
 
@@ -385,6 +388,15 @@ Build the week before opening signups.
 - **Planner**: 3-column Kanban, batch cards, compact Done column
 - **Chat**: Titles, timestamps, grouping, delete, overloaded retry
 - **Entry Points**: Auto-detect from Meta, sync button, active filtering
+
+### 2026-03-25 (Session 13)
+- **Competitive Response Alerts** (Priority 4 complete): Weekly diff engine compares current competitor ad state vs previous weekly snapshot.
+- **diff_engine.py**: Detects new ads launched, ads killed, format shifts (rising/falling), angle changes per brand. Generates markdown narrative and actionable suggested responses.
+- **Migration 013**: `competitor_diff_reports` table + `upsert_competitor_diff_report` + `upsert_competitor_snapshot` SECURITY DEFINER RPCs. pg_cron job Monday 10 AM UTC.
+- **API**: `GET /api/competitors/diffs`, `GET /api/competitors/diffs/latest`, `POST /api/competitors/diffs/generate` (on-demand), `POST /api/competitors/cron/generate-diffs` (cron-key).
+- **Intel Page**: Collapsible "Intel Update" banner at top of page. Shows brand activity (new/killed per brand), format shift cards (green up / red down), rising angle pills, high-priority action items, and suggested ad responses.
+- TypeScript: tsc -b passes clean.
+- DB migration: `013_competitor_diff_reports.sql` (run manually in Supabase dashboard).
 
 ### 2026-03-25 (Session 12)
 - **Self-Improving Prompts** (Priority 3 complete): Performance learner pulls Meta Ads data, parses ODY naming conventions, and stores learned patterns in `performance_insights` table.
