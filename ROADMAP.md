@@ -1,6 +1,6 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-03-25 (Session 10)**
+> **Last updated: 2026-03-25 (Session 14)**
 > Goal-driven, not timeline-driven. Ship MVP when ad generation, launch, monitoring pipeline is bulletproof.
 
 ---
@@ -42,7 +42,7 @@ The MVP is ready when a user can:
 | Settings Redesign | ✅ Done | Sidebar nav (Billing/Integrations/Competitors/Account) |
 | Watcher (Kill/Scale) | ✅ Done | Kill/scale/fatigue rules, 4 autonomy levels, cron |
 | Background Autonomy | 🟡 Partial | Weekly competitor scrape + classify auto-scheduled |
-| Onboarding Flow | ⬜ Not Started | After features complete |
+| Onboarding Flow | ✅ Done | 6-step wizard, persisted progress, OAuth detection |
 
 ---
 
@@ -241,7 +241,46 @@ Automated insights from weekly competitor scrapes.
 - [x] Weekly cron: Monday 10 AM UTC (after scrape at 6am, classify at 8am)
 - [x] DB migration: 013_competitor_diff_reports.sql (run in Supabase dashboard)
 
-### Priority 5: Background Autonomy
+### Priority 5: Landing Page Scan Before Ad Generation ✅ DONE
+
+- [x] `landing_page_scanner.py`: fetches URL with httpx, parses HTML with stdlib html.parser
+- [x] Extracts: headline (h1), subheadlines (h2), meta description, CTA texts, key phrases, price signals
+- [x] Cache: `landing_page_cache` table (URL-unique, 7-day TTL, service-role upsert)
+- [x] `014_landing_page_cache.sql`: table + RLS + cleanup function
+- [x] `_build_business_context()` injects LANDING PAGE INTELLIGENCE section for each active offer
+- [x] Agent sees exact page headlines, CTAs, and brand vocabulary before generating ads
+- [x] Only cache successful scans; failed scans (timeout, 403) retry next time
+
+### Priority 6: Ad Visual Diversity Improvement ✅ DONE
+
+- [x] Replaced basic launched-ad summary with full Creative Diversity Report
+- [x] Pulls last 25 ads (all statuses: published + draft/approved) for comprehensive picture
+- [x] Counts format/color_scheme/funnel/awareness per attribute using Counter
+- [x] Classifies as OVERUSED (>45% of batch) and surfaces UNTESTED attributes
+- [x] Checks funnel distribution imbalance (heavy TOF or BOF)
+- [x] Blocks last 6 headlines from being reused verbatim
+- [x] Generates specific DIVERSITY DIRECTIVE per batch ("avoid dark; try clinical")
+- [x] Agent explicitly told which formats/colors to avoid vs. try
+
+### Priority 7: Onboarding Flow ✅ DONE
+
+- [x] `015_onboarding.sql`: adds onboarding columns to profiles, complete_onboarding_step() RPC (state machine), get_onboarding_state() RPC
+- [x] `GET /api/auth/onboarding` + `POST /api/auth/onboarding/complete-step` endpoints
+- [x] `/me` endpoint derives onboarding_completed from legacy boolean OR new completed_at
+- [x] `frontend/src/pages/onboarding.tsx`: 6-step wizard with progress bar
+  - Step 1: Welcome (team grid + Three Pillars intro)
+  - Step 2: Connect Shopify (OAuth or skip, auto-detects if already connected)
+  - Step 3: Connect Meta Ads (OAuth or skip, auto-detects)
+  - Step 4: Create first offer (name + landing page URL)
+  - Step 5: Competitor intelligence (shows tracked brands, info screen)
+  - Step 6: Set autonomy level (saves to watcher preferences)
+- [x] Progress persisted to backend after each step (resumes on reload)
+- [x] All steps skippable (user never gets stuck)
+- [x] auth-guard.tsx: redirects unonboarded users to /onboarding
+- [x] App.tsx: /onboarding route registered
+- [x] Supabase migrations: `014_landing_page_cache.sql` + `015_onboarding.sql` (run manually)
+
+### Priority 5 (original): Background Autonomy
 Agent creates its own work without being asked.
 
 - [ ] **Daily health check**: auto-created task every morning
@@ -301,7 +340,7 @@ Build the week before opening signups.
 - [ ] No per-user token spending cap per action (agent could burn all credits in one run)
 - [ ] Agent sometimes picks paused EPs if brand brain has old data (cleanup on boot helps but not 100%)
 - [ ] "make me AN ad" sometimes still generates 3 (prompt parsing not perfect)
-- [ ] Agent should scan landing page content before generating ads (not yet implemented)
+- [x] Agent scans landing page content before generating ads (Priority 5 done)
 - [ ] Performance page is placeholder (coming soon)
 
 ### Fixed This Session
@@ -388,6 +427,12 @@ Build the week before opening signups.
 - **Planner**: 3-column Kanban, batch cards, compact Done column
 - **Chat**: Titles, timestamps, grouping, delete, overloaded retry
 - **Entry Points**: Auto-detect from Meta, sync button, active filtering
+
+### 2026-03-25 (Session 14)
+- **Priority 5 (Landing Page Scan)**: `landing_page_scanner.py` — stdlib html.parser, no new deps. Extracts headline/subheadlines/CTAs/key-phrases/prices. `landing_page_cache` table with 7-day TTL. `_build_business_context()` injects "LANDING PAGE INTELLIGENCE" section for each active offer. Agent now sees exact page copy before generating ads. Migration `014_landing_page_cache.sql`.
+- **Priority 6 (Visual Diversity)**: Full Creative Diversity Report replaces basic launched-ad summary. Analyses last 25 ads, counts format/color_scheme/funnel/awareness. Labels OVERUSED (>45%) and UNTESTED. Checks TOF/BOF imbalance. Blocks last 6 headlines. Generates specific per-batch DIVERSITY DIRECTIVE.
+- **Priority 7 (Onboarding)**: 6-step guided wizard. Backend: `complete_onboarding_step()` RPC state machine, onboarding columns on profiles, two API endpoints. Frontend: beautiful wizard with progress bar, OAuth detection (Shopify/Meta), offer creation, competitor info, autonomy level picker. Progress persisted; all steps skippable. `auth-guard` redirects new users to onboarding. Migrations `014` + `015` ready to run in Supabase dashboard.
+- TypeScript: tsc -b passes clean on all three.
 
 ### 2026-03-25 (Session 13)
 - **Competitive Response Alerts** (Priority 4 complete): Weekly diff engine compares current competitor ad state vs previous weekly snapshot.
