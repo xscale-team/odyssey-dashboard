@@ -1,6 +1,6 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-03-25 (Session 9)**
+> **Last updated: 2026-03-25 (Session 10)**
 > Goal-driven, not timeline-driven. Ship MVP when ad generation, launch, monitoring pipeline is bulletproof.
 
 ---
@@ -275,19 +275,29 @@ Build the week before opening signups.
 
 ## Known Bugs & Technical Debt
 
-- [ ] Agent still generates similar ads across batches (diversity needs improvement)
+### Active Issues
+- [ ] Agent ad diversity still needs work (visual variety, not just angle variety)
 - [ ] Agent doesn't analyze competitor ad IMAGES visually (only text/metadata)
-- [ ] Chat doesn't render ad images inline in messages
-- [ ] No Supabase Realtime subscriptions (polling only)
-- [ ] offer_metrics_daily only populated on import, not updated daily from Meta
+- [ ] Chat doesn't render ad images inline in messages (shows in terminal only)
+- [ ] No Supabase Realtime subscriptions (polling only, 10-30s intervals)
+- [ ] offer_metrics_daily only populated on import, not auto-updated from Meta
 - [ ] Facebook CDN image URLs in old generated_assets have expired
 - [ ] Competitor scraper: Garden of Life + Transparent Labs return 0 ads
-- [ ] Loop sync rate limited at 10 req/sec, needs exponential backoff
-- [ ] "New Chat" titles not always auto-naming on first message
 - [ ] Sandbox max_steps=10 may be insufficient for complex workflows (should be 16-20)
-- [ ] No per-user token quota enforcement (agent can burn all credits in one run)
-- [ ] Meta API rate limits hit frequently during testing (need caching/backoff)
-- [ ] Entry point sync makes too many individual API calls (hits Meta rate limit)
+- [ ] No per-user token spending cap per action (agent could burn all credits in one run)
+- [ ] Agent sometimes picks paused EPs if brand brain has old data (cleanup on boot helps but not 100%)
+- [ ] "make me AN ad" sometimes still generates 3 (prompt parsing not perfect)
+- [ ] Agent should scan landing page content before generating ads (not yet implemented)
+- [ ] Performance page is placeholder (coming soon)
+
+### Fixed This Session
+- [x] Chat titles not auto-naming (fixed: now names all messages)
+- [x] Simple questions spinning up E2B sandbox (fixed: smart routing)
+- [x] No thinking indicator in chat (fixed: pulsing dots)
+- [x] Meta API rate limits on EP sync (fixed: 5-min cache)
+- [x] Entry point sync unreliable (fixed: effective_status + auto-sync before ad gen)
+- [x] Agent forced to rotate angles (fixed: keeps winners, varies creatives)
+- [x] Empty conversations cluttering sidebar (fixed: auto-cleanup after 5 min)
 
 ---
 
@@ -352,7 +362,7 @@ Build the week before opening signups.
 - Niche Analytics: angles, formats, hooks, winner scoring
 - Auto-schedule: pg_cron weekly scrape + classify
 
-### 2026-03-25 (Session 9) -- BIGGEST SESSION
+### 2026-03-25 (Session 9)
 - **Billing**: Full Stripe integration, PAYG tokens, 5x markup, volume bonuses
 - **Security Audit**: 4 agents audited entire codebase, 20 issues found and fixed
 - **Navigation**: Consolidated to Chat + Planner with sidebar sub-sections
@@ -361,12 +371,24 @@ Build the week before opening signups.
 - **Planner**: 3-column Kanban, batch cards, compact Done column
 - **Chat**: Titles, timestamps, grouping, delete, overloaded retry
 - **Entry Points**: Auto-detect from Meta, sync button, active filtering
-- **Design Research**: Scanned Linear, Vercel, Cursor, Superhuman, Raycast, Notion for UX patterns
-- **Database**: Missing Shopify tables, column fixes, performance indexes
-- **Frontend**: Hardcoded ID fix, reload removal, memoization, accessibility
-- Key learning: Stripe live keys work on Railway. Webhook signature verification confirmed.
-- Key learning: Meta API rate limits last 5-15 min. Need caching strategy.
-- Key learning: Settings page needs sidebar nav for scalability, not single scroll.
+
+### 2026-03-25 (Session 10) -- CURRENT SESSION
+- **Smart Chat Routing**: Simple questions (ROAS, strategy) use fast Sonnet 4.6 path (~3-5s) instead of full E2B sandbox (~60s). needs_sandbox() classifier routes appropriately.
+- **Thinking Indicator**: Pulsing "ODY-1 is thinking..." with animated dots shown between send and first response.
+- **Agent Freedom**: Removed forced constraints -- agent now keeps winning angles, allows 1-5 ads per batch, confirms plan before generating, can do multiple enhancement rounds.
+- **Entry Point Intelligence**: Agent auto-syncs from Meta before generating, only uses ACTIVE EPs, confirms which EP to target in chat.
+- **EP Auto-Sync**: Caches Meta API results for 5 min to prevent rate limits. Auto-marks non-active EPs as paused.
+- **Brand Brain Cleanup**: Sandbox boot removes outdated rotation instructions from learnings.md.
+- **Comprehensive UX Testing**: Tested 15+ real ecom owner prompts, identified 32 issues.
+- **6 High-Impact UX Fixes**: Typing indicator, smart routing, auto-naming, empty cleanup, launch buttons, EP caching.
+- **Design Research**: Deep research into Linear, Vercel, Cursor, Superhuman, Raycast, Notion, Figma, Framer -- produced design system brief.
+- **Settings Sidebar Nav**: Billing/Integrations/Competitors/Account sections.
+- **Token Pricing Redesign**: Decoy psychology with gradient borders, BEST VALUE hero card.
+- **Stripe Payment Tested**: Live $1 test payment confirmed working end-to-end.
+- Key learning: Agent needs freedom, not rigid rules. Guidelines > hard constraints.
+- Key learning: Simple questions should NEVER spin up E2B sandbox.
+- Key learning: Brand brain files can override prompt instructions -- need cleanup on boot.
+- Key learning: EP status must come from effective_status (accounts for campaign being off).
 
 ---
 
