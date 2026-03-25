@@ -40,7 +40,7 @@ The MVP is ready when a user can:
 | Security Audit | ✅ Done | 20 issues fixed (sandbox injection, auth leakage, CORS, etc.) |
 | Navigation Redesign | ✅ Done | 2 main tabs (Chat/Planner) + sidebar sub-sections |
 | Settings Redesign | ✅ Done | Sidebar nav (Billing/Integrations/Competitors/Account) |
-| Watcher (Kill/Scale) | ⬜ Not Started | Next priority |
+| Watcher (Kill/Scale) | ✅ Done | Kill/scale/fatigue rules, 4 autonomy levels, cron |
 | Background Autonomy | 🟡 Partial | Weekly competitor scrape + classify auto-scheduled |
 | Onboarding Flow | ⬜ Not Started | After features complete |
 
@@ -178,25 +178,32 @@ The MVP is ready when a user can:
 
 ## What's Next -- Priority Order
 
-### Priority 1: Watcher Agent (Kill/Scale/Monitor)
+### Priority 0: Post-Watcher Deploy Steps (Immediate)
+- [ ] Run `011_watcher_agent.sql` migration in Supabase dashboard
+- [ ] Set `CRON_KEY` env var in Railway (for `/api/watcher/cron` security)
+- [ ] Set up pg_cron or Railway cron: `POST api.runodyssey.io/api/watcher/cron` at 8 AM UTC daily
+
+### Priority 1: Watcher Agent (Kill/Scale/Monitor) ✅ DONE
 Daily monitoring that takes action based on user's autonomy level.
 
-- [ ] **Daily health check job**: scan all active ad sets, pull 7-day metrics
-- [ ] **Kill rules**:
-  - CPA > 2x target after 1000+ impressions + 48 hours, flag/pause
-  - ROAS < 0.5x after 72 hours, flag/pause
-  - CTR < 0.5% after 1000 impressions, flag/pause
-- [ ] **Scale rules**:
-  - ROAS > 2.5x for 72+ hours, suggest 20% budget increase
-  - CPA < 0.7x target for 5+ days, suggest duplication to new audience
-- [ ] **Autonomy levels**:
-  - Supervised: creates approval item for everything
-  - Guided: auto-pause bad ads, asks before scaling
-  - Autonomous: auto-pause + auto-scale within limits, notifies after
-  - Full Auto: all actions automatic, daily summary report
-- [ ] Autonomy level stored in user profile, changeable from settings or chat
-- [ ] Statistical significance: require minimum impressions + time before any action
-- [ ] "While you were gone" summary of all Watcher actions
+- [x] **Daily health check job**: scan all active ad sets, pull 7-day metrics
+- [x] **Kill rules** (5 rules from ad-monitor.md):
+  - Emergency kill: CPA > 3x target in first 48h + $50 spend
+  - CPA death spiral: CPA > 2x target + 1000 impressions + 3 days
+  - Zero conversions: $0 revenue after 3x target CPA spend
+  - CTR floor: CTR < 0.8% + 2000 impressions + 3 days
+- [x] **Scale rules** (2 rules):
+  - Steady winner: ROAS > target for 5+ days + 15 conversions + CPA 20%+ below target
+  - Micro-scale: ROAS > target + 3+ days (10% budget increase)
+- [x] **Fatigue detection**: frequency creep, CTR decline, CPA creep
+- [x] **Autonomy levels**: supervised / guided / autonomous / full_auto
+- [x] Autonomy level stored in `user_preferences` table
+- [x] Statistical significance gates (min $50 spend, min impressions, min days)
+- [x] "While you were gone" shown in Planner Watcher Banner
+- [x] Undo action endpoint (re-activate paused ad sets)
+- [x] Daily cron via `/api/watcher/cron` (pg_cron or Railway cron)
+- [x] Background task processor handles `health_check` task type
+- [x] DB migration: `user_preferences`, `watcher_reports`, `watcher_actions`
 
 ### Priority 2: Post-Generation Quality Check
 Reviewer agent that checks ad quality before presenting to user.
@@ -333,6 +340,7 @@ Build the week before opening signups.
 |-----|----------|--------------|
 | weekly-competitor-ad-scrape | Monday 6 AM UTC | Scrapes Ad Library for all competitor brands |
 | weekly-classify-competitor-ads | Monday 8 AM UTC | Classifies new unclassified ads with Sonnet |
+| daily-watcher-health-check | Daily 8 AM UTC | Pulls metrics, kills losers, scales winners for all users |
 
 ---
 
@@ -372,7 +380,14 @@ Build the week before opening signups.
 - **Chat**: Titles, timestamps, grouping, delete, overloaded retry
 - **Entry Points**: Auto-detect from Meta, sync button, active filtering
 
-### 2026-03-25 (Session 10) -- CURRENT SESSION
+### 2026-03-25 (Session 11)
+- **Watcher Agent**: Full kill/scale/monitor engine. 5 kill rules + 2 scale rules + fatigue detection. 4 autonomy levels (supervised/guided/autonomous/full_auto). User preferences stored in new `user_preferences` table. Daily health checks via `/api/watcher/cron`. Background worker handles `health_check` task type. DB: `watcher_reports` + `watcher_actions` tables with SECURITY DEFINER RPCs.
+- **Watcher Frontend**: Compact WatcherBanner in Planner (always visible). Shows last run time, kills/scales/warnings pill summary. "Run Check" button. Expandable to show full report with rationale per action. Reports auto-load on planner open.
+- **Undo Support**: `/api/watcher/actions/{id}/undo` reverses any kill or scale.
+- TypeScript: tsc -b passes clean.
+- Supabase migration: `011_watcher_agent.sql` (run manually in Supabase dashboard).
+
+### 2026-03-25 (Session 10) -- PREVIOUS SESSION
 - **Smart Chat Routing**: Simple questions (ROAS, strategy) use fast Sonnet 4.6 path (~3-5s) instead of full E2B sandbox (~60s). needs_sandbox() classifier routes appropriately.
 - **Thinking Indicator**: Pulsing "ODY-1 is thinking..." with animated dots shown between send and first response.
 - **Agent Freedom**: Removed forced constraints -- agent now keeps winning angles, allows 1-5 ads per batch, confirms plan before generating, can do multiple enhancement rounds.
