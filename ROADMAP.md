@@ -1,6 +1,6 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-03-26 (Session 15)**
+> **Last updated: 2026-03-26 (Session 16)**
 > Goal-driven, not timeline-driven. Ship MVP when ad generation, launch, monitoring pipeline is bulletproof.
 
 ---
@@ -39,23 +39,32 @@ The MVP is ready when a user can:
 | Intel Dashboard | ✅ Done | Standalone page with angles, formats, hooks, brand cards |
 | Competitive Response Alerts | ✅ Done | Weekly diff reports, Intel page banner |
 | Billing (Stripe) | ✅ Done | PAYG tokens, 5x markup, real cost tracking, Stripe Checkout |
-| Security Audit | ✅ Done | 20 issues fixed + CRON_KEY + webhook signature + RLS bypass |
+| Security Audit | ✅ Done | 20 issues fixed + rate limiting + CRON_KEY + webhook signature + RLS bypass |
 | Navigation Redesign | ✅ Done | 2 main tabs (Chat/Planner) + sidebar sub-sections |
 | Settings Redesign | ✅ Done | Sidebar nav (Billing/Integrations/Competitors/Account) |
 | Watcher (Kill/Scale) | ✅ Done | Kill/scale/fatigue rules, 4 autonomy levels, cron |
-| Self-Improving Prompts | ✅ Done | Meta performance → angle/format winners in context |
+| Self-Improving Prompts | ✅ Done | Meta performance → angle/format/persona winners injected into context |
 | Landing Page Scanner | ✅ Done | 24h cache, headlines/CTAs injected into context |
 | Ad Visual Diversity Engine | ✅ Done | Format/color overuse detection, diversity directive |
 | Onboarding Flow | ✅ Done | 6-step wizard, persisted progress, OAuth detection |
 | Model Toggle (Normal/Pro) | ✅ Done | Sonnet/Opus user-selectable, stored in profiles |
 | Performance Dashboard | ✅ Done | Live Meta metrics page, per-offer breakdown |
 | Account Settings | ✅ Done | Profile editing, password change, notification prefs |
-| Background Autonomy | 🟡 Partial | Weekly competitor scrape + watcher daily — planner task cards not auto-creating |
-| Domain Migration | 🟡 Pending | Code supports tryodyssey.ai, Cloudflare custom domain setup needed |
+| API Rate Limiting | ✅ Done | slowapi: 60/min default, 5/min signup, 10/min login, 3/min password reset |
+| OAuth Onboarding Redirects | ✅ Done | OAuth callbacks redirect to /onboarding or /chat based on profile state |
+| Background Autonomy | 🟡 Partial | Weekly competitor scrape + watcher daily; planner task cards not auto-creating |
+| Domain Migration | 🟡 Pending | Code supports tryodyssey.ai, nameserver swap pending |
 
 ---
 
-## What's Done (Sessions 3-15)
+## What's Done (Sessions 3-16)
+
+### Session 16 (2026-03-26)
+- [x] **OAuth Callback Redirects**: `get_user_redirect_base()` checks onboarding status; Shopify and Meta OAuth callbacks redirect to /onboarding or /chat accordingly.
+- [x] **Frontend Alert Removal**: Replaced all `alert()` calls in sidebar.tsx and settings.tsx with inline toast notifications (5s auto-dismiss).
+- [x] **Onboarding OAuth Notices**: Onboarding page reads URL params (?shopify=connected, ?meta=error) and shows success/error banners. URL cleaned after read.
+- [x] **API Rate Limiting**: `rate_limit.py` module with slowapi. 60/min default, 5/min signup, 10/min login, 3/min forgot-password. Wired into FastAPI app state.
+- [x] **Dependencies**: `slowapi==0.1.9` added to requirements.txt.
 
 ### Session 15 (2026-03-26) — QA Hardening + New Features
 
@@ -165,7 +174,6 @@ The MVP is ready when a user can:
 - [x] Daily cron: 8 AM UTC
 
 ### Sessions 9-10 (2026-03-25)
-
 - [x] **Billing**: Stripe PAYG, 5x markup, volume bonuses, Stripe Checkout
 - [x] **Security Audit**: 20 issues fixed across codebase
 - [x] **Smart Routing**: `needs_sandbox()` for fast path on simple questions
@@ -175,7 +183,6 @@ The MVP is ready when a user can:
 - [x] **Agent Freedom**: Removed forced constraints, keeps winning angles
 
 ### Sessions 3-8 (2026-03-20 to 2026-03-24)
-
 - [x] Full auth flow, Shopify/Meta/Loop OAuth
 - [x] Gemini AI ad generation (replaced Pillow)
 - [x] Ad copywriter (Sonnet 4.6, 5 primary + 5 headline variations)
@@ -187,46 +194,42 @@ The MVP is ready when a user can:
 
 ---
 
-## What's Next — Priority Order
+## What's Next -- Priority Order
 
-### Priority 1: Verify Deployed Fixes (Immediate)
-- [ ] Test ad generation + launch on demo.runodyssey.io with real Meta account
-- [ ] Confirm per-brand competitor data shows in agent context (not entire niche)
-- [ ] Verify Meta routing fix (Normal mode sandbox routing)
-- [ ] Confirm Stripe webhook still processing correctly
+### Priority 1: Deploy Session 16 + Verify (Immediate)
+- [ ] Merge `claude/quirky-poincare` branch to main and push
+- [ ] Verify Railway backend deploys with rate limiting (slowapi)
+- [ ] Verify Cloudflare frontend deploys clean
+- [ ] Full new-user QA test on demo.runodyssey.io (Tests 01, 10, 12)
 
-### Priority 2: Outstanding QA Tests
-- [ ] **Test 01 — New User Onboarding**: Sign up fresh account, go through 6-step wizard, generate first ad
-- [ ] **Test 10 — Watcher Agent**: Let watcher run with real Meta ad data, verify kill/scale decisions
-- [ ] **Test 12 — Speed**: Measure end-to-end latency for chat, ad generation, launch
-
-### Priority 3: Domain Migration
+### Priority 2: Domain Migration (app.tryodyssey.ai)
+- [ ] Nameserver swap (waiting on boss)
 - [ ] Set up `app.tryodyssey.ai` as custom domain in Cloudflare Pages
-- [ ] Verify both `demo.runodyssey.io` and `app.tryodyssey.ai` work after setup
-- [ ] Update CORS allowlist in backend config to include both domains
-- [ ] Test auth flow on new domain
+- [ ] Add redirect URLs to Supabase auth config
+- [ ] Update `FRONTEND_URL` in Railway when ready to make primary
+- [ ] Post-migration verification (see DOMAIN_MIGRATION_CHECKLIST.md)
 
-### Priority 4: Performance Dashboard Completion
-- [ ] Wire per-offer ROAS/CPA/spend charts to live Meta data (currently static)
+### Priority 3: Performance Dashboard Completion
+- [ ] Wire per-offer ROAS/CPA/spend charts to live Meta data
 - [ ] Add time-range selector (7d / 30d / 90d)
 - [ ] Add "vs previous period" comparison
-- [ ] Auto-update `offer_metrics_daily` from Meta (currently only populated on import)
+- [ ] Auto-update `offer_metrics_daily` from Meta (currently only on import)
 
-### Priority 5: Background Autonomy Completion
+### Priority 4: Background Autonomy Completion
 - [ ] Daily health check: auto-create task card in Planner each morning
 - [ ] Weekly batch planning: agent drafts strategy for user to approve
 - [ ] All background work shows in Planner as task cards (not just Watcher banner)
 - [ ] Supabase Realtime: replace planner polling with live subscriptions
 
-### Priority 6: Pre-Launch Polish
-- [ ] Rate limiting: 5 req/min chat, 3 sandbox, 60 everything else
+### Priority 5: Pre-Launch Polish
+- [x] Rate limiting: 60/min default, 5/min signup, 10/min login, 3/min password reset
 - [ ] Mobile responsive pass (currently desktop-only)
 - [ ] Loading skeletons for all async operations
 - [ ] Empty states for all lists/grids
 - [ ] Sandbox max_steps: increase to 16-20 for complex workflows
 - [ ] Per-user token spending cap per action (prevent runaway burns)
 
-### Priority 7: Klaviyo Integration
+### Priority 6: Klaviyo Integration
 - [ ] OAuth connection
 - [ ] Pull flows, sequences, open/click rates
 - [ ] LTV improvements tracked via email engagement
@@ -244,13 +247,22 @@ The MVP is ready when a user can:
 - [ ] Competitor scraper: Garden of Life + Transparent Labs return 0 ads
 - [ ] Sandbox max_steps=10 may be insufficient for complex workflows (should be 16-20)
 - [ ] No per-user token spending cap per action (agent could burn all credits in one run)
-- [ ] Agent sometimes picks paused EPs if brand brain has old data
-- [ ] Performance page charts not fully wired to live data (page exists, API calls needed)
-- [ ] Planner approval buttons not fully connected to backend launch endpoints
-- [ ] Domain migration to app.tryodyssey.ai pending (Cloudflare setup)
-- [ ] Tests 01, 10, 12 from QA plan never run
+- [ ] Agent sometimes picks paused EPs if brand brain has old data (cleanup on boot helps but not 100%)
+- [ ] "make me AN ad" sometimes still generates 3 (prompt parsing not perfect)
+- [ ] Background autonomy: planner task cards not auto-creating from daily checks
 
-### Recently Fixed
+### Fixed (Sessions 15-16)
+- [x] Rate limiting added: 60/min default, 5/min signup, 10/min login, 3/min forgot-password
+- [x] OAuth callbacks are onboarding-aware (redirect to /onboarding or /chat based on profile state)
+- [x] Frontend alert() calls replaced with inline toasts (sidebar: 6, settings: 4)
+- [x] Onboarding page shows OAuth connection notices from URL params
+- [x] Email confirmation screen (Supabase email confirm enabled, code handles both paths)
+- [x] Password reset flow end-to-end (forgot-password -> email -> callback -> reset)
+- [x] Onboarding RPC grants (service role access via SECURITY DEFINER)
+- [x] Env var validation on startup (warns for missing soft-required vars)
+- [x] All 7 DB migrations (011-017) confirmed applied
+- [x] Model toggle (Normal/Pro) working
+- [x] Account settings (profile edit, notification prefs) working
 - [x] RLS blocking backend reads (service-role client)
 - [x] Per-brand competitor data in business context
 - [x] UTF-8 surrogate crash
@@ -259,10 +271,6 @@ The MVP is ready when a user can:
 - [x] API overload no retry logic
 - [x] Normal mode incorrectly bypassing sandbox
 - [x] 13 QA bugs (see Session 15 above)
-- [x] Chat titles not auto-naming
-- [x] Simple questions spinning up E2B sandbox
-- [x] Meta API rate limits on EP sync (5-min cache)
-- [x] Agent forced to rotate angles
 
 ---
 
@@ -369,10 +377,16 @@ The MVP is ready when a user can:
 - **Performance Dashboard**: Live Meta metrics, per-offer breakdown. Was placeholder.
 - **Account Settings**: Profile editing, password change, notification prefs.
 - **RLS bypass**: Service-role Supabase client for backend reads.
-- **13 QA bug fixes**: See Session 15 section in HANDOFF.md for full list.
+- **13 QA bug fixes**: Heartbeat keepalive, per-tab conversation lock, balance display, em dash scrub, Bloom fix, Shopify date filter, watcher banner polling, and more.
 - **Security hardening**: Stripe webhook signature, CRON_KEY enforcement.
 - **Context enrichment**: Full business context in every sandbox run (orders, subs, credits, EPs, competitors, insights, landing pages, diversity report).
-- **Migrations**: 016 (onboarding RPC grants) + 017 (model_preference) — both run.
+- **Migrations**: 016 (onboarding RPC grants) + 017 (model_preference) — both applied.
+
+### 2026-03-26 (Session 16)
+- **API Rate Limiting**: `rate_limit.py` with slowapi. 5/min signup, 10/min login, 3/min forgot-password, 60/min default. Wired into FastAPI app state.
+- **OAuth Onboarding Redirects**: `get_user_redirect_base()` in dependencies.py. Shopify + Meta OAuth callbacks redirect to /onboarding or /chat based on profile state.
+- **Inline Toasts**: All `alert()` calls in sidebar.tsx and settings.tsx replaced with glass-style inline notifications (5s auto-dismiss).
+- **Onboarding OAuth Notices**: Onboarding page handles ?shopify= / ?meta= URL params with success/error banners. URL cleaned after read.
 
 ---
 
