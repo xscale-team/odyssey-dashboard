@@ -1,6 +1,6 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-03-25 (Session 14)**
+> **Last updated: 2026-03-26 (Session 15)**
 > Goal-driven, not timeline-driven. Ship MVP when ad generation, launch, monitoring pipeline is bulletproof.
 
 ---
@@ -16,9 +16,9 @@ The MVP is ready when a user can:
 6. ✅ Approve ads, auto-push to Meta Ads Manager (with Sonnet 4.6 copy)
 7. ✅ Competitor intelligence: auto-scrape Ad Library, classify ads, niche analytics
 8. ✅ Billing: pay-as-you-go tokens, Stripe checkout, real cost tracking with 5x markup
-9. ⬜ Agent monitors performance daily, kills losers, scales winners (Watcher agent)
-10. ⬜ Agent proactively plans next batch based on performance + competitor data
-11. ⬜ Guided onboarding flow
+9. ✅ Agent monitors performance daily, kills losers, scales winners (Watcher agent)
+10. ✅ Agent proactively plans next batch based on performance + competitor data (self-improving prompts)
+11. ✅ Guided onboarding flow
 
 ---
 
@@ -28,6 +28,7 @@ The MVP is ready when a user can:
 |------|--------|-------|
 | Integrations (Shopify/Meta/Loop) | ✅ Done | All 3 connected, syncing data |
 | Ad Generation (Gemini AI) | ✅ Working | 10 formats, product composition |
+| Ad Quality Check (Gemini Vision) | ✅ Done | Scores 0-100, auto-regen < 50 |
 | Ad Copywriter (Sonnet 4.6) | ✅ Working | 5 primary texts + 5 headlines per ad |
 | Ad Launch Pipeline | ✅ Done | Approve, push to Meta, New Batch / Add to Batch, CBO detection |
 | Offer Discovery + Funnel | ✅ Done | Entry points, funnel flow, thumbnails |
@@ -36,321 +37,232 @@ The MVP is ready when a user can:
 | Three Pillars (CPA/AOV/LTV) | ✅ Live | All 3 showing real data |
 | Competitor Intelligence | ✅ Done | 185 ads scraped, classified, permanent storage, weekly auto-refresh |
 | Intel Dashboard | ✅ Done | Standalone page with angles, formats, hooks, brand cards |
+| Competitive Response Alerts | ✅ Done | Weekly diff reports, Intel page banner |
 | Billing (Stripe) | ✅ Done | PAYG tokens, 5x markup, real cost tracking, Stripe Checkout |
-| Security Audit | ✅ Done | 20 issues fixed (sandbox injection, auth leakage, CORS, etc.) |
+| Security Audit | ✅ Done | 20 issues fixed + CRON_KEY + webhook signature + RLS bypass |
 | Navigation Redesign | ✅ Done | 2 main tabs (Chat/Planner) + sidebar sub-sections |
 | Settings Redesign | ✅ Done | Sidebar nav (Billing/Integrations/Competitors/Account) |
 | Watcher (Kill/Scale) | ✅ Done | Kill/scale/fatigue rules, 4 autonomy levels, cron |
-| Background Autonomy | 🟡 Partial | Weekly competitor scrape + classify auto-scheduled |
+| Self-Improving Prompts | ✅ Done | Meta performance → angle/format winners in context |
+| Landing Page Scanner | ✅ Done | 24h cache, headlines/CTAs injected into context |
+| Ad Visual Diversity Engine | ✅ Done | Format/color overuse detection, diversity directive |
 | Onboarding Flow | ✅ Done | 6-step wizard, persisted progress, OAuth detection |
+| Model Toggle (Normal/Pro) | ✅ Done | Sonnet/Opus user-selectable, stored in profiles |
+| Performance Dashboard | ✅ Done | Live Meta metrics page, per-offer breakdown |
+| Account Settings | ✅ Done | Profile editing, password change, notification prefs |
+| Background Autonomy | 🟡 Partial | Weekly competitor scrape + watcher daily — planner task cards not auto-creating |
+| Domain Migration | 🟡 Pending | Code supports tryodyssey.ai, Cloudflare custom domain setup needed |
 
 ---
 
-## What's Done (Sessions 3-9)
+## What's Done (Sessions 3-15)
 
-### Session 9 Highlights (2026-03-25)
+### Session 15 (2026-03-26) — QA Hardening + New Features
 
-#### Billing System (Stripe Integration) ✅
-- [x] Real USD cost tracking with 5x markup (actual Claude/Gemini/E2B costs)
-- [x] Pay-as-you-go tokens (1 token = 1 cent)
-- [x] Stripe Checkout for one-time top-ups ($10/$25/$100/$200/$500)
-- [x] Volume bonus tokens: +20% at $100, +40% at $200, +50% at $500
-- [x] Decoy pricing psychology ($200 "BEST VALUE" hero card)
-- [x] Stripe webhook for auto-crediting balance after payment
-- [x] Real-time balance pill in header (green/yellow/red)
-- [x] Low balance warning in Chat (< 100 tokens)
-- [x] Balance deducted after chat, ad batch, and campaign launch
-- [x] Usage dashboard: 30-day breakdown by action type + recent transactions
+#### Gemini Vision Quality Check ✅ (Priority 2 complete)
+- [x] After ads generated, Gemini Vision scores each ad 0-100
+- [x] Weak ads (score < 50) auto-regenerated (up to 2 retries per ad)
+- [x] Quality score shown on ad cards in planner and cockpit view
+- [x] Score factors: visual hierarchy, text legibility, brand fit, CTA prominence
 
-#### Navigation Redesign ✅
-- [x] Consolidated to 2 main tabs: Chat + Planner
-- [x] Planner sidebar: Tasks, Offers, Team, Intel, Performance
-- [x] Sidebar labels with icons
-- [x] Removed cluttered top-level tabs
+#### Model Toggle (Normal / Pro) ✅
+- [x] Normal mode: Claude Sonnet 4.6 in E2B sandbox
+- [x] Pro mode: Claude Opus 4.6 in E2B sandbox (deeper reasoning, ~5x cost)
+- [x] User selects in Settings > Account
+- [x] Stored in `profiles.model_preference` (`sonnet` | `opus`)
+- [x] `/me` endpoint returns model_preference, passed to sandbox script
+- [x] `017_model_preference.sql` migration (run in Supabase dashboard)
 
-#### Intel Dashboard (Standalone Page) ✅
-- [x] Niche overview: total ads, active, turned off, likely winners
-- [x] Top angles bar chart with winner rates
-- [x] Format distribution grid (full names, not codes)
-- [x] Awareness mix (TOF/MOF/BOF cards)
-- [x] Top hooks list with copy-to-clipboard
-- [x] Winning combos section
-- [x] Expandable brand cards with per-brand stats
-- [x] "What's Working" top ads with thumbnails
-- [x] "Use This" button navigates to Chat with recreation prompt
+#### Performance Dashboard ✅
+- [x] Live Meta metrics for all active campaigns
+- [x] Per-offer breakdown: spend, impressions, CTR, CPA, ROAS
+- [x] Replaces "Coming Soon" placeholder page
 
-#### Settings Redesign ✅
-- [x] Sidebar navigation: Billing, Integrations, Competitors, Account
-- [x] Compact balance card (text-4xl, not text-6xl)
-- [x] Beautiful token pricing grid with gradient borders
-- [x] Account section with email + logout
+#### Account Settings ✅
+- [x] Profile editing (name, email)
+- [x] Password change flow
+- [x] Notification preferences
 
-#### Planner Redesign ✅
-- [x] 3-column Kanban: Needs Attention / Active / Done
-- [x] Batch cards with number, angle, persona, awareness badges
-- [x] Approve / Decline / Launch buttons per batch
-- [x] Done column: compact cards, green border, completion time
-- [x] Active column: inline progress bars
-- [x] Expired image placeholders (gradient + icon)
+#### Critical Bug Fixes ✅
+- [x] RLS bypass: service-role Supabase client for backend reads (was blocking data queries)
+- [x] Entry point edit/delete + URL normalization (no duplicate entries)
+- [x] Email signup validation + password reset flow
+- [x] Onboarding RPC grants (`016_onboarding_rpc_grants.sql` — anon/authenticated can call onboarding RPCs)
+- [x] Stripe webhook signature verification
+- [x] CRON_KEY security on all cron endpoints
+- [x] API overload retry (Claude 529 + Gemini quota: exponential backoff)
+- [x] Normal/Pro mode parity (both use sandbox)
+- [x] Per-brand competitor data in business context
+- [x] UTF-8 surrogate character sanitization
+- [x] Full business context enrichment (orders, subs, credits, assets, EPs, rules, competitors)
 
-#### Chat Improvements ✅
-- [x] Sidebar: chat titles auto-named, timestamps, time grouping (Today/Yesterday/Older)
-- [x] Delete conversations with trash icon
-- [x] Max 20 visible, "Show N more" toggle
-- [x] Claude 529 Overloaded error: auto-retry with 5s delay
-- [x] Real-time token balance update after actions
+#### 13 QA Bug Fixes ✅
+- [x] Empty response after long thinking (heartbeat keepalive)
+- [x] Conversation corruption with multiple tabs (per-tab lock)
+- [x] Token depletion display wrong (balance update after action)
+- [x] Unnecessary "shall I proceed?" confirmations removed
+- [x] Em dashes in generated copy (scrubbed from prompts and outputs)
+- [x] Quality score not displaying on ad cards
+- [x] Token cost estimates miscalibrated
+- [x] Stale chat cleanup race condition (debounce)
+- [x] Copy button missing feedback state
+- [x] Bloom competitor returning 0 ads (search term fix)
+- [x] Shopify date filter (was 7 days, now 30)
+- [x] Ad set dates not propagating to Meta campaign
+- [x] Watcher banner not updating after manual run (polling fix)
 
-#### Entry Point System ✅
-- [x] Auto-detect entry points from ACTIVE Meta ad sets
-- [x] Quiz entry point detection (quiz.ibdassist.com)
-- [x] "Sync from Meta" button on offer detail page
-- [x] "Add Entry Point" button with ad set picker
-- [x] Active-only filtering (effective_status, not just status)
-- [x] Agent reads entry point data before generating ads
+### Session 14 (2026-03-25)
 
-#### Security Audit + Fixes (20 issues) ✅
-- [x] CRITICAL: Sandbox code injection fix (json.dumps escaping)
-- [x] CRITICAL: Auth info leakage (generic error messages)
-- [x] HIGH: Error sanitization across 6 router files (17 instances)
-- [x] HIGH: CORS headers explicit allowlist (no wildcard)
-- [x] HIGH: FORBIDDEN rules in agent orchestrator prompt
-- [x] CRITICAL: Hardcoded Supabase project ID in frontend
-- [x] HIGH: window.location.reload replaced with state refreshes
-- [x] MEDIUM: Lazy loading on images, alt text, memoization
-- [x] MEDIUM: Console.error removed from production stores
-- [x] MEDIUM: Rate limit cooldown (60s) on sync button
-- [x] CRITICAL: Missing Shopify tables migration
-- [x] CRITICAL: Column mismatch in migration 009
-- [x] MEDIUM: Performance indexes on user_id+status composites
+#### Landing Page Scanner ✅ (Priority 5)
+- [x] `landing_page_scanner.py` — stdlib html.parser, zero new deps
+- [x] Extracts: h1 headline, h2 subheadlines, meta description, CTA texts, key phrases, price signals
+- [x] `landing_page_cache` table (URL-unique, 7-day TTL, service-role upsert)
+- [x] `_build_business_context()` injects "LANDING PAGE INTELLIGENCE" per active offer
+- [x] Agent sees exact page copy before generating ads
 
-#### Ad Generation Improvements
-- [x] Entry point awareness (agent checks which EPs are active)
-- [x] Auto-match to ACTIVE ad sets (not just any ad set)
-- [x] ACTIVE ad sets sort to top in manual picker
-- [x] Batch history tracking (avoid repeating same angles)
-- [x] Competitor context injected into generation prompt
-
-### Previous Sessions (3-8)
-
-#### Ad System
-- [x] Replaced Pillow renderer with Gemini AI full composition
-- [x] Product images sent to Gemini for natural composition
-- [x] 10 ad format prompts (problem_callout, testimonial, offer, hero_product, us_vs_them, ingredient_breakdown, advertorial, before_after, native_meme, lifestyle)
-- [x] Angle selection guardrails
-- [x] verify_with_user tool for agent decision points
-- [x] Ad naming convention: `ODY-{batch}.{num} | {Angle} | {Persona} | {Awareness} | {Format} | {Hook}`
-
-#### Ad Copywriter
-- [x] Sonnet 4.6 generates 5 primary text + 5 headline variations per ad
-- [x] Tailored to angle, persona, awareness level, and format
-- [x] No em dashes (global rule)
-- [x] Fallback copy if AI generation fails
-
-#### Ad Launch Pipeline
-- [x] Full approve, push to Meta flow
-- [x] New Batch or Add to Batch modes
-- [x] CBO detection (auto-detects Campaign Budget Optimization)
-- [x] Destination URL copied from reference ad set
-- [x] ODY naming convention enforced
-
-#### Competitor Intelligence System ✅
-- [x] Full scraping pipeline: E2B + Playwright, Ad Library, Supabase Storage
-- [x] 185 ads scraped across 10 supplement brands
-- [x] Sonnet classifier: format, awareness, angle, hook
-- [x] Delta detection: turned off ads tracked with timestamps
-- [x] Winner scoring (0-100 scale)
-- [x] Auto-schedule: pg_cron weekly scrape + classify
-- [x] Permanent image storage in Supabase Storage
-
-#### Offers System
-- [x] Auto-discover from Meta Ads by destination URL
-- [x] Funnel flow visualization
-- [x] Entry points with per-EP spend/ROAS/CPA/ad count
-- [x] Loop subscription metrics per offer
-
-#### Security & Stability
-- [x] All tokens encrypted at rest
-- [x] RLS on all tables
-- [x] SECURITY DEFINER functions for competitor writes
-- [x] Meta tokens in Authorization headers
-
----
-
-## What's Next -- Priority Order
-
-### Priority 0: Post-Watcher Deploy Steps (Immediate)
-- [ ] Run `011_watcher_agent.sql` migration in Supabase dashboard
-- [ ] Set `CRON_KEY` env var in Railway (for `/api/watcher/cron` security)
-- [ ] Set up pg_cron or Railway cron: `POST api.runodyssey.io/api/watcher/cron` at 8 AM UTC daily
-
-### Priority 1: Watcher Agent (Kill/Scale/Monitor) ✅ DONE
-Daily monitoring that takes action based on user's autonomy level.
-
-- [x] **Daily health check job**: scan all active ad sets, pull 7-day metrics
-- [x] **Kill rules** (5 rules from ad-monitor.md):
-  - Emergency kill: CPA > 3x target in first 48h + $50 spend
-  - CPA death spiral: CPA > 2x target + 1000 impressions + 3 days
-  - Zero conversions: $0 revenue after 3x target CPA spend
-  - CTR floor: CTR < 0.8% + 2000 impressions + 3 days
-- [x] **Scale rules** (2 rules):
-  - Steady winner: ROAS > target for 5+ days + 15 conversions + CPA 20%+ below target
-  - Micro-scale: ROAS > target + 3+ days (10% budget increase)
-- [x] **Fatigue detection**: frequency creep, CTR decline, CPA creep
-- [x] **Autonomy levels**: supervised / guided / autonomous / full_auto
-- [x] Autonomy level stored in `user_preferences` table
-- [x] Statistical significance gates (min $50 spend, min impressions, min days)
-- [x] "While you were gone" shown in Planner Watcher Banner
-- [x] Undo action endpoint (re-activate paused ad sets)
-- [x] Daily cron via `/api/watcher/cron` (pg_cron or Railway cron)
-- [x] Background task processor handles `health_check` task type
-- [x] DB migration: `user_preferences`, `watcher_reports`, `watcher_actions`
-
-### Priority 2: Post-Generation Quality Check
-Reviewer agent that checks ad quality before presenting to user.
-
-- [ ] After ads generated, reviewer scores each for:
-  - Angle/persona match to brief
-  - Repetition against past batches
-  - Visual diversity (different colors, layouts)
-  - Copy quality (no em dashes, proper CTA, landing page match)
-- [ ] Weak ads auto-regenerated before presenting
-- [ ] Quality score shown on each ad card
-
-### Priority 3: Self-Improving Prompts ✅ DONE
-Agent learns from real performance data over time.
-
-- [x] After campaign sync, extract insights from Meta performance
-- [x] Correlate ad names (ODY naming convention) with CPA/ROAS/CTR
-- [x] `performance_insights` table: stores angle/format/persona/awareness winners + losers
-- [x] Performance-based prompt injection: agent reads insights before every generation
-- [x] Track which angles/formats/personas produce best results per brand
-- [x] `POST /api/integrations/meta/sync-insights` — on-demand refresh
-- [x] `GET /api/integrations/meta/insights` — view stored insights
-- [x] `POST /api/watcher/cron/sync-insights` — weekly cron for all users
-- [x] `performance_sync` background task type in worker
-- [x] DB migration: `012_performance_insights.sql` (run in Supabase dashboard)
-
-### Priority 4: Competitive Response Alerts ✅ DONE
-Automated insights from weekly competitor scrapes.
-
-- [x] Compare each week's scrape against previous week (diff_engine.py)
-- [x] Detect: new ads launched, ads killed, format shifts, angle changes
-- [x] Auto-generate alerts: "AG1 launched 5 new Ingredient Breakdown ads"
-- [x] Suggest responses: "Your competitors are shifting to IB format. Consider testing it."
-- [x] Show in Intel tab as collapsible "Intel Update" banner
-- [x] Weekly cron: Monday 10 AM UTC (after scrape at 6am, classify at 8am)
-- [x] DB migration: 013_competitor_diff_reports.sql (run in Supabase dashboard)
-
-### Priority 5: Landing Page Scan Before Ad Generation ✅ DONE
-
-- [x] `landing_page_scanner.py`: fetches URL with httpx, parses HTML with stdlib html.parser
-- [x] Extracts: headline (h1), subheadlines (h2), meta description, CTA texts, key phrases, price signals
-- [x] Cache: `landing_page_cache` table (URL-unique, 7-day TTL, service-role upsert)
-- [x] `014_landing_page_cache.sql`: table + RLS + cleanup function
-- [x] `_build_business_context()` injects LANDING PAGE INTELLIGENCE section for each active offer
-- [x] Agent sees exact page headlines, CTAs, and brand vocabulary before generating ads
-- [x] Only cache successful scans; failed scans (timeout, 403) retry next time
-
-### Priority 6: Ad Visual Diversity Improvement ✅ DONE
-
-- [x] Replaced basic launched-ad summary with full Creative Diversity Report
-- [x] Pulls last 25 ads (all statuses: published + draft/approved) for comprehensive picture
-- [x] Counts format/color_scheme/funnel/awareness per attribute using Counter
-- [x] Classifies as OVERUSED (>45% of batch) and surfaces UNTESTED attributes
+#### Ad Visual Diversity Engine ✅ (Priority 6)
+- [x] Analyses last 25 ads (all statuses: published + draft/approved)
+- [x] Counts format/color_scheme/funnel/awareness with Counter
+- [x] Labels OVERUSED (>45%) and UNTESTED attributes
 - [x] Checks funnel distribution imbalance (heavy TOF or BOF)
-- [x] Blocks last 6 headlines from being reused verbatim
-- [x] Generates specific DIVERSITY DIRECTIVE per batch ("avoid dark; try clinical")
-- [x] Agent explicitly told which formats/colors to avoid vs. try
+- [x] Blocks last 6 headlines from verbatim reuse
+- [x] Generates per-batch DIVERSITY DIRECTIVE
 
-### Priority 7: Onboarding Flow ✅ DONE
-
-- [x] `015_onboarding.sql`: adds onboarding columns to profiles, complete_onboarding_step() RPC (state machine), get_onboarding_state() RPC
-- [x] `GET /api/auth/onboarding` + `POST /api/auth/onboarding/complete-step` endpoints
-- [x] `/me` endpoint derives onboarding_completed from legacy boolean OR new completed_at
-- [x] `frontend/src/pages/onboarding.tsx`: 6-step wizard with progress bar
-  - Step 1: Welcome (team grid + Three Pillars intro)
-  - Step 2: Connect Shopify (OAuth or skip, auto-detects if already connected)
-  - Step 3: Connect Meta Ads (OAuth or skip, auto-detects)
-  - Step 4: Create first offer (name + landing page URL)
-  - Step 5: Competitor intelligence (shows tracked brands, info screen)
-  - Step 6: Set autonomy level (saves to watcher preferences)
+#### Onboarding Flow ✅ (Priority 7)
+- [x] `015_onboarding.sql`: onboarding columns on profiles, `complete_onboarding_step()` RPC state machine
+- [x] 6-step wizard: Welcome → Shopify → Meta → Create Offer → Competitors → Autonomy Level
 - [x] Progress persisted to backend after each step (resumes on reload)
-- [x] All steps skippable (user never gets stuck)
-- [x] auth-guard.tsx: redirects unonboarded users to /onboarding
-- [x] App.tsx: /onboarding route registered
-- [x] Supabase migrations: `014_landing_page_cache.sql` + `015_onboarding.sql` (run manually)
+- [x] All steps skippable
+- [x] `auth-guard.tsx` redirects unonboarded users to /onboarding
 
-### Priority 5 (original): Background Autonomy
-Agent creates its own work without being asked.
+### Session 13 (2026-03-25)
 
-- [ ] **Daily health check**: auto-created task every morning
-- [ ] **Weekly batch planning**: draft strategy for user to approve
-- [x] **Weekly competitor scan**: pg_cron auto-scrapes Ad Library
-- [x] **Auto-classify**: new ads classified after each scrape
-- [x] **Diff reports**: new ads, killed ads, format/angle shifts per week
-- [ ] All background work shows in Planner as task cards
+#### Competitive Response Alerts ✅ (Priority 4)
+- [x] `diff_engine.py`: compares current vs previous weekly competitor snapshot
+- [x] Detects: new ads launched, ads killed, format shifts (rising/falling), angle changes
+- [x] Auto-generates markdown narrative + suggested responses
+- [x] Intel page: collapsible "Intel Update" banner with brand activity, format shift cards, action items
+- [x] Weekly cron: Monday 10 AM UTC
 
-### Priority 6: Agent Intelligence Improvements
-Make ad output truly diverse and data-driven.
+### Session 12 (2026-03-25)
 
-- [ ] Agent reads Meta performance data BEFORE creating ads
-- [ ] Agent parses ad names to correlate angle/format/hook with CPA
-- [ ] User feedback on ads (thumbs up/down), stored, informs future batches
-- [ ] Batch strategy: "2 competitor-inspired + 1 winner iteration + 2 new swings"
-- [ ] Gemini receives angle/persona/awareness context for visual diversity
-- [ ] No repeated angle/format combo within 7 days
+#### Self-Improving Prompts ✅ (Priority 3)
+- [x] `performance_learner.py`: pulls 30-day Meta metrics for all ODY-named ads
+- [x] Parses naming convention to extract angle/persona/format/awareness dimensions
+- [x] Classifies tiers: winner/average/loser/insufficient_data
+- [x] `performance_insights` table with SECURITY DEFINER RPCs
+- [x] `_build_business_context()` injects PERFORMANCE INSIGHTS before every generation
+- [x] Weekly cron: Monday 10 AM UTC
 
-### Priority 7: Onboarding Flow
-Build AFTER all features work, BEFORE opening signups.
+### Session 11 (2026-03-25)
 
-- [ ] Step 1: Sign up (email + password + brand name + URL)
-- [ ] Step 2: The Atomic Unit -- explain offers concept
-- [ ] Step 3: Connect Shopify (OAuth)
-- [ ] Step 4: Connect Meta Ads (OAuth)
-- [ ] Step 5: Connect Loop (API key, optional)
-- [ ] Step 6: Auto-discover offers from Meta + Shopify
-- [ ] Step 7: Set niche + auto-add competitors
-- [ ] Step 8: Set autonomy level
-- [ ] Step 9: Brand brain generated, first recommendations shown
-- [ ] Step 10: "Create your first ad batch?" (with competitor context)
+#### Watcher Agent ✅ (Priority 1)
+- [x] 5 kill rules: emergency kill, CPA death spiral, zero conversions, CTR floor, frequency/fatigue
+- [x] 2 scale rules: steady winner (5+ days), micro-scale (3+ days)
+- [x] 4 autonomy levels: supervised / guided / autonomous / full_auto
+- [x] Undo action endpoint (re-activate paused ad sets)
+- [x] WatcherBanner in Planner: pill summary, expandable report, Run Check button
+- [x] Daily cron: 8 AM UTC
 
-### Priority 8: Pre-Launch Polish
-Build the week before opening signups.
+### Sessions 9-10 (2026-03-25)
 
-- [ ] Rate limiting (5 req/min chat, 3 sandbox, 60 everything else)
-- [ ] Mobile responsive pass
+- [x] **Billing**: Stripe PAYG, 5x markup, volume bonuses, Stripe Checkout
+- [x] **Security Audit**: 20 issues fixed across codebase
+- [x] **Smart Routing**: `needs_sandbox()` for fast path on simple questions
+- [x] **Navigation Redesign**: Chat + Planner + sidebar sub-sections
+- [x] **Intel Page**: Competitor analytics dashboard
+- [x] **Settings**: Premium billing UI, decoy pricing psychology
+- [x] **Agent Freedom**: Removed forced constraints, keeps winning angles
+
+### Sessions 3-8 (2026-03-20 to 2026-03-24)
+
+- [x] Full auth flow, Shopify/Meta/Loop OAuth
+- [x] Gemini AI ad generation (replaced Pillow)
+- [x] Ad copywriter (Sonnet 4.6, 5 primary + 5 headline variations)
+- [x] Ad launch pipeline (full approve → Meta flow)
+- [x] Competitor intelligence system (185 ads, 10 brands, weekly auto-refresh)
+- [x] Offers system (auto-discover, funnel flow, entry points)
+- [x] Team page (Three Pillars wired to live data)
+- [x] Security: RLS, encrypted tokens, CORS, no debug endpoints
+
+---
+
+## What's Next — Priority Order
+
+### Priority 1: Verify Deployed Fixes (Immediate)
+- [ ] Test ad generation + launch on demo.runodyssey.io with real Meta account
+- [ ] Confirm per-brand competitor data shows in agent context (not entire niche)
+- [ ] Verify Meta routing fix (Normal mode sandbox routing)
+- [ ] Confirm Stripe webhook still processing correctly
+
+### Priority 2: Outstanding QA Tests
+- [ ] **Test 01 — New User Onboarding**: Sign up fresh account, go through 6-step wizard, generate first ad
+- [ ] **Test 10 — Watcher Agent**: Let watcher run with real Meta ad data, verify kill/scale decisions
+- [ ] **Test 12 — Speed**: Measure end-to-end latency for chat, ad generation, launch
+
+### Priority 3: Domain Migration
+- [ ] Set up `app.tryodyssey.ai` as custom domain in Cloudflare Pages
+- [ ] Verify both `demo.runodyssey.io` and `app.tryodyssey.ai` work after setup
+- [ ] Update CORS allowlist in backend config to include both domains
+- [ ] Test auth flow on new domain
+
+### Priority 4: Performance Dashboard Completion
+- [ ] Wire per-offer ROAS/CPA/spend charts to live Meta data (currently static)
+- [ ] Add time-range selector (7d / 30d / 90d)
+- [ ] Add "vs previous period" comparison
+- [ ] Auto-update `offer_metrics_daily` from Meta (currently only populated on import)
+
+### Priority 5: Background Autonomy Completion
+- [ ] Daily health check: auto-create task card in Planner each morning
+- [ ] Weekly batch planning: agent drafts strategy for user to approve
+- [ ] All background work shows in Planner as task cards (not just Watcher banner)
+- [ ] Supabase Realtime: replace planner polling with live subscriptions
+
+### Priority 6: Pre-Launch Polish
+- [ ] Rate limiting: 5 req/min chat, 3 sandbox, 60 everything else
+- [ ] Mobile responsive pass (currently desktop-only)
 - [ ] Loading skeletons for all async operations
 - [ ] Empty states for all lists/grids
-- [ ] Glass card/button/input reusable components
-- [ ] Performance page (placeholder currently)
+- [ ] Sandbox max_steps: increase to 16-20 for complex workflows
+- [ ] Per-user token spending cap per action (prevent runaway burns)
+
+### Priority 7: Klaviyo Integration
+- [ ] OAuth connection
+- [ ] Pull flows, sequences, open/click rates
+- [ ] LTV improvements tracked via email engagement
+- [ ] Agent creates Klaviyo flows via Mailer team member
 
 ---
 
 ## Known Bugs & Technical Debt
 
 ### Active Issues
-- [ ] Agent ad diversity still needs work (visual variety, not just angle variety)
-- [ ] Agent doesn't analyze competitor ad IMAGES visually (only text/metadata)
 - [ ] Chat doesn't render ad images inline in messages (shows in terminal only)
 - [ ] No Supabase Realtime subscriptions (polling only, 10-30s intervals)
-- [ ] offer_metrics_daily only populated on import, not auto-updated from Meta
-- [ ] Facebook CDN image URLs in old generated_assets have expired
+- [ ] `offer_metrics_daily` only populated on import, not auto-updated from Meta
+- [ ] Facebook CDN image URLs in old `generated_assets` have expired
 - [ ] Competitor scraper: Garden of Life + Transparent Labs return 0 ads
 - [ ] Sandbox max_steps=10 may be insufficient for complex workflows (should be 16-20)
 - [ ] No per-user token spending cap per action (agent could burn all credits in one run)
-- [ ] Agent sometimes picks paused EPs if brand brain has old data (cleanup on boot helps but not 100%)
-- [ ] "make me AN ad" sometimes still generates 3 (prompt parsing not perfect)
-- [x] Agent scans landing page content before generating ads (Priority 5 done)
-- [ ] Performance page is placeholder (coming soon)
+- [ ] Agent sometimes picks paused EPs if brand brain has old data
+- [ ] Performance page charts not fully wired to live data (page exists, API calls needed)
+- [ ] Planner approval buttons not fully connected to backend launch endpoints
+- [ ] Domain migration to app.tryodyssey.ai pending (Cloudflare setup)
+- [ ] Tests 01, 10, 12 from QA plan never run
 
-### Fixed This Session
-- [x] Chat titles not auto-naming (fixed: now names all messages)
-- [x] Simple questions spinning up E2B sandbox (fixed: smart routing)
-- [x] No thinking indicator in chat (fixed: pulsing dots)
-- [x] Meta API rate limits on EP sync (fixed: 5-min cache)
-- [x] Entry point sync unreliable (fixed: effective_status + auto-sync before ad gen)
-- [x] Agent forced to rotate angles (fixed: keeps winners, varies creatives)
-- [x] Empty conversations cluttering sidebar (fixed: auto-cleanup after 5 min)
+### Recently Fixed
+- [x] RLS blocking backend reads (service-role client)
+- [x] Per-brand competitor data in business context
+- [x] UTF-8 surrogate crash
+- [x] Stripe webhook signature not verified
+- [x] CRON_KEY not enforced on cron endpoints
+- [x] API overload no retry logic
+- [x] Normal mode incorrectly bypassing sandbox
+- [x] 13 QA bugs (see Session 15 above)
+- [x] Chat titles not auto-naming
+- [x] Simple questions spinning up E2B sandbox
+- [x] Meta API rate limits on EP sync (5-min cache)
+- [x] Agent forced to rotate angles
 
 ---
 
@@ -372,9 +284,10 @@ Build the week before opening signups.
 | Service | Platform | Status | Auto-deploy? |
 |---------|----------|--------|-------------|
 | Frontend | Cloudflare Pages | ✅ Live (demo.runodyssey.io) | Yes (git push) |
+| Frontend | Cloudflare Pages | 🟡 Pending (app.tryodyssey.ai) | After custom domain setup |
 | Backend API | Railway (odyssey-x) | ✅ Live (api.runodyssey.io) | Yes (git push) |
 | Worker | Railway (clever-gentleness) | ✅ Deployed | Yes (git push) |
-| Database | Supabase | ✅ Live | Manual migrations |
+| Database | Supabase | ✅ Live (migrations 000-017 applied) | Manual migrations |
 | Image Storage | Supabase Storage | ✅ Live (competitor-ads bucket) | Auto via scraper |
 | Payments | Stripe (live keys) | ✅ Live | Webhook auto-processes |
 
@@ -428,56 +341,38 @@ Build the week before opening signups.
 - **Chat**: Titles, timestamps, grouping, delete, overloaded retry
 - **Entry Points**: Auto-detect from Meta, sync button, active filtering
 
-### 2026-03-25 (Session 14)
-- **Priority 5 (Landing Page Scan)**: `landing_page_scanner.py` — stdlib html.parser, no new deps. Extracts headline/subheadlines/CTAs/key-phrases/prices. `landing_page_cache` table with 7-day TTL. `_build_business_context()` injects "LANDING PAGE INTELLIGENCE" section for each active offer. Agent now sees exact page copy before generating ads. Migration `014_landing_page_cache.sql`.
-- **Priority 6 (Visual Diversity)**: Full Creative Diversity Report replaces basic launched-ad summary. Analyses last 25 ads, counts format/color_scheme/funnel/awareness. Labels OVERUSED (>45%) and UNTESTED. Checks TOF/BOF imbalance. Blocks last 6 headlines. Generates specific per-batch DIVERSITY DIRECTIVE.
-- **Priority 7 (Onboarding)**: 6-step guided wizard. Backend: `complete_onboarding_step()` RPC state machine, onboarding columns on profiles, two API endpoints. Frontend: beautiful wizard with progress bar, OAuth detection (Shopify/Meta), offer creation, competitor info, autonomy level picker. Progress persisted; all steps skippable. `auth-guard` redirects new users to onboarding. Migrations `014` + `015` ready to run in Supabase dashboard.
-- TypeScript: tsc -b passes clean on all three.
-
-### 2026-03-25 (Session 13)
-- **Competitive Response Alerts** (Priority 4 complete): Weekly diff engine compares current competitor ad state vs previous weekly snapshot.
-- **diff_engine.py**: Detects new ads launched, ads killed, format shifts (rising/falling), angle changes per brand. Generates markdown narrative and actionable suggested responses.
-- **Migration 013**: `competitor_diff_reports` table + `upsert_competitor_diff_report` + `upsert_competitor_snapshot` SECURITY DEFINER RPCs. pg_cron job Monday 10 AM UTC.
-- **API**: `GET /api/competitors/diffs`, `GET /api/competitors/diffs/latest`, `POST /api/competitors/diffs/generate` (on-demand), `POST /api/competitors/cron/generate-diffs` (cron-key).
-- **Intel Page**: Collapsible "Intel Update" banner at top of page. Shows brand activity (new/killed per brand), format shift cards (green up / red down), rising angle pills, high-priority action items, and suggested ad responses.
-- TypeScript: tsc -b passes clean.
-- DB migration: `013_competitor_diff_reports.sql` (run manually in Supabase dashboard).
-
-### 2026-03-25 (Session 12)
-- **Self-Improving Prompts** (Priority 3 complete): Performance learner pulls Meta Ads data, parses ODY naming conventions, and stores learned patterns in `performance_insights` table.
-- **Performance Insights DB**: `012_performance_insights.sql` migration with `upsert_performance_insight` and `clear_performance_insights` SECURITY DEFINER RPCs.
-- **Performance Learner**: `backend/app/integrations/meta/performance_learner.py` — fetches 30-day metrics for all ODY-named ad sets/ads, groups by angle/persona/format/awareness, classifies tiers (winner/average/loser), stores in DB.
-- **Agent Context Injection**: `_build_business_context()` in executor.py now calls `get_performance_context()` and injects PERFORMANCE INSIGHTS section into every agent system prompt. Agent sees which angles are winning, which formats drive CTR, which personas convert best.
-- **Endpoints**: `POST /api/integrations/meta/sync-insights` (on-demand) + `GET /api/integrations/meta/insights` (view stored).
-- **Weekly Cron**: `POST /api/watcher/cron/sync-insights` runs for all Meta-connected users.
-- **Background Worker**: `performance_sync` task type added to task_processor.py.
-- TypeScript: tsc -b passes clean.
-- DB migration: `012_performance_insights.sql` (run manually in Supabase dashboard).
+### 2026-03-25 (Session 10)
+- **Smart Chat Routing**: `needs_sandbox()` classifier, fast path for simple questions
+- **Agent Freedom**: Removed forced constraints, keeps winning angles
+- **EP Intelligence**: Auto-sync before generation, ACTIVE-only filtering
+- **Settings Sidebar**: Billing/Integrations/Competitors/Account
+- **Token Pricing**: Decoy psychology, gradient borders, BEST VALUE hero card
+- **Stripe**: Live $1 test payment confirmed end-to-end
 
 ### 2026-03-25 (Session 11)
-- **Watcher Agent**: Full kill/scale/monitor engine. 5 kill rules + 2 scale rules + fatigue detection. 4 autonomy levels (supervised/guided/autonomous/full_auto). User preferences stored in new `user_preferences` table. Daily health checks via `/api/watcher/cron`. Background worker handles `health_check` task type. DB: `watcher_reports` + `watcher_actions` tables with SECURITY DEFINER RPCs.
-- **Watcher Frontend**: Compact WatcherBanner in Planner (always visible). Shows last run time, kills/scales/warnings pill summary. "Run Check" button. Expandable to show full report with rationale per action. Reports auto-load on planner open.
-- **Undo Support**: `/api/watcher/actions/{id}/undo` reverses any kill or scale.
-- TypeScript: tsc -b passes clean.
-- Supabase migration: `011_watcher_agent.sql` (run manually in Supabase dashboard).
+- **Watcher Agent** (Priority 1): 5 kill rules + 2 scale rules + fatigue. 4 autonomy levels. Daily cron. Undo support. WatcherBanner in Planner.
 
-### 2026-03-25 (Session 10) -- PREVIOUS SESSION
-- **Smart Chat Routing**: Simple questions (ROAS, strategy) use fast Sonnet 4.6 path (~3-5s) instead of full E2B sandbox (~60s). needs_sandbox() classifier routes appropriately.
-- **Thinking Indicator**: Pulsing "ODY-1 is thinking..." with animated dots shown between send and first response.
-- **Agent Freedom**: Removed forced constraints -- agent now keeps winning angles, allows 1-5 ads per batch, confirms plan before generating, can do multiple enhancement rounds.
-- **Entry Point Intelligence**: Agent auto-syncs from Meta before generating, only uses ACTIVE EPs, confirms which EP to target in chat.
-- **EP Auto-Sync**: Caches Meta API results for 5 min to prevent rate limits. Auto-marks non-active EPs as paused.
-- **Brand Brain Cleanup**: Sandbox boot removes outdated rotation instructions from learnings.md.
-- **Comprehensive UX Testing**: Tested 15+ real ecom owner prompts, identified 32 issues.
-- **6 High-Impact UX Fixes**: Typing indicator, smart routing, auto-naming, empty cleanup, launch buttons, EP caching.
-- **Design Research**: Deep research into Linear, Vercel, Cursor, Superhuman, Raycast, Notion, Figma, Framer -- produced design system brief.
-- **Settings Sidebar Nav**: Billing/Integrations/Competitors/Account sections.
-- **Token Pricing Redesign**: Decoy psychology with gradient borders, BEST VALUE hero card.
-- **Stripe Payment Tested**: Live $1 test payment confirmed working end-to-end.
-- Key learning: Agent needs freedom, not rigid rules. Guidelines > hard constraints.
-- Key learning: Simple questions should NEVER spin up E2B sandbox.
-- Key learning: Brand brain files can override prompt instructions -- need cleanup on boot.
-- Key learning: EP status must come from effective_status (accounts for campaign being off).
+### 2026-03-25 (Session 12)
+- **Self-Improving Prompts** (Priority 3): Performance learner, ODY naming parse, `performance_insights` table, context injection, weekly cron.
+
+### 2026-03-25 (Session 13)
+- **Competitive Response Alerts** (Priority 4): diff_engine.py, Intel Update banner, weekly cron. Migration 013.
+
+### 2026-03-25 (Session 14)
+- **Landing Page Scanner** (Priority 5): landing_page_scanner.py, 7-day cache, context injection. Migration 014.
+- **Visual Diversity Engine** (Priority 6): Last 25 ads, overuse detection, DIVERSITY DIRECTIVE.
+- **Onboarding Flow** (Priority 7): 6-step wizard, OAuth detection, progress persistence. Migrations 014+015.
+
+### 2026-03-26 (Session 15)
+- **Gemini Vision Quality Check** (Priority 2): Scores every ad 0-100, auto-regen < 50. Quality score on ad cards.
+- **Model Toggle**: Normal (Sonnet) / Pro (Opus) user-selectable. Migration 017.
+- **Performance Dashboard**: Live Meta metrics, per-offer breakdown. Was placeholder.
+- **Account Settings**: Profile editing, password change, notification prefs.
+- **RLS bypass**: Service-role Supabase client for backend reads.
+- **13 QA bug fixes**: See Session 15 section in HANDOFF.md for full list.
+- **Security hardening**: Stripe webhook signature, CRON_KEY enforcement.
+- **Context enrichment**: Full business context in every sandbox run (orders, subs, credits, EPs, competitors, insights, landing pages, diversity report).
+- **Migrations**: 016 (onboarding RPC grants) + 017 (model_preference) — both run.
 
 ---
 
@@ -508,22 +403,6 @@ USER ACTION (e.g., chat, ad batch, launch)
  |- If balance < estimated cost -> 402 Payment Required
  |- User tops up via Stripe Checkout ($10-$500, bonus tokens at volume)
  |- Webhook auto-credits balance on successful payment
-```
-
-### Competitor Intelligence Architecture
-```
-NICHE (e.g., "Supplements")
- |- 12 Competitor Brands (shared across all users in niche)
- |- 185 Total Ads (scraped from Meta Ad Library)
- |    |- Permanent images in Supabase Storage
- |    |- Each classified: format + awareness + angle + hook
- |    |- Winner score: 0-100
- |    |- Status: active / turned_off (with deactivation date)
- |- Niche Analytics (aggregated)
- |    |- Top angles: Gut Health (42), Nutrient Gaps (10), Sleep (7)
- |    |- Top formats: OFFER, HP, IB, TEST, LIFE
- |    |- Awareness mix: TOF 45%, MOF 30%, BOF 25%
- |- Auto-refresh: Weekly scrape + classify via pg_cron
 ```
 
 ### Three Pillars
