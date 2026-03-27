@@ -1,6 +1,6 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-03-26 (Session 16)**
+> **Last updated: 2026-03-26 (Session 17)**
 > Goal-driven, not timeline-driven. Ship MVP when ad generation, launch, monitoring pipeline is bulletproof.
 
 ---
@@ -52,12 +52,42 @@ The MVP is ready when a user can:
 | Account Settings | ✅ Done | Profile editing, password change, notification prefs |
 | API Rate Limiting | ✅ Done | slowapi: 60/min default, 5/min signup, 10/min login, 3/min password reset |
 | OAuth Onboarding Redirects | ✅ Done | OAuth callbacks redirect to /onboarding or /chat based on profile state |
+| Surrogate Encoding Fix | ✅ Done (v2) | Sanitize before truncate in router.py + initial payload in executor.py |
+| Em Dash Rule | ✅ Done | Added to orchestrator.md prompt + sandbox system prompt |
+| Visual Ad Tools | ✅ Done | get_competitor_ads + image embedding in get_ad_level_performance |
+| Planner Task Timeout | ✅ Done | Auto-fail after 30min, amber "Timed Out" badge + Retry button |
+| Conversation History Loading | ✅ Done | isLoadingConversation state + race condition guard |
 | Background Autonomy | 🟡 Partial | Weekly competitor scrape + watcher daily; planner task cards not auto-creating |
 | Domain Migration | 🟡 Pending | Code supports tryodyssey.ai, nameserver swap pending |
+| Visual Ads in Chat | 🟡 Needs Verify | Images may not render inline in chat markdown |
 
 ---
 
-## What's Done (Sessions 3-16)
+## What's Done (Sessions 3-17)
+
+### Session 17 (2026-03-26) — QA Bug Fixes + Visual Ads
+
+#### Merged Branches
+- **claude/quirky-poincare**: OAuth callback redirects (onboarding-aware), frontend alert() → inline toasts, onboarding OAuth notices, API rate limiting (slowapi), domain support for app.tryodyssey.ai, model toggle + account settings (Session 15)
+- **claude/brave-goldwasser**: Surrogate encoding fix v1 — sanitize in router.py + executor.py, frontend receivedDone flag for stream state recovery
+
+#### P0 Fixes (Critical)
+- [x] **Surrogate encoding v2**: Sanitize BEFORE truncation in `chat/router.py`. Sanitize the initial message payload in `sandbox/executor.py`. Two-pass sanitization prevents crash on any non-standard unicode.
+
+#### P1 Fixes (High)
+- [x] **Em dash rule**: Added "NEVER use em dashes" directive to `orchestrator.md` prompt AND the sandbox system prompt injected at runtime. Double-enforcement.
+- [x] **Visual ad creatives**: Registered two new tools in sandbox executor:
+  - `get_competitor_ads` — queries `competitor_ads` table, returns permanent Supabase Storage image URLs
+  - Updated `get_ad_level_performance` — embeds image URLs in response so agent can reference them
+  - Updated Image Creative director prompt to always call `get_competitor_ads` before generating
+  - Frontend gallery label updated for clarity
+
+#### P2 Fixes (Medium)
+- [x] **Planner task timeout**: Tasks auto-fail after 30 minutes. Amber "Timed Out" badge shown with Retry button. Prevents stuck tasks from staying in "Running" state forever.
+- [x] **Conversation history loading fix**: `isLoadingConversation` state added to chat store. Race condition guard prevents new messages being sent while history is loading. Message input disabled while loading.
+
+#### P3 Fixes (Low)
+- [x] **Credit balance refresh on error**: Credit balance now refreshes even after failed API calls (so user sees correct balance without needing to reload).
 
 ### Session 16 (2026-03-26)
 - [x] **OAuth Callback Redirects**: `get_user_redirect_base()` checks onboarding status; Shopify and Meta OAuth callbacks redirect to /onboarding or /chat accordingly.
@@ -68,42 +98,22 @@ The MVP is ready when a user can:
 
 ### Session 15 (2026-03-26) — QA Hardening + New Features
 
-#### Gemini Vision Quality Check ✅ (Priority 2 complete)
+#### Gemini Vision Quality Check ✅
 - [x] After ads generated, Gemini Vision scores each ad 0-100
 - [x] Weak ads (score < 50) auto-regenerated (up to 2 retries per ad)
 - [x] Quality score shown on ad cards in planner and cockpit view
-- [x] Score factors: visual hierarchy, text legibility, brand fit, CTA prominence
 
 #### Model Toggle (Normal / Pro) ✅
 - [x] Normal mode: Claude Sonnet 4.6 in E2B sandbox
-- [x] Pro mode: Claude Opus 4.6 in E2B sandbox (deeper reasoning, ~5x cost)
-- [x] User selects in Settings > Account
+- [x] Pro mode: Claude Opus 4.6 in E2B sandbox (~5x cost, deeper reasoning)
 - [x] Stored in `profiles.model_preference` (`sonnet` | `opus`)
-- [x] `/me` endpoint returns model_preference, passed to sandbox script
-- [x] `017_model_preference.sql` migration (run in Supabase dashboard)
 
 #### Performance Dashboard ✅
 - [x] Live Meta metrics for all active campaigns
 - [x] Per-offer breakdown: spend, impressions, CTR, CPA, ROAS
-- [x] Replaces "Coming Soon" placeholder page
 
 #### Account Settings ✅
-- [x] Profile editing (name, email)
-- [x] Password change flow
-- [x] Notification preferences
-
-#### Critical Bug Fixes ✅
-- [x] RLS bypass: service-role Supabase client for backend reads (was blocking data queries)
-- [x] Entry point edit/delete + URL normalization (no duplicate entries)
-- [x] Email signup validation + password reset flow
-- [x] Onboarding RPC grants (`016_onboarding_rpc_grants.sql` — anon/authenticated can call onboarding RPCs)
-- [x] Stripe webhook signature verification
-- [x] CRON_KEY security on all cron endpoints
-- [x] API overload retry (Claude 529 + Gemini quota: exponential backoff)
-- [x] Normal/Pro mode parity (both use sandbox)
-- [x] Per-brand competitor data in business context
-- [x] UTF-8 surrogate character sanitization
-- [x] Full business context enrichment (orders, subs, credits, assets, EPs, rules, competitors)
+- [x] Profile editing (name, email), password change, notification prefs
 
 #### 13 QA Bug Fixes ✅
 - [x] Empty response after long thinking (heartbeat keepalive)
@@ -121,57 +131,18 @@ The MVP is ready when a user can:
 - [x] Watcher banner not updating after manual run (polling fix)
 
 ### Session 14 (2026-03-25)
-
-#### Landing Page Scanner ✅ (Priority 5)
-- [x] `landing_page_scanner.py` — stdlib html.parser, zero new deps
-- [x] Extracts: h1 headline, h2 subheadlines, meta description, CTA texts, key phrases, price signals
-- [x] `landing_page_cache` table (URL-unique, 7-day TTL, service-role upsert)
-- [x] `_build_business_context()` injects "LANDING PAGE INTELLIGENCE" per active offer
-- [x] Agent sees exact page copy before generating ads
-
-#### Ad Visual Diversity Engine ✅ (Priority 6)
-- [x] Analyses last 25 ads (all statuses: published + draft/approved)
-- [x] Counts format/color_scheme/funnel/awareness with Counter
-- [x] Labels OVERUSED (>45%) and UNTESTED attributes
-- [x] Checks funnel distribution imbalance (heavy TOF or BOF)
-- [x] Blocks last 6 headlines from verbatim reuse
-- [x] Generates per-batch DIVERSITY DIRECTIVE
-
-#### Onboarding Flow ✅ (Priority 7)
-- [x] `015_onboarding.sql`: onboarding columns on profiles, `complete_onboarding_step()` RPC state machine
-- [x] 6-step wizard: Welcome → Shopify → Meta → Create Offer → Competitors → Autonomy Level
-- [x] Progress persisted to backend after each step (resumes on reload)
-- [x] All steps skippable
-- [x] `auth-guard.tsx` redirects unonboarded users to /onboarding
+- [x] **Landing Page Scanner**: `landing_page_scanner.py` — stdlib html.parser, zero new deps. 7-day cache, context injection. Migration 014.
+- [x] **Ad Visual Diversity Engine**: Last 25 ads, overuse detection, DIVERSITY DIRECTIVE per batch.
+- [x] **Onboarding Flow**: 6-step wizard, OAuth detection, progress persistence. Migrations 015+016.
 
 ### Session 13 (2026-03-25)
-
-#### Competitive Response Alerts ✅ (Priority 4)
-- [x] `diff_engine.py`: compares current vs previous weekly competitor snapshot
-- [x] Detects: new ads launched, ads killed, format shifts (rising/falling), angle changes
-- [x] Auto-generates markdown narrative + suggested responses
-- [x] Intel page: collapsible "Intel Update" banner with brand activity, format shift cards, action items
-- [x] Weekly cron: Monday 10 AM UTC
+- [x] **Competitive Response Alerts**: diff_engine.py, Intel Update banner, weekly cron. Migration 013.
 
 ### Session 12 (2026-03-25)
-
-#### Self-Improving Prompts ✅ (Priority 3)
-- [x] `performance_learner.py`: pulls 30-day Meta metrics for all ODY-named ads
-- [x] Parses naming convention to extract angle/persona/format/awareness dimensions
-- [x] Classifies tiers: winner/average/loser/insufficient_data
-- [x] `performance_insights` table with SECURITY DEFINER RPCs
-- [x] `_build_business_context()` injects PERFORMANCE INSIGHTS before every generation
-- [x] Weekly cron: Monday 10 AM UTC
+- [x] **Self-Improving Prompts**: Performance learner, ODY naming parse, `performance_insights` table, context injection, weekly cron.
 
 ### Session 11 (2026-03-25)
-
-#### Watcher Agent ✅ (Priority 1)
-- [x] 5 kill rules: emergency kill, CPA death spiral, zero conversions, CTR floor, frequency/fatigue
-- [x] 2 scale rules: steady winner (5+ days), micro-scale (3+ days)
-- [x] 4 autonomy levels: supervised / guided / autonomous / full_auto
-- [x] Undo action endpoint (re-activate paused ad sets)
-- [x] WatcherBanner in Planner: pill summary, expandable report, Run Check button
-- [x] Daily cron: 8 AM UTC
+- [x] **Watcher Agent**: 5 kill rules + 2 scale rules + fatigue. 4 autonomy levels. Daily cron. Undo support. WatcherBanner in Planner.
 
 ### Sessions 9-10 (2026-03-25)
 - [x] **Billing**: Stripe PAYG, 5x markup, volume bonuses, Stripe Checkout
@@ -179,8 +150,6 @@ The MVP is ready when a user can:
 - [x] **Smart Routing**: `needs_sandbox()` for fast path on simple questions
 - [x] **Navigation Redesign**: Chat + Planner + sidebar sub-sections
 - [x] **Intel Page**: Competitor analytics dashboard
-- [x] **Settings**: Premium billing UI, decoy pricing psychology
-- [x] **Agent Freedom**: Removed forced constraints, keeps winning angles
 
 ### Sessions 3-8 (2026-03-20 to 2026-03-24)
 - [x] Full auth flow, Shopify/Meta/Loop OAuth
@@ -194,13 +163,14 @@ The MVP is ready when a user can:
 
 ---
 
-## What's Next -- Priority Order
+## What's Next — Priority Order
 
-### Priority 1: Deploy Session 16 + Verify (Immediate)
-- [ ] Merge `claude/quirky-poincare` branch to main and push
-- [ ] Verify Railway backend deploys with rate limiting (slowapi)
-- [ ] Verify Cloudflare frontend deploys clean
-- [ ] Full new-user QA test on demo.runodyssey.io (Tests 01, 10, 12)
+### Priority 1: Verify Session 17 Fixes on Live (Immediate)
+- [ ] Verify surrogate encoding v2 fix on live — confirm no crash with Shopify product descriptions containing non-standard chars
+- [ ] Verify em dash compliance — run ad generation, scan output for em dashes
+- [ ] Verify visual ads — confirm `get_competitor_ads` tool is called and images display in chat
+- [ ] Verify planner task timeout — let a task run, confirm it auto-fails after 30min
+- [ ] Verify conversation history loading — reload chat mid-session, confirm history loads cleanly
 
 ### Priority 2: Domain Migration (app.tryodyssey.ai)
 - [ ] Nameserver swap (waiting on boss)
@@ -219,9 +189,15 @@ The MVP is ready when a user can:
 - [ ] Daily health check: auto-create task card in Planner each morning
 - [ ] Weekly batch planning: agent drafts strategy for user to approve
 - [ ] All background work shows in Planner as task cards (not just Watcher banner)
+- [ ] "While You Were Gone" morning briefing format in chat
 - [ ] Supabase Realtime: replace planner polling with live subscriptions
 
-### Priority 5: Pre-Launch Polish
+### Priority 5: Real Competitor Ad Images
+- [ ] Wire Apify or SearchAPI for US commercial Meta ad images
+- [ ] Replace expired CDN URLs with permanent Supabase Storage images
+- [ ] `get_competitor_ads` tool already built — just needs real image source
+
+### Priority 6: Pre-Launch Polish
 - [x] Rate limiting: 60/min default, 5/min signup, 10/min login, 3/min password reset
 - [ ] Mobile responsive pass (currently desktop-only)
 - [ ] Loading skeletons for all async operations
@@ -229,7 +205,7 @@ The MVP is ready when a user can:
 - [ ] Sandbox max_steps: increase to 16-20 for complex workflows
 - [ ] Per-user token spending cap per action (prevent runaway burns)
 
-### Priority 6: Klaviyo Integration
+### Priority 7: Klaviyo Integration
 - [ ] OAuth connection
 - [ ] Pull flows, sequences, open/click rates
 - [ ] LTV improvements tracked via email engagement
@@ -239,27 +215,38 @@ The MVP is ready when a user can:
 
 ## Known Bugs & Technical Debt
 
-### Active Issues
-- [ ] Chat doesn't render ad images inline in messages (shows in terminal only)
+### Active Issues (Unverified Fixes — Need Live Verification)
+- [ ] Surrogate encoding: v2 fix deployed, needs live verification
+- [ ] Em dash compliance: prompt rule added, needs live verification
+- [ ] Visual ads in chat: images may not render inline in chat markdown (markdown vs HTML)
+- [ ] Competitor ad images from Meta Ad Library not yet wired (Apify/SearchAPI needed)
+
+### Active Issues (Known Open)
+- [ ] Sandbox crashes intermittently on first message ("peer closed connection" — E2B cold start)
+- [ ] Normal mode runs full E2B sandbox (may want lighter path for quick questions)
+- [ ] Response length inconsistency across scenarios (some too short, some too long)
+- [ ] Team persona inconsistency — agent sometimes says "I" instead of using team member names
+- [ ] No "While You Were Gone" morning briefing format yet
 - [ ] No Supabase Realtime subscriptions (polling only, 10-30s intervals)
 - [ ] `offer_metrics_daily` only populated on import, not auto-updated from Meta
 - [ ] Facebook CDN image URLs in old `generated_assets` have expired
 - [ ] Competitor scraper: Garden of Life + Transparent Labs return 0 ads
 - [ ] Sandbox max_steps=10 may be insufficient for complex workflows (should be 16-20)
 - [ ] No per-user token spending cap per action (agent could burn all credits in one run)
-- [ ] Agent sometimes picks paused EPs if brand brain has old data (cleanup on boot helps but not 100%)
-- [ ] "make me AN ad" sometimes still generates 3 (prompt parsing not perfect)
 - [ ] Background autonomy: planner task cards not auto-creating from daily checks
+- [ ] "make me AN ad" sometimes still generates 3 (prompt parsing not perfect)
 
-### Fixed (Sessions 15-16)
+### Fixed (Sessions 15-17)
+- [x] Surrogate encoding v1 + v2 (sanitize before truncate, sanitize initial payload)
+- [x] Em dash rule added to orchestrator.md + sandbox system prompt
+- [x] Visual ad tools registered (get_competitor_ads + updated get_ad_level_performance)
+- [x] Planner task timeout (auto-fail 30min, amber badge, Retry button)
+- [x] Conversation history loading race condition
+- [x] Credit balance refresh on error
 - [x] Rate limiting added: 60/min default, 5/min signup, 10/min login, 3/min forgot-password
-- [x] OAuth callbacks are onboarding-aware (redirect to /onboarding or /chat based on profile state)
-- [x] Frontend alert() calls replaced with inline toasts (sidebar: 6, settings: 4)
+- [x] OAuth callbacks are onboarding-aware (redirect to /onboarding or /chat)
+- [x] Frontend alert() calls replaced with inline toasts
 - [x] Onboarding page shows OAuth connection notices from URL params
-- [x] Email confirmation screen (Supabase email confirm enabled, code handles both paths)
-- [x] Password reset flow end-to-end (forgot-password -> email -> callback -> reset)
-- [x] Onboarding RPC grants (service role access via SECURITY DEFINER)
-- [x] Env var validation on startup (warns for missing soft-required vars)
 - [x] All 7 DB migrations (011-017) confirmed applied
 - [x] Model toggle (Normal/Pro) working
 - [x] Account settings (profile edit, notification prefs) working
@@ -379,14 +366,24 @@ The MVP is ready when a user can:
 - **RLS bypass**: Service-role Supabase client for backend reads.
 - **13 QA bug fixes**: Heartbeat keepalive, per-tab conversation lock, balance display, em dash scrub, Bloom fix, Shopify date filter, watcher banner polling, and more.
 - **Security hardening**: Stripe webhook signature, CRON_KEY enforcement.
-- **Context enrichment**: Full business context in every sandbox run (orders, subs, credits, EPs, competitors, insights, landing pages, diversity report).
+- **Context enrichment**: Full business context in every sandbox run.
 - **Migrations**: 016 (onboarding RPC grants) + 017 (model_preference) — both applied.
 
 ### 2026-03-26 (Session 16)
-- **API Rate Limiting**: `rate_limit.py` with slowapi. 5/min signup, 10/min login, 3/min forgot-password, 60/min default. Wired into FastAPI app state.
-- **OAuth Onboarding Redirects**: `get_user_redirect_base()` in dependencies.py. Shopify + Meta OAuth callbacks redirect to /onboarding or /chat based on profile state.
-- **Inline Toasts**: All `alert()` calls in sidebar.tsx and settings.tsx replaced with glass-style inline notifications (5s auto-dismiss).
-- **Onboarding OAuth Notices**: Onboarding page handles ?shopify= / ?meta= URL params with success/error banners. URL cleaned after read.
+- **API Rate Limiting**: `rate_limit.py` with slowapi. 5/min signup, 10/min login, 3/min forgot-password, 60/min default.
+- **OAuth Onboarding Redirects**: `get_user_redirect_base()` in dependencies.py. Shopify + Meta OAuth callbacks redirect to /onboarding or /chat.
+- **Inline Toasts**: All `alert()` calls in sidebar.tsx and settings.tsx replaced with glass-style inline notifications.
+- **Onboarding OAuth Notices**: Onboarding page handles ?shopify= / ?meta= URL params with success/error banners.
+
+### 2026-03-26 (Session 17)
+- **Merged** claude/quirky-poincare (Session 16 work) + claude/brave-goldwasser (surrogate fix v1) to main
+- **Surrogate encoding v2**: Two-pass sanitization — sanitize before truncate in router.py, sanitize initial payload in executor.py. Eliminates surrogate crash on non-standard unicode.
+- **Em dash enforcement**: "NEVER use em dashes" rule added to orchestrator.md + sandbox system prompt. Double-enforcement.
+- **Visual ad tools**: `get_competitor_ads` tool queries competitor_ads table with permanent image URLs. Image Creative director prompt updated. `get_ad_level_performance` updated with image embedding.
+- **Planner task timeout**: Auto-fail after 30min. Amber "Timed Out" badge + Retry button. Prevents infinite stuck tasks.
+- **Conversation history loading**: `isLoadingConversation` flag + race condition guard. Input disabled during history load.
+- **Credit balance on error**: Balance refreshes even after failed API calls.
+- **QA test run** with real Shopify + Meta account: First message quality 8-9/10. Multi-agent orchestration working well.
 
 ---
 
