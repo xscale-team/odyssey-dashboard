@@ -1,6 +1,6 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-03-26 (Session 17)**
+> **Last updated: 2026-03-30 (Session 18 Continued)**
 > Goal-driven, not timeline-driven. Ship MVP when ad generation, launch, monitoring pipeline is bulletproof.
 
 ---
@@ -52,7 +52,7 @@ The MVP is ready when a user can:
 | Account Settings | ✅ Done | Profile editing, password change, notification prefs |
 | API Rate Limiting | ✅ Done | slowapi: 60/min default, 5/min signup, 10/min login, 3/min password reset |
 | OAuth Onboarding Redirects | ✅ Done | OAuth callbacks redirect to /onboarding or /chat based on profile state |
-| Surrogate Encoding Fix | ✅ Done (v2) | Sanitize before truncate in router.py + initial payload in executor.py |
+| Surrogate Encoding Fix | ✅ Done (v3) | v2 + 4 more sanitization points for DB-loaded conversation history |
 | Em Dash Rule | ✅ Done | Added to orchestrator.md prompt + sandbox system prompt |
 | Visual Ad Tools | ✅ Done | get_competitor_ads + image embedding in get_ad_level_performance |
 | Planner Task Timeout | ✅ Done | Auto-fail after 30min, amber "Timed Out" badge + Retry button |
@@ -63,7 +63,26 @@ The MVP is ready when a user can:
 
 ---
 
-## What's Done (Sessions 3-17)
+## What's Done (Sessions 3-18)
+
+### Session 18 (2026-03-27) — Surrogates v3 + Live QA
+
+#### P0 — Surrogate Encoding v3 (Root Cause Fixed)
+- [x] **Root cause identified**: Assistant responses loaded from DB (containing raw Meta/Shopify tool result data) were never sanitized before being passed back to Anthropic API on subsequent turns. Turn 3 crash reproduced live at position 872-873 in `chat/router.py`.
+- [x] **4 additional sanitization points** added in `chat/router.py` at lines ~408, ~704, ~721, ~904 — sanitize ALL message content pulled from DB before re-injecting into the Anthropic messages array.
+- [x] **v2 fix confirmed working** for turn 1 and turn 2 via live browser testing on demo.runodyssey.io.
+
+#### Live QA Results (Chrome Extension Method)
+- [x] **Turn 1** (Shopify + Meta + competitors complex query): 7 agents, 42 steps, 164s. Stream completed. **BUG FOUND**: Response showed "Analysis saved" but no actual data displayed to user. Agent saves to brand brain but doesn't show the analysis.
+- [x] **Turn 2** (follow-up for actual numbers): Worked perfectly. Beautiful tables with real data (products by revenue, ads by CPA, competitor intelligence with 183 classified ads). Surrogates v2 confirmed working.
+- [x] **Turn 3** (ad generation): Crashed at position 872-873 with surrogates error. Triggered v3 fix.
+- [x] **Em dash compliance**: No em dashes spotted in visible responses. Fix confirmed working.
+- [x] **Browser testing method confirmed**: Chrome extension (Claude in Chrome MCP) creates own tab group, operates via DOM/extension API. Does NOT take over user's mouse/keyboard. This is the method for all future live QA.
+
+#### New Bugs Found in Session 18
+- [ ] **"Analysis saved" UX bug**: Agent saves analysis to brand brain but only says "Analysis saved" — doesn't display the actual analysis data to the user. Needs prompt fix in orchestrator.md.
+- [ ] **Blank visual ad images**: "3 CREATIVES GENERATED" section appears in UI but images are blank (not loaded). Image rendering issue.
+- [ ] **Slow competitor scan**: Competitor intelligence scan takes ~60+ seconds, causes long UI wait with no intermediate feedback.
 
 ### Session 17 (2026-03-26) — QA Bug Fixes + Visual Ads
 
@@ -165,12 +184,11 @@ The MVP is ready when a user can:
 
 ## What's Next — Priority Order
 
-### Priority 1: Verify Session 17 Fixes on Live (Immediate)
-- [ ] Verify surrogate encoding v2 fix on live — confirm no crash with Shopify product descriptions containing non-standard chars
-- [ ] Verify em dash compliance — run ad generation, scan output for em dashes
-- [ ] Verify visual ads — confirm `get_competitor_ads` tool is called and images display in chat
-- [ ] Verify planner task timeout — let a task run, confirm it auto-fails after 30min
-- [ ] Verify conversation history loading — reload chat mid-session, confirm history loads cleanly
+### Priority 1: Fix Critical UX Bugs Found in Session 18 QA
+- [ ] **Fix "Analysis saved" UX bug** — Agent saves analysis to brand brain but doesn't display it. Fix orchestrator.md prompt: after saving to brand brain, agent MUST also display the full analysis to user.
+- [ ] **Verify surrogates v3 on turn 3+** — v3 fix committed and pushed. Run a full 3-turn conversation on demo.runodyssey.io to confirm no crash on turn 3.
+- [ ] **Fix blank visual ad images** — "3 CREATIVES GENERATED" section appears but images are blank. Debug image URL rendering in the UI component.
+- [ ] **Slow competitor scan** — ~60+ second wait with no feedback. Add intermediate progress events or stream the competitor scan results.
 
 ### Priority 2: Domain Migration (app.tryodyssey.ai)
 - [ ] Nameserver swap (waiting on boss)
@@ -215,10 +233,18 @@ The MVP is ready when a user can:
 
 ## Known Bugs & Technical Debt
 
-### Active Issues (Unverified Fixes — Need Live Verification)
-- [ ] Surrogate encoding: v2 fix deployed, needs live verification
-- [ ] Em dash compliance: prompt rule added, needs live verification
-- [ ] Visual ads in chat: images may not render inline in chat markdown (markdown vs HTML)
+### Active Issues (New — Found in Session 18 Continued QA)
+- [ ] **"Analysis Saved" evasion (persistent)**: Guard catches most variants but agent finds new phrasings. Current patterns cover "full report is above", "already included", "save_brand_brain", etc. May need a deeper prompt fix. Response DOES render now but is sometimes a summary-only instead of full data.
+- [ ] **Competitor intel `get_competitor_ads` loop**: Researcher calls the tool 8-12 times when individual ad records don't load. Tool should return an explicit "no individual records available, use aggregate data" message and agent should stop retrying. Wastes 3-4 iterations.
+- [ ] **`get_competitor_ads` individual records not loading**: The tool returns aggregated 183-ad stats but not individual ad rows. Likely a DB query issue — the filter/limit parameters may be returning empty. Needs investigation.
+- [ ] **Blank visual ad images**: "3 CREATIVES GENERATED" section shows but images don't load. UI rendering bug.
+- [ ] **Slow competitor scan**: ~60+ seconds with no intermediate feedback. Needs progress streaming.
+
+### Active Issues (New — Found in Session 18 QA)
+- [x] **Blank response (rendering bug)**: Root cause found — E2B delivers stdout line-by-line via WebSocket. Long response JSON (5K+ chars) gets fragmented, json.loads fails, done event lost, blank chat. Fixed by chunking response into 400-char response_chunk events. **FIXED** in commit 37bc952.
+
+### Active Issues (Confirmed via v3 Fix — Needs Verification)
+- [ ] Surrogate encoding v3: fix committed and pushed. Needs live verification on turn 3+ conversation.
 - [ ] Competitor ad images from Meta Ad Library not yet wired (Apify/SearchAPI needed)
 
 ### Active Issues (Known Open)
@@ -236,8 +262,13 @@ The MVP is ready when a user can:
 - [ ] Background autonomy: planner task cards not auto-creating from daily checks
 - [ ] "make me AN ad" sometimes still generates 3 (prompt parsing not perfect)
 
-### Fixed (Sessions 15-17)
-- [x] Surrogate encoding v1 + v2 (sanitize before truncate, sanitize initial payload)
+### Fixed (Sessions 15-18 Continued)
+- [x] **Blank response (E2B line limit)**: Response emission chunked to 400-char response_chunk events. Router accumulates chunks and forwards as text SSE. No more silent lost done events.
+- [x] **Active campaign awareness**: Agent now checks effective_status, identifies offer swaps (PAUSED = old offer), focuses analysis on ACTIVE campaigns only.
+- [x] **MAX_ITERATIONS safety net**: Loop exhausted without end_turn now emits done event instead of silent failure.
+- [x] **manager.py silent exception**: Sandbox event parse failures now logged (were silently dropped).
+- [x] **Analysis Saved guard (programmatic)**: Short "saved"-pattern responses trigger a one-shot rewrite. Guard has infinite-loop protection (_rewrite_attempted flag). Patterns expanded: full report is above, already included, save_brand_brain, response above, etc.
+- [x] Surrogate encoding v1 + v2 + v3 (sanitize before truncate, sanitize initial payload, sanitize all DB-loaded history messages)
 - [x] Em dash rule added to orchestrator.md + sandbox system prompt
 - [x] Visual ad tools registered (get_competitor_ads + updated get_ad_level_performance)
 - [x] Planner task timeout (auto-fail 30min, amber badge, Retry button)
@@ -383,7 +414,33 @@ The MVP is ready when a user can:
 - **Planner task timeout**: Auto-fail after 30min. Amber "Timed Out" badge + Retry button. Prevents infinite stuck tasks.
 - **Conversation history loading**: `isLoadingConversation` flag + race condition guard. Input disabled during history load.
 - **Credit balance on error**: Balance refreshes even after failed API calls.
-- **QA test run** with real Shopify + Meta account: First message quality 8-9/10. Multi-agent orchestration working well.
+
+### 2026-03-30 (Session 18 Continued) — Blank Response Root Cause + Phase 4 QA
+
+#### Root Cause Fix: Blank Responses
+- **Root cause identified**: E2B delivers sandbox stdout line-by-line over WebSocket. A long competitor analysis response (~5K chars) produces one massive JSON line that gets fragmented. `json.loads` fails silently in `manager.py`, `done` event lost, `full_response = ""`, blank chat. This explained why morning briefings (short) worked but competitor intel (long) was blank.
+- **Fix**: Sandbox now emits `response_start` + multiple `response_chunk` events (400 chars each) + bare `done` signal. Router handles `response_chunk` events, accumulates `full_response`, forwards as text SSE events. 5 commits: `ffc55b0`, `dd60437`, `3090a66`, `37bc952`, `ab12041`, `8005b04`.
+
+#### Phase 4 QA Tests Run
+- **Competitor intel** ("Show me what my competitors are doing..."): Response NOW RENDERS. Agent gave useful insight ("you have a massive competitive moat"). Still shows Analysis Saved pattern with "full report is above" — new guard patterns added to catch this.
+- **CPA spike diagnostic** ("My CPA spiked this week..."): FULLY WORKING after multiple rounds of fixes. Final response: full table ($439.69 spend, 10 purchases, $43.97 CPA vs $51 target), ad-level breakdown naming "50/50 bottle" as winner ($30.97 CPA, 60% of purchases), 2 dead ads with exact wasted spend, frequency 2.81 approaching danger zone, priority action list with time estimates. Production-quality output.
+
+#### UX Improvements Observed (To Implement)
+1. **Agent loops on failed tool**: `get_competitor_ads` called 8-12x when individual records are empty. Tool should return explicit "no records, use aggregate" and agent should stop.
+2. **"Full report is above" / "Already included above"**: Agent thinks earlier thinking blocks are visible. Guard now catches these but root fix is a stronger system prompt: "ONLY your final text message is visible. Nothing from before save_brand_brain."
+3. **No "what happened" answer in CPA query**: Agent jumped straight to "what to do" without explaining root cause first. User asked "what happened" and got a to-do list.
+4. **~90-110 second response time**: No chat-area progress indicator during the wait. Terminal panel is good but the message bubble itself just shows "thinking..." dot. Could show "Analyst is checking your campaigns..." in the bubble.
+5. **Tool names leaked in chat**: Agent said "above the save_brand_brain call" — internal tool names should never appear in user-facing responses.
+6. **Credit balance drop visible**: Charges showing correctly (~200 tokens per analysis), good.
+
+### 2026-03-27 (Session 18)
+- **Live QA via browser testing** (Chrome extension method): Full 3-turn conversation on demo.runodyssey.io with real Shopify + Meta account.
+  - Turn 1: 7 agents, 42 steps, 164s — stream completed but "Analysis saved" UX bug found
+  - Turn 2: Perfect — beautiful tables with real data, surrogates v2 confirmed working
+  - Turn 3: Crashed with surrogates at position 872-873 — triggered v3 fix
+- **Surrogate encoding v3**: Root cause found — DB-loaded conversation history (assistant messages containing raw Meta/Shopify tool results) never sanitized before re-injection into Anthropic API. Added 4 new sanitization points in chat/router.py (~lines 408, 704, 721, 904). Committed and pushed to main.
+- **Em dash confirmed working**: No em dashes observed in live responses.
+- **New bugs catalogued**: "Analysis saved" UX bug, blank visual ad images, slow competitor scan (~60s).
 
 ---
 
@@ -422,3 +479,23 @@ USER ACTION (e.g., chat, ad batch, launch)
 | CPA | Meta Ads | $51 | Better ads, angles, targeting |
 | AOV | Shopify | $45 | Better offers, bundles, upsells |
 | LTV | Loop | $326 | Better retention, email flows |
+
+---
+
+## What To Do Next (Session 19)
+
+### P0 — Fix `get_competitor_ads` individual record loading
+The tool always returns empty individual ad records (returns aggregate stats only). Agent loops 8-12x retrying. Fix the SQL query in the tool definition to actually return rows from `competitor_ads` table with proper filters. This will make competitor intel responses much richer.
+
+### P1 — Fix Analysis Saved at the prompt level
+The programmatic guard is a safety net but the root cause is the agent's mental model. Add to the sandbox system prompt:
+> "CRITICAL: Your ONLY output to the user is what you write in your text messages AFTER all tool calls are complete. Nothing from your thinking, no tool results, no brand brain content is visible. Write your FULL analysis inline. Never say 'report above', 'full analysis included', or reference save_brand_brain."
+
+### P2 — UX: Response time progress indicator
+~90-110s responses with only "thinking..." dots in the message bubble feels abandoned. Add agent status text inside the message bubble as it streams: "Analyst checking your campaigns... → Scout pulling Shopify data... → Writing analysis..."
+
+### P3 — UX: CPA diagnostic format
+The agent should answer "what happened" BEFORE "what to do." Current format: [to-do list]. Better format: "[Root cause]: [specific metric change] → [why] → [3 options]."
+
+### P4 — Verify `get_competitor_ads` + Analysis Saved guard after latest deploys
+Once deploys settle, run both tests again to verify the new guard patterns and tool fix are working.
