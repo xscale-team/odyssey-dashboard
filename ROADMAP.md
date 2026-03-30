@@ -417,6 +417,17 @@ The MVP is ready when a user can:
 - **Conversation history loading**: `isLoadingConversation` flag + race condition guard. Input disabled during history load.
 - **Credit balance on error**: Balance refreshes even after failed API calls.
 
+### 2026-03-30 (Session 18 Continued Part 2) — Image Display Fix + Live QA Verified
+
+#### Column Bug Fix + Image Display
+- **Root cause of `get_competitor_ads` looping**: Tool queried `days_running` and `ad_copy` — neither column exists in DB. Fixed to `days_active` and `primary_text`. Also added `ad_classification` JSONB fallback for angle/format/awareness.
+- **IMAGE DISPLAY RULE added**: System prompt now requires agent to embed `![Brand — Angle](image_url)` markdown for all ads. Tool result also returns reminder note.
+- **Live QA verified**: Both tests passed end-to-end on demo.runodyssey.io:
+  1. **Competitor ads**: "Show me what my competitors are doing" — 183 classified ads across 12 brands, brand-by-brand breakdown (Seed, AG1, Bloom, Momentous, Ritual, Thorne), competitive moat analysis, intercept strategy, **25 ad images rendered in 3-column grid**. 5 agents, 32 steps, 118.9s.
+  2. **Own brand ads**: "Show me my best performing ads with their images" — 8 ads ranked by CPA, performance summary table, KEY TAKEAWAYS (50/50 bottle is winner at $30.97 CPA, kill "2 img box"), **own ad creative images rendered** (testimonials, product shots, review cards). 5 agents, 24 steps, 197.2s.
+- **All 185 competitor ads have permanent Supabase Storage image URLs** — no expired CDN links.
+- **Own brand ads use Meta thumbnail URLs** — valid at query time, rendered inline.
+
 ### 2026-03-30 (Session 18 Continued) — Blank Response Root Cause + Phase 4 QA
 
 #### Root Cause Fix: Blank Responses
