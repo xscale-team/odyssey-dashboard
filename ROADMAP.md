@@ -235,8 +235,10 @@ The MVP is ready when a user can:
 
 ### Active Issues (New — Found in Session 18 Continued QA)
 - [ ] **"Analysis Saved" evasion (persistent)**: Guard catches most variants but agent finds new phrasings. Current patterns cover "full report is above", "already included", "save_brand_brain", etc. May need a deeper prompt fix. Response DOES render now but is sometimes a summary-only instead of full data.
-- [ ] **Competitor intel `get_competitor_ads` loop**: Researcher calls the tool 8-12 times when individual ad records don't load. Tool should return an explicit "no individual records available, use aggregate data" message and agent should stop retrying. Wastes 3-4 iterations.
-- [ ] **`get_competitor_ads` individual records not loading**: The tool returns aggregated 183-ad stats but not individual ad rows. Likely a DB query issue — the filter/limit parameters may be returning empty. Needs investigation.
+- [x] **Competitor intel `get_competitor_ads` column bugs**: Tool was selecting `days_running` (doesn't exist) and `ad_copy` (doesn't exist). Both fixed — now uses `days_active`, `primary_text`. Also added `ad_classification` JSONB fallback for angle/format/awareness. **FIXED** commit 0de0292.
+- [x] **`get_competitor_ads` individual records not loading**: Root cause was column name mismatch (`days_running` doesn't exist in DB). Fixed to use correct columns. All 185 competitor ads now return with valid image URLs (Supabase Storage, permanent). **FIXED** commit 0de0292.
+- [x] **Images not showing in chat**: Added IMAGE DISPLAY RULE to system prompt — agent must embed `![Brand — Angle](image_url)` markdown for competitor and own brand ads. Frontend renders natively. Tool result also returns `note` reminding agent to use image markdown. **FIXED** commit 0de0292.
+- [ ] **`days_active` = 0 for all competitor ads**: Scraper sets `days_active=0` on all inserts. `first_seen_at` = `last_seen_at` = scrape date so duration is always 0. Need to update scraper to track re-sighted ads and increment `days_active`. Also affects `is_likely_winner` (always false).
 - [ ] **Blank visual ad images**: "3 CREATIVES GENERATED" section shows but images don't load. UI rendering bug.
 - [ ] **Slow competitor scan**: ~60+ seconds with no intermediate feedback. Needs progress streaming.
 
@@ -484,18 +486,29 @@ USER ACTION (e.g., chat, ad batch, launch)
 
 ## What To Do Next (Session 19)
 
-### P0 — Fix `get_competitor_ads` individual record loading
-The tool always returns empty individual ad records (returns aggregate stats only). Agent loops 8-12x retrying. Fix the SQL query in the tool definition to actually return rows from `competitor_ads` table with proper filters. This will make competitor intel responses much richer.
+### P0 — Live QA: Verify image display works end-to-end
+Now that `get_competitor_ads` column bugs are fixed and IMAGE DISPLAY RULE is added, run a live test: ask "show me what my competitors are doing right now" and confirm that:
+1. The tool actually returns ad records (not empty like before)
+2. Agent embeds `![](image_url)` markdown in the response
+3. Images render visually in the chat bubble (not just URLs)
+4. 185 ads should be available — Bloom Nutrition, Seed, AG1, NOW Foods
 
-### P1 — Fix Analysis Saved at the prompt level
-The programmatic guard is a safety net but the root cause is the agent's mental model. Add to the sandbox system prompt:
-> "CRITICAL: Your ONLY output to the user is what you write in your text messages AFTER all tool calls are complete. Nothing from your thinking, no tool results, no brand brain content is visible. Write your FULL analysis inline. Never say 'report above', 'full analysis included', or reference save_brand_brain."
+### P1 — Fix `days_active` = 0 for competitor ads
+The scraper sets `days_active=0` on all inserts because `first_seen_at = last_seen_at = scrape timestamp`. Need to:
+1. On re-scrape, update `last_seen_at` for existing ads (match by `meta_ad_id`)
+2. Calculate `days_active = last_seen_at - first_seen_at` via pg trigger or scraper update
+3. Set `is_likely_winner = true` when `days_active >= 30`
+This affects the learning loop — can't distinguish winner ads without duration data.
 
 ### P2 — UX: Response time progress indicator
 ~90-110s responses with only "thinking..." dots in the message bubble feels abandoned. Add agent status text inside the message bubble as it streams: "Analyst checking your campaigns... → Scout pulling Shopify data... → Writing analysis..."
 
-### P3 — UX: CPA diagnostic format
-The agent should answer "what happened" BEFORE "what to do." Current format: [to-do list]. Better format: "[Root cause]: [specific metric change] → [why] → [3 options]."
+### P3 — Analysis Saved guard: prompt-level fix
+The programmatic guard catches most evasions. Strengthen the root cause fix in system prompt:
+> "Your ONLY user-visible output is what you write AFTER all tool calls are complete. Nothing from tool results, no brand brain content, no thinking is visible. Write your FULL analysis inline. Never reference saved files."
 
-### P4 — Verify `get_competitor_ads` + Analysis Saved guard after latest deploys
-Once deploys settle, run both tests again to verify the new guard patterns and tool fix are working.
+### P4 — UX: Improve competitor intel response format
+After image fix lands, improve how the agent presents competitor data:
+- Group by brand with a header
+- Show image → angle → copy → hook → format → awareness level
+- Add "What this means for [brand]" synthesis section at the end
