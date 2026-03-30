@@ -1,6 +1,6 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-03-30 (Session 18 Continued)**
+> **Last updated: 2026-03-30 (Session 18 Part 2 — Images, Adaptation, Google Signup)**
 > Goal-driven, not timeline-driven. Ship MVP when ad generation, launch, monitoring pipeline is bulletproof.
 
 ---
@@ -52,6 +52,10 @@ The MVP is ready when a user can:
 | Account Settings | ✅ Done | Profile editing, password change, notification prefs |
 | API Rate Limiting | ✅ Done | slowapi: 60/min default, 5/min signup, 10/min login, 3/min password reset |
 | OAuth Onboarding Redirects | ✅ Done | OAuth callbacks redirect to /onboarding or /chat based on profile state |
+| Google Signup | ✅ Done | Google Cloud OAuth + Supabase provider, zero code changes |
+| Image Display in Chat | ✅ Done | Competitor ads + own brand ads render visually via markdown |
+| Founder Adaptation | ✅ Done | Agent learns user preferences via preferences.md, adapts per founder |
+| Live-First Analysis | ✅ Done | Agent prioritizes active ads, past winners as suggestions |
 | Surrogate Encoding Fix | ✅ Done (v3) | v2 + 4 more sanitization points for DB-loaded conversation history |
 | Em Dash Rule | ✅ Done | Added to orchestrator.md prompt + sandbox system prompt |
 | Visual Ad Tools | ✅ Done | get_competitor_ads + image embedding in get_ad_level_performance |
@@ -417,7 +421,15 @@ The MVP is ready when a user can:
 - **Conversation history loading**: `isLoadingConversation` flag + race condition guard. Input disabled during history load.
 - **Credit balance on error**: Balance refreshes even after failed API calls.
 
-### 2026-03-30 (Session 18 Continued Part 2) — Image Display Fix + Live QA Verified
+### 2026-03-30 (Session 18 Continued Part 2) — Images, Founder Adaptation, Google Signup
+
+#### Google Signup
+- **Google OAuth configured**: Google Cloud Console OAuth app + Supabase provider enabled. Zero code changes — frontend buttons, callback handler, and profile trigger were already built. Tested end-to-end: Google login → onboarding flow → chat. Working.
+
+#### Founder Adaptation System
+- **preferences.md brain file**: Agent now learns each founder's communication style, decision patterns, risk tolerance, and preferred formats over time. Reads at session start (Phase 0), saves observations silently after meaningful interactions.
+- **Live-first analysis rule**: Agent prioritizes active/spending ads (70% of response), past winners as suggestions (20%), key takeaways (10%). Paused ads are context, not priorities.
+- **All system prompt rules framed as defaults**: Diagnostic format, image display, live-first analysis are defaults for new users that adapt as agent learns the founder.
 
 #### Column Bug Fix + Image Display
 - **Root cause of `get_competitor_ads` looping**: Tool queried `days_running` and `ad_copy` — neither column exists in DB. Fixed to `days_active` and `primary_text`. Also added `ad_classification` JSONB fallback for angle/format/awareness.
@@ -497,29 +509,22 @@ USER ACTION (e.g., chat, ad batch, launch)
 
 ## What To Do Next (Session 19)
 
-### P0 — Live QA: Verify image display works end-to-end
-Now that `get_competitor_ads` column bugs are fixed and IMAGE DISPLAY RULE is added, run a live test: ask "show me what my competitors are doing right now" and confirm that:
-1. The tool actually returns ad records (not empty like before)
-2. Agent embeds `![](image_url)` markdown in the response
-3. Images render visually in the chat bubble (not just URLs)
-4. 185 ads should be available — Bloom Nutrition, Seed, AG1, NOW Foods
-
-### P1 — Fix `days_active` = 0 for competitor ads
+### P0 — Fix `days_active` = 0 for competitor ads
 The scraper sets `days_active=0` on all inserts because `first_seen_at = last_seen_at = scrape timestamp`. Need to:
 1. On re-scrape, update `last_seen_at` for existing ads (match by `meta_ad_id`)
 2. Calculate `days_active = last_seen_at - first_seen_at` via pg trigger or scraper update
 3. Set `is_likely_winner = true` when `days_active >= 30`
 This affects the learning loop — can't distinguish winner ads without duration data.
 
-### P2 — UX: Response time progress indicator
+### P1 — UX: Response time progress indicator
 ~90-110s responses with only "thinking..." dots in the message bubble feels abandoned. Add agent status text inside the message bubble as it streams: "Analyst checking your campaigns... → Scout pulling Shopify data... → Writing analysis..."
 
-### P3 — Analysis Saved guard: prompt-level fix
+### P2 — Analysis Saved guard: prompt-level fix
 The programmatic guard catches most evasions. Strengthen the root cause fix in system prompt:
 > "Your ONLY user-visible output is what you write AFTER all tool calls are complete. Nothing from tool results, no brand brain content, no thinking is visible. Write your FULL analysis inline. Never reference saved files."
 
-### P4 — UX: Improve competitor intel response format
-After image fix lands, improve how the agent presents competitor data:
-- Group by brand with a header
-- Show image → angle → copy → hook → format → awareness level
-- Add "What this means for [brand]" synthesis section at the end
+### P3 — Apple signup
+Google is live. Add Apple sign-in for full OAuth coverage. Similar process: Apple Developer Console + Supabase provider config.
+
+### P4 — Landing page / marketing site
+Now that the product is working (ads, images, competitor intel, Google auth, onboarding), need a public-facing marketing site at runodyssey.io for signups.
