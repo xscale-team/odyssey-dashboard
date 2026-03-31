@@ -1,6 +1,6 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-03-30 (Session 18 Part 2 — Images, Adaptation, Google Signup)**
+> **Last updated: 2026-03-31 (Session 18 Part 3 — Shopify Dev Dashboard, UX Fixes, QA)**
 > Goal-driven, not timeline-driven. Ship MVP when ad generation, launch, monitoring pipeline is bulletproof.
 
 ---
@@ -421,6 +421,30 @@ The MVP is ready when a user can:
 - **Conversation history loading**: `isLoadingConversation` flag + race condition guard. Input disabled during history load.
 - **Credit balance on error**: Balance refreshes even after failed API calls.
 
+### 2026-03-31 (Session 18 Part 3) — Shopify Dev Dashboard, UX Fixes, QA
+
+#### Shopify Dev Dashboard Connection Flow
+- **Built POST /connect-manual endpoint**: Validates token with test API call to /shop.json, checks scopes, encrypts + stores, kicks off background sync. All existing OAuth endpoints untouched.
+- **ShopifyConnectGuide component**: 5-step accordion guide with scope pills, token warning, paste fields. Used in both onboarding and settings.
+- **Expanded Shopify scopes**: Added read_analytics, read_reports, read_content, read_themes, read_price_rules, read_discounts, read_marketing_events, read_inventory, read_checkouts (13 total).
+
+#### Onboarding Redirect Loop Fix
+- **Root cause**: After completing onboarding, AuthGuard checked `user.onboarding_completed` in Zustand store which was still `false` (never updated). Caused infinite loop: /chat → AuthGuard → /onboarding → API says completed → /chat → loop.
+- **Fix**: Update `useAuthStore` with `onboarding_completed: true` BEFORE navigating to /chat.
+
+#### UX Improvements (All Verified Live)
+- **Inline thinking status**: Chat bubble shows "Checking your ad campaigns" → "Pulling ad performance data" → "Saving insights for next time" instead of static "ODY-1 is thinking..."
+- **No more empty chats**: "+ New Chat" just shows welcome screen. Conversations created lazily on first message.
+- **Prompt suggestions work**: Click sends message immediately (was already wired but + New Chat was interfering).
+- **Human-readable tool names**: `get_meta_campaigns` → "Checking your ad campaigns", `save_brand_brain` → "Saving insights for next time"
+- **Cleaner Team Activity**: "Loaded 7 brand brain files" → "Remembering your brand context (7 files)"
+
+#### Live QA Tests (3 Scenarios, All Passing)
+1. "What should I focus on to grow revenue?" — 6 agents, 29 steps, 96.8s. Business metrics table, priority-ranked action plan, Three Pillars scorecard. A+ quality.
+2. "How much did I spend on ads this week?" — 5 agents, 19 steps, 32.5s. Campaign table, frequency warning, forward projection. Fast and direct.
+3. "Write me 5 scroll-stopping ad headlines for HashiAid" — 3 agents, 22 steps, 39.4s. Table with Headline/Angle/Funnel/Format/Why It Works. Strategically avoided overused angles. A+ quality.
+4. "Give me a full analysis of my store and ads" — Prompt suggestion click test. Live-first analysis ("SECTION 1: WHAT'S LIVE RIGHT NOW") with status indicators (✅⚠️🔴). All UX fixes confirmed.
+
 ### 2026-03-30 (Session 18 Continued Part 2) — Images, Founder Adaptation, Google Signup
 
 #### Google Signup
@@ -516,15 +540,25 @@ The scraper sets `days_active=0` on all inserts because `first_seen_at = last_se
 3. Set `is_likely_winner = true` when `days_active >= 30`
 This affects the learning loop — can't distinguish winner ads without duration data.
 
-### P1 — UX: Response time progress indicator
-~90-110s responses with only "thinking..." dots in the message bubble feels abandoned. Add agent status text inside the message bubble as it streams: "Analyst checking your campaigns... → Scout pulling Shopify data... → Writing analysis..."
+### P1 — Test Shopify Dev Dashboard connection flow end-to-end
+The manual connect flow is built (POST /connect-manual, ShopifyConnectGuide component) but untested with a real Shopify store. Need to:
+1. Open onboarding on a fresh account → verify the 5-step guide renders
+2. Create a custom app on a dev store following the guide
+3. Paste credentials → verify token validation, encryption, sync
+4. Also test in Settings page (expandable card)
+5. Take Dev Dashboard screenshots for `/public/guides/shopify/step{1-5}.png`
 
-### P2 — Analysis Saved guard: prompt-level fix
-The programmatic guard catches most evasions. Strengthen the root cause fix in system prompt:
-> "Your ONLY user-visible output is what you write AFTER all tool calls are complete. Nothing from tool results, no brand brain content, no thinking is visible. Write your FULL analysis inline. Never reference saved files."
+### P2 — UX: Follow-up action buttons below responses
+After the agent suggests something ("Want me to create ads for that?"), show 1-2 clickable action buttons below the response. This makes conversation flow natural instead of requiring the user to type.
 
-### P3 — Apple signup
+### P3 — UX: Copy button on responses
+Founders will want to copy ad headlines, tables, or specific text. Add a copy-to-clipboard button on hover over each response.
+
+### P4 — Apple signup
 Google is live. Add Apple sign-in for full OAuth coverage. Similar process: Apple Developer Console + Supabase provider config.
+
+### P5 — Marketing site / landing page
+Now that the product is working (ads, images, competitor intel, Google auth, onboarding), need a public-facing marketing site at runodyssey.io for signups.
 
 ### P4 — Landing page / marketing site
 Now that the product is working (ads, images, competitor intel, Google auth, onboarding), need a public-facing marketing site at runodyssey.io for signups.
