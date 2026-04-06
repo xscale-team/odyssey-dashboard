@@ -1,6 +1,6 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-03-31 (Session 18 Part 3 — Shopify Dev Dashboard, UX Fixes, QA)**
+> **Last updated: 2026-04-06 (Session 19 — Shopify Client ID, Competitor Vision, Gemini Full-Creative, Meta OAuth)**
 > Goal-driven, not timeline-driven. Ship MVP when ad generation, launch, monitoring pipeline is bulletproof.
 
 ---
@@ -26,8 +26,8 @@ The MVP is ready when a user can:
 
 | Area | Status | Notes |
 |------|--------|-------|
-| Integrations (Shopify/Meta/Loop) | ✅ Done | All 3 connected, syncing data |
-| Ad Generation (Gemini AI) | ✅ Working | 10 formats, product composition |
+| Integrations (Shopify/Meta/Loop) | ✅ Done | Shopify: Client ID + Client Secret OAuth. Meta: OAuth + data deletion endpoint. Loop: API key. |
+| Ad Generation (Gemini AI) | ✅ Working | 10 formats, Gemini generates COMPLETE ads (layout + typography + imagery) |
 | Ad Quality Check (Gemini Vision) | ✅ Done | Scores 0-100, auto-regen < 50 |
 | Ad Copywriter (Sonnet 4.6) | ✅ Working | 5 primary texts + 5 headlines per ad |
 | Ad Launch Pipeline | ✅ Done | Approve, push to Meta, New Batch / Add to Batch, CBO detection |
@@ -35,7 +35,7 @@ The MVP is ready when a user can:
 | Entry Point Auto-Detection | ✅ Done | Sync from Meta, auto-detect active ad destinations |
 | Subscription Metrics (Loop) | ✅ Done | LTV, churn, MRR per selling plan |
 | Three Pillars (CPA/AOV/LTV) | ✅ Live | All 3 showing real data |
-| Competitor Intelligence | ✅ Done | 185 ads scraped, classified, permanent storage, weekly auto-refresh |
+| Competitor Intelligence | ✅ Done | 185 ads scraped, classified with vision AI, permanent storage, weekly auto-refresh |
 | Intel Dashboard | ✅ Done | Standalone page with angles, formats, hooks, brand cards |
 | Competitive Response Alerts | ✅ Done | Weekly diff reports, Intel page banner |
 | Billing (Stripe) | ✅ Done | PAYG tokens, 5x markup, real cost tracking, Stripe Checkout |
@@ -188,13 +188,19 @@ The MVP is ready when a user can:
 
 ## What's Next — Priority Order
 
-### Priority 1: Fix Critical UX Bugs Found in Session 18 QA
-- [ ] **Fix "Analysis saved" UX bug** — Agent saves analysis to brand brain but doesn't display it. Fix orchestrator.md prompt: after saving to brand brain, agent MUST also display the full analysis to user.
-- [ ] **Verify surrogates v3 on turn 3+** — v3 fix committed and pushed. Run a full 3-turn conversation on demo.runodyssey.io to confirm no crash on turn 3.
-- [ ] **Fix blank visual ad images** — "3 CREATIVES GENERATED" section appears but images are blank. Debug image URL rendering in the UI component.
-- [ ] **Slow competitor scan** — ~60+ second wait with no feedback. Add intermediate progress events or stream the competitor scan results.
+### Priority 1: Complete Meta App Review (BLOCKING for non-tester users)
+- [ ] Upload App Icon in Meta Developer Dashboard
+- [ ] Complete Data Handling + Reviewer Instructions sections
+- [ ] Remove oEmbed permissions from review submission
+- [ ] Submit for review (ads_management, ads_read, business_management)
+- [ ] **Workaround**: Add teammates as Testers in App Roles until approved
 
-### Priority 2: Domain Migration (app.tryodyssey.ai)
+### Priority 2: Fix Sandbox Token Refresh on Integration Connect
+- [ ] When user connects Meta/Shopify mid-session, existing sandbox doesn't have the new tokens
+- [ ] Need to invalidate/recreate sandbox when integrations change (or inject tokens dynamically)
+- [ ] Currently requires "New Chat" to pick up new integration tokens
+
+### Priority 3: Domain Migration (app.tryodyssey.ai)
 - [ ] Nameserver swap (waiting on boss)
 - [ ] Set up `app.tryodyssey.ai` as custom domain in Cloudflare Pages
 - [ ] Add redirect URLs to Supabase auth config
@@ -243,8 +249,9 @@ The MVP is ready when a user can:
 - [x] **`get_competitor_ads` individual records not loading**: Root cause was column name mismatch (`days_running` doesn't exist in DB). Fixed to use correct columns. All 185 competitor ads now return with valid image URLs (Supabase Storage, permanent). **FIXED** commit 0de0292.
 - [x] **Images not showing in chat**: Added IMAGE DISPLAY RULE to system prompt — agent must embed `![Brand — Angle](image_url)` markdown for competitor and own brand ads. Frontend renders natively. Tool result also returns `note` reminding agent to use image markdown. **FIXED** commit 0de0292.
 - [ ] **`days_active` = 0 for all competitor ads**: Scraper sets `days_active=0` on all inserts. `first_seen_at` = `last_seen_at` = scrape date so duration is always 0. Need to update scraper to track re-sighted ads and increment `days_active`. Also affects `is_likely_winner` (always false).
-- [ ] **Blank visual ad images**: "3 CREATIVES GENERATED" section shows but images don't load. UI rendering bug.
+- [x] **Blank visual ad images**: Fixed. Was caused by old Pillow overlay approach. Now Gemini generates complete ads.
 - [ ] **Slow competitor scan**: ~60+ seconds with no intermediate feedback. Needs progress streaming.
+- [ ] **Sandbox doesn't pick up new integrations**: If Meta/Shopify connected after sandbox creation, tokens not available until "New Chat".
 
 ### Active Issues (New — Found in Session 18 QA)
 - [x] **Blank response (rendering bug)**: Root cause found — E2B delivers stdout line-by-line via WebSocket. Long response JSON (5K+ chars) gets fragmented, json.loads fails, done event lost, blank chat. Fixed by chunking response into 400-char response_chunk events. **FIXED** in commit 37bc952.
@@ -263,7 +270,7 @@ The MVP is ready when a user can:
 - [ ] `offer_metrics_daily` only populated on import, not auto-updated from Meta
 - [ ] Facebook CDN image URLs in old `generated_assets` have expired
 - [ ] Competitor scraper: Garden of Life + Transparent Labs return 0 ads
-- [ ] Sandbox max_steps=10 may be insufficient for complex workflows (should be 16-20)
+- [x] Sandbox MAX_ITERATIONS increased 20 > 30 (was causing blank responses on complex batch flows)
 - [ ] No per-user token spending cap per action (agent could burn all credits in one run)
 - [ ] Background autonomy: planner task cards not auto-creating from daily checks
 - [ ] "make me AN ad" sometimes still generates 3 (prompt parsing not perfect)
@@ -420,6 +427,51 @@ The MVP is ready when a user can:
 - **Planner task timeout**: Auto-fail after 30min. Amber "Timed Out" badge + Retry button. Prevents infinite stuck tasks.
 - **Conversation history loading**: `isLoadingConversation` flag + race condition guard. Input disabled during history load.
 - **Credit balance on error**: Balance refreshes even after failed API calls.
+
+### 2026-04-06 (Session 19) — Shopify Client ID, Competitor Vision, Gemini Full-Creative, Meta OAuth
+
+#### Shopify Integration Overhaul (Client ID + Client Secret)
+- [x] **Replaced deprecated access token flow** with modern Client ID + Client Secret OAuth
+- [x] Frontend guide rewritten: 4-step flow (Create App, Create Version with Scopes, Install, Get Credentials)
+- [x] Backend: `/connect-manual` now stores user's credentials, builds OAuth URL, redirects to Shopify
+- [x] Callback retrieves per-user credentials from nonce metadata for token exchange
+- [x] DB migration 019: `metadata` JSONB on `oauth_nonces`, `encrypted_client_id`/`encrypted_client_secret` on `connected_services`
+
+#### Competitor Ad Visual Analysis (Vision AI)
+- [x] **Ad classifier now uses Claude Vision** to analyze actual competitor ad images
+- [x] New `CLASSIFY_PROMPT_WITH_IMAGE` describes layout, colors (hex), typography, composition from the real image
+- [x] Recreation prompts now contain actual visual analysis, not guesses from copy
+- [x] `classify_unclassified_ads()` passes image_url to classifier
+
+#### Gemini Full-Creative Generation (MAJOR)
+- [x] **Killed the old Pillow text overlay approach entirely**. Gemini now generates the COMPLETE ad: layout, typography, imagery, composition as one cohesive piece.
+- [x] New `_build_full_ad_prompt()` with format-specific creative direction and funnel guardrails
+- [x] Competitor recreation prompts woven into Gemini creative briefs as visual inspiration
+- [x] Retry with simpler prompt on first failure
+- [x] Updated ALL references across prompts, skills, tool descriptions to reflect Gemini full-creative
+
+#### Meta OAuth Improvements
+- [x] **Better error messages for Development Mode**: Captures `error_reason` + `error_description` from Facebook
+- [x] Token exchange parses Facebook's JSON error instead of bare `raise_for_status()`
+- [x] Frontend shows specific messages: "Ask the admin to add your Facebook account as a tester"
+- [x] **Data deletion callback endpoint**: `POST /api/integrations/meta/data-deletion` for Meta App Review
+
+#### Ad Image Resolution Fix
+- [x] Reordered Meta API image URL fallback: `creative.image_url` > `link_data.image_url` > `video_data.image_url` > `link_data.picture` > `creative.thumbnail_url`
+
+#### Orchestrator Prompt Improvements
+- [x] CMO-level strategic voice: business intelligence, pattern recognition, proactive insights
+- [x] Competitor-to-creative pipeline shows what inspired each batch
+- [x] Efficiency rules: one `get_competitor_ads` call, no `scan_competitor_ads` during generation
+- [x] MAX_ITERATIONS increased 20 > 30 to prevent blank responses on complex batch flows
+- [x] Fixed `num_ads` bug (undefined variable in error handler)
+
+#### Meta App Review Progress
+- [x] Meta App is Live (ID 1975630903302854), Published
+- [x] Privacy policy URL set (thexscale.com/privacy-policy)
+- [x] Started App Review submission for `ads_management`, `ads_read`, `business_management`
+- [ ] **Pending**: Complete App Review (app icon, data handling, reviewer instructions)
+- [ ] **Pending**: Remove stale oEmbed permissions from review submission
 
 ### 2026-03-31 (Session 18 Part 3) — Shopify Dev Dashboard, UX Fixes, QA
 
