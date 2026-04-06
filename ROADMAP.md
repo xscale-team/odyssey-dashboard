@@ -230,7 +230,7 @@ The MVP is ready when a user can:
 - [ ] Mobile responsive pass (currently desktop-only)
 - [ ] Loading skeletons for all async operations
 - [ ] Empty states for all lists/grids
-- [ ] Sandbox max_steps: increase to 16-20 for complex workflows
+- [x] Sandbox MAX_ITERATIONS increased to 30 (was 20, caused blank responses)
 - [ ] Per-user token spending cap per action (prevent runaway burns)
 
 ### Priority 7: Klaviyo Integration
@@ -474,6 +474,50 @@ The MVP is ready when a user can:
 - **Pipeline reliability: 3/4 tests worked on first try** (1 intermittent SSE failure, retried successfully)
 - **Agent intelligence: A+** — Correctly identifies winners/losers, cites actual data, proactive recommendations, follows naming conventions
 - **UX: A** — Team Activity panel informative, streaming smooth, images render, structured tables display correctly
+
+#### Critical Fixes Applied During Session 20
+
+**Billing: Real Token Tracking (was flat $0.60 per message)**
+- [x] Root cause: sandbox charged hardcoded 15K input + 5K output tokens regardless of actual usage = always $0.60
+- [x] Fix: sandbox now tracks real `response.usage.input_tokens/output_tokens` across all iterations, emits in done event
+- [x] Router uses real tokens for billing, falls back to estimates for old sandbox deploys
+- [x] Verified: analytics query costs $3.27, ad deep dive $4.82, ad generation $16.95 (proportional to actual work)
+
+**Shopify Data: Full Pagination + Channel Breakdown**
+- [x] Root cause: `get_shopify_orders` had `limit=250` with zero pagination. Store had 1000+ orders, only first 250 returned.
+- [x] Fix: Full pagination via Shopify Link header. Also fixed bug where `len(page_orders)==250` check stopped pagination early.
+- [x] Added cancelled/voided/pending order filtering to match Shopify Analytics
+- [x] Added `source_name` field: channel breakdown (Online Store, Subscription Renewals, Amazon, Shop App)
+- [x] Returns both ALL channels total AND Online Store only (matches Shopify Analytics default view)
+- [x] Max pages increased to 20 (5000 orders)
+
+**Gemini Full-Creative (killed Pillow text overlays)**
+- [x] Old approach: Gemini made generic "dark moody background" → Pillow overlaid same font/layout every time
+- [x] New approach: Gemini generates COMPLETE ad (layout, typography, imagery, composition)
+- [x] Format-specific creative direction with funnel guardrails (TOF: no product, BOF: show product)
+- [x] Competitor recreation prompts woven into Gemini creative briefs
+- [x] Updated ALL references across prompts, skills, tool descriptions
+
+**Ad Inspiration Side-by-Side**
+- [x] Every generated ad now shows the inspiration source (competitor/winner) alongside it
+- [x] Agent compares generated vs inspiration during review phase
+- [x] Regenerates if ad doesn't hold up against inspiration
+- [x] Presentation format: INSPIRATION → (image + why) → OUR AD → (image + how it connects)
+
+**Orchestrator Improvements**
+- [x] MAX_ITERATIONS increased 20 → 30 (was causing blank responses on complex batches)
+- [x] Fixed `num_ads` undefined variable bug in error handler
+- [x] CMO-level strategic voice added to system prompt
+- [x] Efficiency rules: one `get_competitor_ads` call, no `scan_competitor_ads` during generation
+- [x] Meta data deletion callback endpoint for App Review
+
+#### Live Multi-Turn Test Results (3-message conversation)
+| # | Message | Cost | Time | Steps | Grade |
+|---|---------|------|------|-------|-------|
+| 1 | Sales + channel breakdown + Meta ROAS | $3.27 | 93.5s | 26 | A+ |
+| 2 | Ad creative deep dive + 10 ad images | $4.82 | 165.3s | 25 | A+ |
+| 3 | Generate 3 winner-inspired ads | $16.95 | ~120s | 30+ | A+ |
+| **Total** | **3 messages** | **$25.04** | **~6.5 min** | | |
 
 ### 2026-04-06 (Session 19) — Shopify Client ID, Competitor Vision, Gemini Full-Creative, Meta OAuth
 
