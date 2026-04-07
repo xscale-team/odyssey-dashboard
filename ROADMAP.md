@@ -28,9 +28,9 @@
 - [x] Removed `pending` filter from order count (Session 21) — did NOT resolve the gap
 - [x] Added subscription source_name mapping (Loop → Subscription)
 - [x] Tried date-only format + 1-day buffer for timezone fix — only added 2 orders (270 vs 268)
-- [ ] **ROOT CAUSE CONFIRMED:** REST API returns only 270 orders total. Shopify Analytics counts 424. The missing ~154 orders are NOT returned by the REST Orders API at all. Debug shows: paid=269, refunded=1, source breakdown shows subscription_contract_checkout_one=182, web=60, amazon=18. The REST API simply does not include all order types that Shopify Analytics counts.
-- [ ] **FIX:** Must switch to Shopify GraphQL Admin API for order counting, OR use the Shopify Analytics API/Reports API
-- [ ] Alternative: Accept ~36% undercount from REST API and show disclaimer "Online Store + Subscription orders only"
+- [x] **ROOT CAUSE CONFIRMED:** REST API returns only 270 orders total. Shopify Analytics counts 424. The REST API simply does not include all order types.
+- [x] **FIX DEPLOYED (Session 22):** Replaced REST `orders.json` with GraphQL Admin API (`orders` query). GraphQL returns ALL order types (subscriptions, POS, draft orders, etc.). Cursor-based pagination, rate limiting, same return structure. Needs verification against Shopify Analytics.
+- [ ] **VERIFY:** Run Welcome Audit and compare order count with Shopify Analytics (target: ~424)
 
 ### Priority 2: Fix Orphaned Conversation Bug
 - [x] Added error message + retry guidance to chat-store.ts (Session 21)
@@ -140,6 +140,32 @@
 | 19 | 2026-03-31 | Shopify Client ID OAuth, competitor vision analysis, Gemini full-creative, Meta OAuth improvements |
 | 20 | 2026-04-06 | **Full system test**: 9-ad full-funnel suite (all 8-10/10), data accuracy audit, 5,641 credits for full session. Grade: A |
 | 21 | 2026-04-07 | **Full system test + 6 bug fixes + Welcome Audit**: 12 msgs tested (all A+), 6 ads QA'd, 6 bugs fixed. Built Welcome Audit flow (726 tokens/$7.26). Cost optimization (MAX_ITER 30→20, parallel calls). Shopify REST API confirmed missing 154/424 orders. |
+| 22 | 2026-04-07 | **New User UX Audit + P0 Fixes**: Full UX audit of every screen. Fixed: welcome screen (heading, CTA hierarchy, button text), brand name hallucination (AXOS→IBD Assist), broken creative images, competitor images in audit, mobile sidebar collapse. Audit now 80s/802 tokens. Ship verdict: CONDITIONAL SHIP. |
+
+### Session 22 Detail
+
+**Phase 1 — Full UX Audit (every screen screenshotted and graded)**
+- Welcome Screen: B→A (after fixes), Loading: A-, Audit Response: A, Three Pillars: A+, #1 Opportunity: A+, Planner: B+, Settings: A, Mobile: D→B (after sidebar fix)
+
+**Phase 2-3 — P0 Fixes (commit 1fee488)**
+1. Welcome heading "Meet ODY-1" → "Your AI Marketing Team"
+2. Welcome CTA: teal accent primary button with subtitle, shorter text (no truncation)
+3. System prompt: use Shopify shop name for audit header, no competitor image embeds
+4. Image gallery: contextual labels ("References" vs "Creatives Generated"), broken image fallback
+5. Mobile: sidebar hidden on < md breakpoint
+6. Chat store: added subscription metrics tool label
+
+**Phase 4 — Final Validation**
+- Brand name: "IBD Assist (Crohniva)" (correct, no AXOS hallucination)
+- Audit time: 80.8s (down from 103.9s, 22% faster)
+- Token cost: 802 tokens ($8.02), leaves $11.98 for follow-ups
+- No crashes, no orphaned conversations, no blank responses
+- No competitor images embedded, no broken images
+
+**Ship Verdict: CONDITIONAL SHIP**
+- Ready for limited invite (5-10 users) with monitoring
+- Blockers remaining: Meta App Review (non-tester users), brand brain reset for new users (first-time users won't have AXOS issue)
+- Risks: orphaned conversation (3 occurrences total, intermittent), Shopify 36% order undercount
 
 ### Session 21 Detail
 
