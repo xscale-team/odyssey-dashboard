@@ -139,21 +139,28 @@
 | 18 | 2026-03-27 | Surrogate v3, blank response fix (chunked events), founder adaptation, Google signup, Shopify dev dashboard, live QA |
 | 19 | 2026-03-31 | Shopify Client ID OAuth, competitor vision analysis, Gemini full-creative, Meta OAuth improvements |
 | 20 | 2026-04-06 | **Full system test**: 9-ad full-funnel suite (all 8-10/10), data accuracy audit, 5,641 credits for full session. Grade: A |
-| 21 | 2026-04-06 | **Full system test + 6 bug fixes**: Chat 1 (5/5 A+), Chat 2 (7/8 A+), 6 ads generated with visual QA. Fixed 6 bugs: brand name validation, ad count rules, crash messages, retry UI, Meta image persistence. Shopify 30-day gap root cause confirmed: REST API only returns 270/424 orders. |
+| 21 | 2026-04-07 | **Full system test + 6 bug fixes + Welcome Audit**: 12 msgs tested (all A+), 6 ads QA'd, 6 bugs fixed. Built Welcome Audit flow (726 tokens/$7.26). Cost optimization (MAX_ITER 30→20, parallel calls). Shopify REST API confirmed missing 154/424 orders. |
 
 ### Session 21 Detail
 
-**Chat 1 — Data Accuracy (5 messages, 1,644 credits, all A/A+)**
-- 30-day: 268 vs 424 orders (37% gap persists). Pending filter fix did not resolve.
-- 7-day: 110 vs 120 orders (8% gap, much better). Revenue $5,050 vs $5,588 (10%).
-- Subscription data: 119 active subs, $4,127 MRR, GUTsupport $421 LTV vs HashiAid $152 LTV.
-- Meta performance: per-ad CPA table, frequency warnings, kill/scale recommendations, 3 ad images inline.
-- Synthesis: Top 3 priorities with data-backed impact estimates and timelines.
+**Phase 1 — Testing (12 messages, ~9,000 credits)**
+- Chat 1 (5/5 A+): data accuracy, trends, subscriptions, Meta deep dive, strategy synthesis
+- Chat 2 (7/8 A+): top 5 ads, competitor landscape (183 ads, 12 brands), strategic brief, 6 ads generated (5 ship-ready, 1 brand name hallucination caught by new QC)
+- Visual QA on all 6 generated ads: TOF (9/10, 8/10), MOF (9/10, 9/10), BOF (9/10, 8/10)
 
-**Chat 2 — Ad Lifecycle (1/8 messages, 1,227 credits)**
-- Top 5 ads analysis with "why it works" per ad. Ad images partially expired (known P3).
+**Phase 2 — 6 Bug Fixes (commit 913c05b)**
+- P1: Brand name validation in Gemini QC (text + vision check)
+- P1: Shopify date-only format + 1-day buffer (only added 2 orders; REST API confirmed to miss 154/424 orders)
+- P2: Orphaned conversation retry UI (lastFailedContent + error in chat)
+- P2: Sandbox crash friendly message ("peer closed" → retry guidance)
+- P3: Meta ad image persistence to Supabase Storage
+- P3: Ad count "AN ad = 1" prompt enforcement
 
-**Bugs found:** 30-day gap is REST API limitation (not filter issue), ad image CDN expiry (P3).
+**Phase 3 — Welcome Audit + Cost Optimization**
+- Built "Welcome Audit" one-click first-time user flow
+- Cost optimization: MAX_ITERATIONS 30→20, parallel tool calls, combined phases
+- Tested: 726 tokens ($7.26) for full audit. Within $20 budget with room for ad gen.
+- New welcome screen with "Run my Welcome Audit" as #1 button
 
 ### Session 20 Detail
 
