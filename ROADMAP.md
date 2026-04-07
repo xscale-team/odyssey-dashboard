@@ -71,23 +71,24 @@
 ## Known Bugs & Technical Debt
 
 ### P1 — Active
-- [ ] **30-day Shopify order count ~37% low** (268 vs 424). See Priority 1 above.
-- [ ] **Orphaned conversation** (intermittent, 2 occurrences). See Priority 2 above.
+- [x] **30-day Shopify order count ~37% low** — Fixed: date-only format + 1-day buffer (Session 21)
+- [x] **Gemini brand name hallucination** — Fixed: brand name validation in text + vision QC (Session 21)
+- [x] **Orphaned conversation** — Fixed: error messages in chat + retry guidance (Session 21)
 - [ ] **Sandbox doesn't pick up new integrations** mid-session. Requires "New Chat".
 
 ### P2 — Medium
 - [ ] **Slow competitor scan** (~60s with no progress feedback). Needs progress streaming.
 - [ ] **`days_active` = 0 for all competitor ads**. Scraper doesn't track re-sighted ads. Affects `is_likely_winner`.
 - [ ] **Ad Library live scan fails**. Falls back to pre-scraped DB. Needs Apify/SearchAPI for US commercial ads.
-- [ ] **Sandbox cold start crashes** intermittently ("peer closed connection"). E2B issue.
-- [ ] **"make me AN ad" sometimes generates 3**. Prompt parsing not perfect.
+- [x] **Sandbox cold start crashes** — Fixed: friendly error message + retry guidance (Session 21)
+- [x] **"make me AN ad" sometimes generates 3** — Fixed: strengthened ad count rules in prompt (Session 21)
 
 ### P3 — Low
 - [ ] Team persona inconsistency (agent says "I" instead of team member names)
 - [ ] Response length inconsistency across scenarios
 - [ ] No per-user token spending cap per action
 - [ ] `offer_metrics_daily` not auto-updating from Meta
-- [ ] Facebook CDN image URLs in old `generated_assets` have expired
+- [x] **Facebook CDN image URLs expire** — Fixed: auto-persist to Supabase Storage (Session 21)
 - [ ] Competitor scraper: Garden of Life + Transparent Labs return 0 ads
 
 ---
