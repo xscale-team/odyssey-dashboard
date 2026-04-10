@@ -1,6 +1,6 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-06 (Session 21)**
+> **Last updated: 2026-04-09 (Session 23)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 
 ---
@@ -72,25 +72,28 @@
 ## Known Bugs & Technical Debt
 
 ### P1 — Active
-- [x] **30-day Shopify order count ~37% low** — Fixed: date-only format + 1-day buffer (Session 21)
+- [x] **CRITICAL: Brand data leaking across accounts** — Fixed: removed all hardcoded brand names, scoped competitor ads per user, auto-assign on signup (Session 23)
+- [x] **Billing only charged on batch completion** — Fixed: per-ad charging, prevents free-riding on errors (Session 23)
+- [x] **Gemini ignoring competitor style references** — Fixed: contradictory prompt was telling it to copy style AND ignore everything (Session 23)
+- [x] **30-day Shopify order count ~37% low** — Fixed: GraphQL API (Session 22)
 - [x] **Gemini brand name hallucination** — Fixed: brand name validation in text + vision QC (Session 21)
-- [x] **Orphaned conversation** — Fixed: error messages in chat + retry guidance (Session 21)
 - [ ] **Sandbox doesn't pick up new integrations** mid-session. Requires "New Chat".
 
 ### P2 — Medium
+- [x] **Gemini rate limits (first 2 ads in batch fail)** — Fixed: 3s delay between calls + retry with simplified prompt (Session 23)
+- [x] **Same competitor ads used every session** — Fixed: time-seeded randomization (Session 23)
+- [x] **Wrong product images persisting across sessions** — Fixed: removed Supabase cache, fresh download each time + user verification (Session 23)
 - [ ] **Slow competitor scan** (~60s with no progress feedback). Needs progress streaming.
-- [ ] **`days_active` = 0 for all competitor ads**. Scraper doesn't track re-sighted ads. Affects `is_likely_winner`.
-- [ ] **Ad Library live scan fails**. Falls back to pre-scraped DB. Needs Apify/SearchAPI for US commercial ads.
-- [x] **Sandbox cold start crashes** — Fixed: friendly error message + retry guidance (Session 21)
-- [x] **"make me AN ad" sometimes generates 3** — Fixed: strengthened ad count rules in prompt (Session 21)
+- [ ] **`days_active` = 0 for all competitor ads**. Scraper doesn't track re-sighted ads.
+- [ ] **Ad Library live scan fails**. Falls back to pre-scraped DB. Needs Apify/SearchAPI.
 
 ### P3 — Low
 - [ ] Team persona inconsistency (agent says "I" instead of team member names)
 - [ ] Response length inconsistency across scenarios
 - [ ] No per-user token spending cap per action
 - [ ] `offer_metrics_daily` not auto-updating from Meta
-- [x] **Facebook CDN image URLs expire** — Fixed: auto-persist to Supabase Storage (Session 21)
 - [ ] Competitor scraper: Garden of Life + Transparent Labs return 0 ads
+- [ ] Product image shows AFTER buttons in verification step (layout ordering)
 
 ---
 
@@ -141,6 +144,40 @@
 | 20 | 2026-04-06 | **Full system test**: 9-ad full-funnel suite (all 8-10/10), data accuracy audit, 5,641 credits for full session. Grade: A |
 | 21 | 2026-04-07 | **Full system test + 6 bug fixes + Welcome Audit**: 12 msgs tested (all A+), 6 ads QA'd, 6 bugs fixed. Built Welcome Audit flow (726 tokens/$7.26). Cost optimization (MAX_ITER 30→20, parallel calls). Shopify REST API confirmed missing 154/424 orders. |
 | 22 | 2026-04-07 | **New User UX Audit + P0 Fixes**: Full UX audit of every screen. Fixed: welcome screen (heading, CTA hierarchy, button text), brand name hallucination (AXOS→IBD Assist), broken creative images, competitor images in audit, mobile sidebar collapse. Audit now 80s/802 tokens. Ship verdict: CONDITIONAL SHIP. |
+
+| 23 | 2026-04-09 | **CRITICAL: Data isolation + billing + ad quality overhaul**. Fixed AXOS brand contamination across all accounts, per-user competitor scoping, auto-assign competitors on signup, per-ad billing (was only charging on batch completion), Gemini cost $0.02→$0.13, Opus-only mode, admin P&L dashboard, kanban tickets, Shopify onboarding rewrite, product image verification flow, creative preferences hydration, feedback weight system (likes 3, dislikes 5, admin 7/10, no-feedback 1), Gemini retry on failure, mobile text limits, fixed Gemini style-copying (contradictory prompt was making it ignore competitor references entirely). |
+
+### Session 23 Detail
+
+**Data Isolation (CRITICAL):**
+- Removed ALL hardcoded brand names (HashiAid/AXOS/IBDAssist) from 8 files
+- Competitor ads query scoped to user's tracked brands (was global dump of all 500)
+- Auto-assign all 12 competitor brands to new users via DB trigger + backfill
+- Brand QA check validates against actual user brand name, not hardcoded whitelist
+- Deleted contaminated brand brain files and cached product images for affected accounts
+
+**Billing Overhaul:**
+- Per-ad charging (was only at batch completion, so errors = we eat the cost)
+- Gemini cost corrected: $0.02 → $0.13 per image
+- All users on Opus 4.6 (removed Normal/Pro toggle)
+- Admin P&L dashboard: Stripe Revenue, Our API Costs, Net Profit/Loss, Free Credit Subsidy
+- Feedback weights: user like=3, dislike=5, admin like=7, dislike=10, no feedback=1
+
+**Ad Quality:**
+- Gemini style-copying FIXED: old prompt said "copy style" + "ZERO elements from competitor" which contradicted. Gemini ignored references entirely. New prompt separates design-copy from brand-safety.
+- Gemini retry on failure (5s delay, simplified prompt, no inspiration)
+- 3s delay between Gemini calls (prevents rate limit 429s)
+- Mobile text limits per format (meme 15 words, callout 25, IB 40)
+- Brand/product name rules (product name on ad, not parent brand)
+- Competitor ad randomization (time-seeded, 3 winners + 3 random)
+- Gemini outcome logging to usage_events for pattern analysis
+
+**UX:**
+- Admin tickets as drag-and-drop kanban board with user emails
+- Clickable buttons for emoji/bullet options (parser updated)
+- Questions + options at END of message (above input box)
+- Product image verification mandatory before generation
+- Shopify onboarding: correct dev dashboard URL, App URL, redirect URL, store name auto-suffix
 
 ### Session 22 Detail
 
