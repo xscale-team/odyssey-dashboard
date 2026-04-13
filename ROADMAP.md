@@ -67,6 +67,17 @@
 ### Priority 8: Klaviyo Integration (Post-MVP)
 - [ ] OAuth, pull flows/sequences, track email engagement
 
+### Priority 9: Meta Ads Integration (Post Meta App Review)
+Deferred from MVP. Re-add once Meta App Review is approved for Advanced Access.
+- [ ] Re-add `connect_meta` onboarding step
+- [ ] Meta Ads launch pipeline (create campaigns, ad sets, ads from generated creatives)
+- [ ] Offer system re-enable (offer = product + pricing + landing page + entry points + ads)
+- [ ] Onboarding steps: Create Offer, Set Competitors, Pick Ad Styles, Set Autonomy
+- [ ] Performance dashboard with Meta spend/ROAS/CPA charts
+- [ ] Watcher integration with Meta (auto kill/scale based on live performance)
+- [ ] Ad Library live scan (currently falls back to pre-scraped DB)
+- **Code preserved in git history** — removed in commit for Session 24 onboarding simplification
+
 ---
 
 ## Known Bugs & Technical Debt
