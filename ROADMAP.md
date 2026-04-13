@@ -1,6 +1,6 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-09 (Session 23)**
+> **Last updated: 2026-04-13 (Session 24)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 
 ---
@@ -73,19 +73,25 @@
 
 ### P1 — Active
 - [x] **CRITICAL: Brand data leaking across accounts** — Fixed: removed all hardcoded brand names, scoped competitor ads per user, auto-assign on signup (Session 23)
+- [x] **CRITICAL: New user signup crash** — Fixed: `assign_default_competitors` had no search_path, crashing entire signup (Session 24)
 - [x] **Billing only charged on batch completion** — Fixed: per-ad charging, prevents free-riding on errors (Session 23)
 - [x] **Gemini ignoring competitor style references** — Fixed: contradictory prompt was telling it to copy style AND ignore everything (Session 23)
 - [x] **30-day Shopify order count ~37% low** — Fixed: GraphQL API (Session 22)
 - [x] **Gemini brand name hallucination** — Fixed: brand name validation in text + vision QC (Session 21)
+- [x] **Generated ads vanish on SSE crash** — Fixed: partial content preserved as message on error (Session 24)
+- [x] **Product image download fails (URL truncation)** — Fixed: download_product_image now uses Shopify product_id for fresh API fetch (Session 24)
 - [ ] **Sandbox doesn't pick up new integrations** mid-session. Requires "New Chat".
 
 ### P2 — Medium
 - [x] **Gemini rate limits (first 2 ads in batch fail)** — Fixed: 3s delay between calls + retry with simplified prompt (Session 23)
 - [x] **Same competitor ads used every session** — Fixed: time-seeded randomization (Session 23)
 - [x] **Wrong product images persisting across sessions** — Fixed: removed Supabase cache, fresh download each time + user verification (Session 23)
+- [x] **Competitor inspiration images fail to download in sandbox** — Fixed: images cached to sandbox filesystem in get_competitor_ads, generate_ad_batch checks cache first (Session 24)
+- [x] **usage_events check constraint rejects ad_single** — Fixed: expanded constraint to include ad_single, ad_batch (Session 24)
 - [ ] **Slow competitor scan** (~60s with no progress feedback). Needs progress streaming.
 - [ ] **`days_active` = 0 for all competitor ads**. Scraper doesn't track re-sighted ads.
 - [ ] **Ad Library live scan fails**. Falls back to pre-scraped DB. Needs Apify/SearchAPI.
+- [ ] **Agent still not using cached base64 for inspiration** — pre-loading works but agent passes URL not base64. Cache fallback handles it but style-copying would be better with actual images.
 
 ### P3 — Low
 - [ ] Team persona inconsistency (agent says "I" instead of team member names)
@@ -93,7 +99,7 @@
 - [ ] No per-user token spending cap per action
 - [ ] `offer_metrics_daily` not auto-updating from Meta
 - [ ] Competitor scraper: Garden of Life + Transparent Labs return 0 ads
-- [ ] Product image shows AFTER buttons in verification step (layout ordering)
+- [x] Product image shows AFTER buttons in verification step — Fixed: terminal panel moved above message, buttons at bottom (Session 24)
 
 ---
 
@@ -146,6 +152,7 @@
 | 22 | 2026-04-07 | **New User UX Audit + P0 Fixes**: Full UX audit of every screen. Fixed: welcome screen (heading, CTA hierarchy, button text), brand name hallucination (AXOS→IBD Assist), broken creative images, competitor images in audit, mobile sidebar collapse. Audit now 80s/802 tokens. Ship verdict: CONDITIONAL SHIP. |
 
 | 23 | 2026-04-09 | **CRITICAL: Data isolation + billing + ad quality overhaul**. Fixed AXOS brand contamination across all accounts, per-user competitor scoping, auto-assign competitors on signup, per-ad billing (was only charging on batch completion), Gemini cost $0.02→$0.13, Opus-only mode, admin P&L dashboard, kanban tickets, Shopify onboarding rewrite, product image verification flow, creative preferences hydration, feedback weight system (likes 3, dislikes 5, admin 7/10, no-feedback 1), Gemini retry on failure, mobile text limits, fixed Gemini style-copying (contradictory prompt was making it ignore competitor references entirely). |
+| 24 | 2026-04-13 | **LAUNCH PREP: 13 fixes + Meta Pixel + 10-ad test**. Fixed signup crash (search_path), Shopify onboarding simplified (3 steps), no Meta Ads suggestion in audit, product images by ID, terminal above messages, ads preserved on SSE crash, usage_events constraint, Files gallery button, competitor image caching to sandbox, sandbox timeout 14→20min, Meta Pixel dual tracking (X Scale + Odyssey), Stripe Purchase tracking with revenue, CompleteRegistration on onboarding, sortable admin table, 2500 free tokens for all users, auto-create credit_balances on signup. Tested 10-ad generation: 8.8min, $6.81, no timeout. |
 
 ### Session 23 Detail
 
