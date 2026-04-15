@@ -103,7 +103,7 @@ Deferred from MVP. Re-add once Meta App Review is approved for Advanced Access.
 - [x] **Gemini brand name hallucination** — Fixed: brand name validation in text + vision QC (Session 21)
 - [x] **Generated ads vanish on SSE crash** — Fixed: partial content preserved as message on error (Session 24)
 - [x] **Product image download fails (URL truncation)** — Fixed: download_product_image now uses Shopify product_id for fresh API fetch (Session 24)
-- [ ] **Sandbox doesn't pick up new integrations** mid-session. Requires "New Chat".
+- [x] **Sandbox doesn't pick up new integrations** mid-session — Fixed: `get_or_create()` now re-injects env vars on every cached-sandbox hit, so new Shopify/Meta tokens land before the next `run_code` (Session 26)
 
 ### P2 — Medium
 - [x] **Gemini rate limits (first 2 ads in batch fail)** — Fixed: 3s delay between calls + retry with simplified prompt (Session 23)
