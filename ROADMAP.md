@@ -104,6 +104,12 @@ Deferred from MVP. Re-add once Meta App Review is approved for Advanced Access.
 - [x] **Generated ads vanish on SSE crash** — Fixed: partial content preserved as message on error (Session 24)
 - [x] **Product image download fails (URL truncation)** — Fixed: download_product_image now uses Shopify product_id for fresh API fetch (Session 24)
 - [x] **Sandbox doesn't pick up new integrations** mid-session — Fixed: `get_or_create()` now re-injects env vars on every cached-sandbox hit, so new Shopify/Meta tokens land before the next `run_code` (Session 26)
+- [x] **Agent saw OLDEST 20 messages, not newest** — Fixed: `chat/router.py` conversation history query was `order(desc=False).limit(20)` which returned the first 20 messages. Now `desc=True, limit(50)` + reverse in Python. Long conversations were leaving the agent blind to recent turns (Session 26)
+- [x] **`_save_brand_brain` returned `persisted: True` on cloud failure** — Fixed: only reports `persisted: True` when Supabase Storage accepted the upload. Returns `success: False` with error detail otherwise so the agent knows the save didn't stick (Session 26)
+- [x] **Brain files silently truncated at 4000 chars on read** — Fixed: removed `_MAX_BRAIN_CHARS` cap. Agent now reads the full accumulated learnings.md / generated_ads.md. Half the brain was being hidden after ~50 ads (Session 26)
+- [x] **Per-ad billing errors silently swallowed** — Fixed: exceptions in `chat/router.py` charge path now log loudly and insert a `billing_failures` row for reconciliation. Added migration 027 for the table (Session 26)
+- [x] **`_CONTEXT_CACHE` grew unbounded** — Fixed: added `_context_cache_evict_expired()` called on every cache write. O(n) sweep is cheap at our scale (Session 26)
+- [x] **`_active_sandboxes` never reaped idle users** — Fixed: `SandboxManager` now tracks `_last_used` and drops references inactive > 30 min on every `get_or_create` (Session 26)
 
 ### P2 — Medium
 - [x] **Gemini rate limits (first 2 ads in batch fail)** — Fixed: 3s delay between calls + retry with simplified prompt (Session 23)
