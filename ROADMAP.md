@@ -75,7 +75,6 @@
 - [ ] Mobile responsive pass
 - [ ] Loading skeletons for async operations
 - [ ] Per-user token spending cap per action
-- [ ] Domain migration to app.tryodyssey.ai
 
 ### Priority 8: Klaviyo Integration (Post-MVP)
 - [ ] OAuth, pull flows/sequences, track email engagement
