@@ -143,7 +143,7 @@ Deferred from MVP. Re-add once Meta App Review is approved for Advanced Access.
 
 | Service | Platform | Auto-deploy? |
 |---------|----------|-------------|
-| Frontend | Cloudflare Pages (demo.runodyssey.io) | Yes (git push) |
+| Frontend | Cloudflare Pages (runodyssey.io) | Yes (git push) |
 | Backend API | Railway (odyssey-x → api.runodyssey.io) | Yes (git push) |
 | Worker | Railway (clever-gentleness) | Yes (git push) |
 | Database | Supabase (migrations 000-023) | Supabase MCP (automated) |
