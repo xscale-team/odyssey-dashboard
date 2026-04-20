@@ -1,6 +1,6 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-13 (Session 25)**
+> **Last updated: 2026-04-20 (Session 27)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 
 ---
@@ -56,9 +56,9 @@
 - [ ] Remove oEmbed permissions, submit for Advanced Access
 - [ ] Workaround: Add teammates as Testers in App Roles
 
-### Priority 4: Fix Sandbox Token Refresh on Integration Connect
-- [ ] New integrations not picked up until "New Chat"
-- [ ] Need sandbox invalidation or dynamic token injection
+### Priority 4: Fix Sandbox Token Refresh on Integration Connect — ✅ SHIPPED
+- [x] New integrations not picked up until "New Chat" — fixed in commit e912663
+- [x] Sandbox invalidation / dynamic token injection — `get_or_create()` now re-injects env vars on every cached-sandbox hit
 
 ### Priority 5: Performance Dashboard Completion
 - [ ] Time-range selector (7d / 30d / 90d)
@@ -89,6 +89,14 @@ Deferred from MVP. Re-add once Meta App Review is approved for Advanced Access.
 - [ ] Watcher integration with Meta (auto kill/scale based on live performance)
 - [ ] Ad Library live scan (currently falls back to pre-scraped DB)
 - **Code preserved in git history** — removed in commit for Session 24 onboarding simplification
+
+### Priority 10: Post-Launch Expansion (Directional)
+Directional items captured from the old architecture doc future phases. Not committed to, just preserved so nothing is lost.
+- [ ] Entry-point page types beyond landing pages (advertorials, listicles, quizzes) — CPA pillar
+- [ ] Video ad / UGC content generation (Gemini stills only today)
+- [ ] Multi-platform expansion: TikTok Ads, Google Ads, Pinterest
+- [ ] Multi-store support (one user → many Shopify stores)
+- [ ] White-label / agency-mode for Xscale clients
 
 ---
 
@@ -183,6 +191,7 @@ Deferred from MVP. Re-add once Meta App Review is approved for Advanced Access.
 | 23 | 2026-04-09 | **CRITICAL: Data isolation + billing + ad quality overhaul**. Fixed AXOS brand contamination across all accounts, per-user competitor scoping, auto-assign competitors on signup, per-ad billing (was only charging on batch completion), Gemini cost $0.02→$0.13, Opus-only mode, admin P&L dashboard, kanban tickets, Shopify onboarding rewrite, product image verification flow, creative preferences hydration, feedback weight system (likes 3, dislikes 5, admin 7/10, no-feedback 1), Gemini retry on failure, mobile text limits, fixed Gemini style-copying (contradictory prompt was making it ignore competitor references entirely). |
 | 24 | 2026-04-13 | **PUBLIC LAUNCH + 20 fixes + referral program**. Fixed signup crash, removed ghost connect_meta step (was blocking 38% of signups), simplified onboarding to Welcome→Shopify→Chat (removed 4 unnecessary steps), video walkthrough for Shopify setup, product images by ID, ads preserved on SSE crash, competitor image caching, sandbox timeout 14→20min, Meta Pixel dual tracking, Stripe Purchase tracking, sortable admin table, 2500 free tokens, auto-create credit_balances, referral program (both users get 500 tokens), Files gallery button. Tested 10-ad generation: 8.8min, $6.81, no timeout. 45 signups on launch day. |
 | 25 | 2026-04-13 | **Founding Member Quest (gamification Phase 1)**. Full superpowers flow (brainstorm → spec → plan → subagent-driven implementation). 20-task plan executed across 4 migrations (020-023), backend quest module + RPCs, 5 SSE/OAuth hooks, full frontend (/quest page, banner, completion modal + confetti, sidebar pill, admin tab), 12 pytest tests, 2 Playwright E2E tests in real headless Chrome. Caught and fixed an orphaned pages/chat.tsx that prevented banner rendering. Also: removed NOW Foods from competitor list (pet contamination), connected Supabase + Cloudflare MCPs, saved multiple project-memory notes. 25 commits on feat/founding-member-quest, merged to main. |
+| 26 | 2026-04-17 | **Context leak hardening + credit balance on signup**. Closed brand brain cache, billing, conversation history leaks. Added `auto_create_credit_balance` trigger (migration 029) so new users see 2500 tokens immediately. Fixed sandbox to refresh env vars on cached hit. Loop onboarding step + Meta coming-soon banner. |
 
 ### Session 23 Detail
 

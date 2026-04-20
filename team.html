@@ -531,7 +531,7 @@ function render(data) {
   // Recent updates (from session log — human-friendly)
   const recentEl = document.getElementById('recentUpdates');
   // Simplify session log items — filter out dev-only entries
-  const devTerms = ['migration', 'CLAUDE.md', 'ROADMAP.md', 'TypeScript', 'tsc', 'HANDOFF', 'git', 'Docker', 'Railway', 'Cloudflare', 'path resolution', 'router', 'registry', 'Pydantic', 'schema', 'MASTER-PLAN', 'column mismatch', 'CHECK constraint', 'dev-dashboard', 'sync-dashboard'];
+  const devTerms = ['migration', 'CLAUDE.md', 'ROADMAP.md', 'TypeScript', 'tsc', 'HANDOFF', 'git', 'Docker', 'Railway', 'Cloudflare', 'path resolution', 'router', 'registry', 'Pydantic', 'schema', 'ARCHITECTURE', 'column mismatch', 'CHECK constraint', 'dev-dashboard', 'sync-dashboard'];
 
   const cleanSessions = data.session_log.map(session => {
     const cleanItems = session.items.filter(item => {
