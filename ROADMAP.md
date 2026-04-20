@@ -76,8 +76,12 @@
 - [ ] Loading skeletons for async operations
 - [ ] Per-user token spending cap per action
 
-### Priority 8: Klaviyo Integration (Post-MVP)
-- [ ] OAuth, pull flows/sequences, track email engagement
+### Priority 8: Klaviyo Integration — 🚧 IN PROGRESS (PR 1 of 4 merged)
+- [x] PR 1 — Connect + data sync (lists/segments/flows/campaigns/templates → 5 brain files) + daily cron refresh + Settings UI
+- [ ] PR 2 — Three Pillars brain file + competitor email library (RGE scraper, competitor_emails table, weekly pg_cron refresh)
+- [ ] PR 3 — Email/SMS/push generation tools + flow archetypes + proactive audit + per-draft billing
+- [ ] PR 4 — Pytest coverage + manual QA against live Klaviyo + docs finalize
+- Private API key only; public OAuth app deferred.
 
 ### Priority 9: Meta Ads Integration (Post Meta App Review)
 Deferred from MVP. Re-add once Meta App Review is approved for Advanced Access.
@@ -137,6 +141,8 @@ Directional items captured from the old architecture doc future phases. Not comm
 - [ ] `offer_metrics_daily` not auto-updating from Meta
 - [ ] Competitor scraper: Garden of Life + Transparent Labs return 0 ads
 - [x] Product image shows AFTER buttons in verification step — Fixed: terminal panel moved above message, buttons at bottom (Session 24)
+- [ ] `connected_services.shop_domain` overloaded for 3 platforms (Shopify domain / Meta ad account ID / Klaviyo account public ID). Rename to `platform_account_id` in a future cleanup migration.
+- [ ] Klaviyo router endpoints have no `@limiter.limit` decorators due to a project-wide FastAPI + slowapi bug with `@limiter.limit` + Pydantic body + `Depends(get_current_user)` (same issue affects Loop/Shopify endpoints). Fix requires upgrading slowapi or restructuring the decorator stack.
 
 ---
 
@@ -148,7 +154,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | Meta Ads | ✅ OAuth | ✅ Campaigns, ads, metrics | ✅ Launch/create | ✅ 90% |
 | Loop Subs | ✅ API Key | ✅ LTV, churn, MRR | N/A | ✅ 95% |
 | Stripe | ✅ Live | ✅ Checkout, webhooks | ✅ Balance top-up | ✅ 95% |
-| Klaviyo | ⬜ | ⬜ | ⬜ | ⬜ 0% |
+| Klaviyo | ✅ API Key | ✅ Lists, Segments, Flows, Campaigns, Metrics | ⬜ Drafts (PR 3) | 🟡 25% |
 
 ---
 
@@ -192,6 +198,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 24 | 2026-04-13 | **PUBLIC LAUNCH + 20 fixes + referral program**. Fixed signup crash, removed ghost connect_meta step (was blocking 38% of signups), simplified onboarding to Welcome→Shopify→Chat (removed 4 unnecessary steps), video walkthrough for Shopify setup, product images by ID, ads preserved on SSE crash, competitor image caching, sandbox timeout 14→20min, Meta Pixel dual tracking, Stripe Purchase tracking, sortable admin table, 2500 free tokens, auto-create credit_balances, referral program (both users get 500 tokens), Files gallery button. Tested 10-ad generation: 8.8min, $6.81, no timeout. 45 signups on launch day. |
 | 25 | 2026-04-13 | **Founding Member Quest (gamification Phase 1)**. Full superpowers flow (brainstorm → spec → plan → subagent-driven implementation). 20-task plan executed across 4 migrations (020-023), backend quest module + RPCs, 5 SSE/OAuth hooks, full frontend (/quest page, banner, completion modal + confetti, sidebar pill, admin tab), 12 pytest tests, 2 Playwright E2E tests in real headless Chrome. Caught and fixed an orphaned pages/chat.tsx that prevented banner rendering. Also: removed NOW Foods from competitor list (pet contamination), connected Supabase + Cloudflare MCPs, saved multiple project-memory notes. 25 commits on feat/founding-member-quest, merged to main. |
 | 26 | 2026-04-17 | **Context leak hardening + credit balance on signup**. Closed brand brain cache, billing, conversation history leaks. Added `auto_create_credit_balance` trigger (migration 029) so new users see 2500 tokens immediately. Fixed sandbox to refresh env vars on cached hit. Loop onboarding step + Meta coming-soon banner. |
+| 27 | 2026-04-20 | **Klaviyo PR 1 — integration + data sync**. Private API key auth, 5 new brand brain files (lists/segments/flows/campaigns/email-performance), daily pg_cron refresh (migration 030), Settings UI Klaviyo card, worker handlers for klaviyo_initial_sync + klaviyo_daily_sync tasks. Generation tools come in PR 3. |
 
 ### Session 23 Detail
 
