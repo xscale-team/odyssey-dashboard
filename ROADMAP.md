@@ -1,7 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-20 (Session 27)**
+> **Last updated: 2026-04-20 (Session 28)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
+>
+> **What To Do Next:** Klaviyo PR 4 — SMS/push draft tools, flow drafts, proactive audit, Three Pillars brain file, competitor email library (RGE scraper + `competitor_emails` table + weekly pg_cron refresh), pytest expansion, docs finalize. PR 3 is in review on `feat/klaviyo-pr3-email-draft` and gated on human manual QA inside the Klaviyo admin UI before merge.
 
 ---
 
@@ -76,11 +78,10 @@
 - [ ] Loading skeletons for async operations
 - [ ] Per-user token spending cap per action
 
-### Priority 8: Klaviyo Integration — 🚧 IN PROGRESS (PR 1 of 4 merged)
+### Priority 8: Klaviyo Integration — 🚧 IN PROGRESS (PR 3 of 4 merged)
 - [x] PR 1 — Connect + data sync (lists/segments/flows/campaigns/templates → 5 brain files) + daily cron refresh + Settings UI
-- [ ] PR 2 — Three Pillars brain file + competitor email library (RGE scraper, competitor_emails table, weekly pg_cron refresh)
-- [ ] PR 3 — Email/SMS/push generation tools + flow archetypes + proactive audit + per-draft billing
-- [ ] PR 4 — Pytest coverage + manual QA against live Klaviyo + docs finalize
+- [x] PR 3 — Email draft → Klaviyo campaign-draft push: `create_template` / `update_template` / `create_campaign` client methods, `email-assets` Supabase bucket (migration 032), Gemini 3 Pro hero pipeline, HTML email renderer (600px / inline CSS / liquid tags / em-dash-free), top-5 campaigns' HTML backfill during sync, 4 sandbox tools (`get_top_performing_emails`, `save_klaviyo_template`, `create_klaviyo_campaign_draft`, `generate_email_batch`), sandbox→Railway HTTP tool-bridge + `agent_events` log, `klaviyo_draft_created` SSE event + frontend deep-link card, per-email billing, orchestrator Flow B prompt + Mailer SOP upgrade. **Manual QA gate:** human verifies draft renders in Klaviyo UI before merge.
+- [ ] PR 4 — SMS / push draft tools, flow drafts, proactive audit, Three Pillars brain file, competitor email library (RGE scraper, `competitor_emails` table, weekly pg_cron refresh), pytest expansion, docs finalize
 - Private API key only; public OAuth app deferred.
 
 ### Priority 9: Meta Ads Integration (Post Meta App Review)
@@ -154,7 +155,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | Meta Ads | ✅ OAuth | ✅ Campaigns, ads, metrics | ✅ Launch/create | ✅ 90% |
 | Loop Subs | ✅ API Key | ✅ LTV, churn, MRR | N/A | ✅ 95% |
 | Stripe | ✅ Live | ✅ Checkout, webhooks | ✅ Balance top-up | ✅ 95% |
-| Klaviyo | ✅ API Key | ✅ Lists, Segments, Flows, Campaigns, Metrics | ⬜ Drafts (PR 3) | 🟡 25% |
+| Klaviyo | ✅ API Key | ✅ Lists, Segments, Flows, Campaigns, Metrics | ✅ Email template + campaign drafts (PR 3); SMS/push/flows in PR 4 | 🟡 60% |
 
 ---
 
@@ -199,6 +200,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 25 | 2026-04-13 | **Founding Member Quest (gamification Phase 1)**. Full superpowers flow (brainstorm → spec → plan → subagent-driven implementation). 20-task plan executed across 4 migrations (020-023), backend quest module + RPCs, 5 SSE/OAuth hooks, full frontend (/quest page, banner, completion modal + confetti, sidebar pill, admin tab), 12 pytest tests, 2 Playwright E2E tests in real headless Chrome. Caught and fixed an orphaned pages/chat.tsx that prevented banner rendering. Also: removed NOW Foods from competitor list (pet contamination), connected Supabase + Cloudflare MCPs, saved multiple project-memory notes. 25 commits on feat/founding-member-quest, merged to main. |
 | 26 | 2026-04-17 | **Context leak hardening + credit balance on signup**. Closed brand brain cache, billing, conversation history leaks. Added `auto_create_credit_balance` trigger (migration 029) so new users see 2500 tokens immediately. Fixed sandbox to refresh env vars on cached hit. Loop onboarding step + Meta coming-soon banner. |
 | 27 | 2026-04-20 | **Klaviyo PR 1 — integration + data sync**. Private API key auth, 5 new brand brain files (lists/segments/flows/campaigns/email-performance), daily pg_cron refresh (migration 030), Settings UI Klaviyo card, worker handlers for klaviyo_initial_sync + klaviyo_daily_sync tasks. Generation tools come in PR 3. |
+| 28 | 2026-04-20 | **Klaviyo PR 3 — email draft push**. Client write methods (create/update_template, create_campaign), `email-assets` bucket (migration 032), Gemini 3 Pro hero pipeline, HTML email renderer (600px / inline CSS / liquid tags / no em-dashes), top-5 campaigns' HTML backfill during sync, 4 sandbox tools, sandbox→Railway HTTP tool-bridge + `agent_events` log, `klaviyo_draft_created` SSE + frontend deep-link card, per-email billing, orchestrator Flow B prompt + Mailer SOP. 136 tests passing, frontend builds clean. PR opened for human review + manual QA inside Klaviyo. |
 
 ### Session 23 Detail
 
