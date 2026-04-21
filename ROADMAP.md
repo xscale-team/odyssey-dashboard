@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-20 (Session 28)**
+> **Last updated: 2026-04-21 (Session 29)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Klaviyo PR 4 — SMS/push draft tools, flow drafts, proactive audit, Three Pillars brain file, competitor email library (RGE scraper + `competitor_emails` table + weekly pg_cron refresh), pytest expansion, docs finalize. PR 3 is in review on `feat/klaviyo-pr3-email-draft` and gated on human manual QA inside the Klaviyo admin UI before merge.
+> **What To Do Next:** Three plan docs landed 2026-04-21 describing the next big arc — cinematic chat DNA + review Gallery surface, sandbox persistent-daemon, and daily-plays generator. Execute the cinematic-chat plan first (ships user-visible value fast, touches mostly UI), then sandbox-daemon (invisible but big cost/latency win), then daily-plays (depends on both). Plans at `docs/superpowers/plans/2026-04-21-cinematic-chat.md`, `-sandbox-persistent-daemon.md`, `-daily-plays-generator.md`.
 
 ---
 
@@ -201,6 +201,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 26 | 2026-04-17 | **Context leak hardening + credit balance on signup**. Closed brand brain cache, billing, conversation history leaks. Added `auto_create_credit_balance` trigger (migration 029) so new users see 2500 tokens immediately. Fixed sandbox to refresh env vars on cached hit. Loop onboarding step + Meta coming-soon banner. |
 | 27 | 2026-04-20 | **Klaviyo PR 1 — integration + data sync**. Private API key auth, 5 new brand brain files (lists/segments/flows/campaigns/email-performance), daily pg_cron refresh (migration 030), Settings UI Klaviyo card, worker handlers for klaviyo_initial_sync + klaviyo_daily_sync tasks. Generation tools come in PR 3. |
 | 28 | 2026-04-20 | **Klaviyo PR 3 — email draft push**. Client write methods (create/update_template, create_campaign), `email-assets` bucket (migration 032), Gemini 3 Pro hero pipeline, HTML email renderer (600px / inline CSS / liquid tags / no em-dashes), top-5 campaigns' HTML backfill during sync, 4 sandbox tools, sandbox→Railway HTTP tool-bridge + `agent_events` log, `klaviyo_draft_created` SSE + frontend deep-link card, per-email billing, orchestrator Flow B prompt + Mailer SOP. 136 tests passing, frontend builds clean. PR opened for human review + manual QA inside Klaviyo. |
+| 29 | 2026-04-21 | **Full QA run + Loop RLS fix + cinematic redesign kickoff**. End-to-end Playwright QA as a fresh single-store merchant: signup → Shopify connect → Loop connect → `/v2/home` with real $14.9k / 384 orders / $42.61 AOV. Found + fixed Loop's `store_connection` anon-key RLS bug mid-run (commit 5f49fea, same pattern as Shopify PR 28). Added RLS lesson to CLAUDE.md. Shipped XS row: Loop onboarding copy fix ("API & Integrations" → "API tokens"), `/v2` default now routes to `/v2/chat`, login/signup/post-onboarding all land in v2 cinematic chat. Wrote three plan docs for the next arc: cinematic-chat UX, sandbox persistent-daemon, daily-plays generator. |
 
 ### Session 23 Detail
 
@@ -214,7 +215,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 **Billing Overhaul:**
 - Per-ad charging (was only at batch completion, so errors = we eat the cost)
 - Gemini cost corrected: $0.02 → $0.13 per image
-- All users on Opus 4.6 (removed Normal/Pro toggle)
+- All users on Opus 4.7 (removed Normal/Pro toggle; model-preference feature deleted 2026-04-21)
 - Admin P&L dashboard: Stripe Revenue, Our API Costs, Net Profit/Loss, Free Credit Subsidy
 - Feedback weights: user like=3, dislike=5, admin like=7, dislike=10, no feedback=1
 
