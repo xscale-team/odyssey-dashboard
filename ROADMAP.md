@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-24 (Session 30)**
+> **Last updated: 2026-04-26 (Session 31)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** E2B is fully removed (Phases 0-11 complete, 2026-04-24). The chat agent now runs natively on Railway via Anthropic `tool_use`. Next: verify native-only in prod for 48h, then move on to cinematic chat DNA + review Gallery, then daily-plays generator. Plans at `docs/superpowers/plans/2026-04-21-cinematic-chat.md`, `-daily-plays-generator.md`. The `sandbox-persistent-daemon.md` plan is **obsolete** — superseded by the native-tool-use migration + Operations Layer (pg_cron + webhook-driven work).
+> **What To Do Next:** Fix the Session 31 production brand-owner QA findings before more growth testing: unify bot/dashboard metrics, reinstate the product-image verification gate in native ad generation, hide failed regenerated variants from the ready gallery, add OCR/compliance-backed creative review, normalize generated images to 1080x1080, and enforce true cross-session creative diversity. Full notes: `docs/qa-runs/2026-04-26-brand-owner-ad-bot-qa.md`.
 
 ---
 
@@ -108,6 +108,13 @@ Directional items captured from the old architecture doc future phases. Not comm
 ## Known Bugs & Technical Debt
 
 ### P1 — Active
+- [ ] **Bot metrics disagree with dashboard metrics** - Session 31 production QA: bot reported 30d revenue `$16,387`, orders `392`, CPA `$65`; dashboard showed Net Sales `$13,327`, orders `346`, CPA `$33.22`. Need one shared metrics contract and labels for gross/net sales, first-order CPA, blended CPA, attribution window, and source filters.
+- [ ] **Native ad generation skipped mandatory product image verification** - Session 31: HashiAid CDN image was pulled and generation started immediately without showing the product image for confirmation.
+- [ ] **Regenerated ads remain approve-ready** - Session 31: requested 3 ads, generated BOF replacement after QC, but UI rendered `AD BATCH · 4 ready` including the rejected BOF original.
+- [ ] **Prior ad batch leaks into fresh chats** - Session 31 production QA: a new chat showed the previous `AD BATCH · 4 ready` strip before any new images were generated. Working-tree patch resets `streamingBatchAds`/`adBatchTotal` on new conversation, conversation switch, and new send.
+- [ ] **Fresh chats reuse the same creative spine for repeat ad requests** - Session 31: a no-image 3-ad plan for the same HashiAid Energy & Fatigue angle reused TOF 2pm fatigue callout + MOF proof/science + BOF offer. Need hard same-product/same-angle anti-copy constraints.
+- [ ] **Creative self-critique hallucinates asset details** - Session 31: critique flagged nonexistent `lost 18 lbs` and `Always exhausted? Hashimoto's might be why` copy. Review needs OCR/image-grounded inputs or must disclose it cannot inspect final pixels.
+- [ ] **Supplement/Meta compliance checker is too weak** - Session 31 generated Hashimoto's/fatigue claims, likely fabricated testimonial copy, and time-bound outcome claims without blocking or substantiation.
 - [x] **CRITICAL: Brand data leaking across accounts** — Fixed: removed all hardcoded brand names, scoped competitor ads per user, auto-assign on signup (Session 23)
 - [x] **CRITICAL: New user signup crash** — Fixed: `assign_default_competitors` had no search_path, crashing entire signup (Session 24)
 - [x] **Billing only charged on batch completion** — Fixed: per-ad charging, prevents free-riding on errors (Session 23)
@@ -125,6 +132,10 @@ Directional items captured from the old architecture doc future phases. Not comm
 - [x] **`_active_sandboxes` never reaped idle users** — Fixed: `SandboxManager` now tracks `_last_used` and drops references inactive > 30 min on every `get_or_create` (Session 26)
 
 ### P2 — Medium
+- [ ] **Generated ad images are 1254x1254, not 1080x1080** - Session 31 downloaded all four generated PNGs and each was 1254 square. Normalize before upload or fix provider request dimensions.
+- [ ] **Em dash rule still leaks into customer-facing chat/ad labels** - Session 31 bot response used multiple em dashes despite the public-facing no-em-dash rule.
+- [ ] **No obvious review-gallery CTA after ad generation** - Bot says "Open the gallery to approve and ship", but the batch card exposes direct image links, not a clear approve/review action.
+- [ ] **Streaming chunk stitching drops spaces** - Observed `recommendation.I have` and `batch.Got` in streamed chat text.
 - [x] **Gemini rate limits (first 2 ads in batch fail)** — Fixed: 3s delay between calls + retry with simplified prompt (Session 23)
 - [x] **Same competitor ads used every session** — Fixed: time-seeded randomization (Session 23)
 - [x] **Wrong product images persisting across sessions** — Fixed: removed Supabase cache, fresh download each time + user verification (Session 23)
@@ -203,6 +214,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 28 | 2026-04-20 | **Klaviyo PR 3 — email draft push**. Client write methods (create/update_template, create_campaign), `email-assets` bucket (migration 032), Gemini 3 Pro hero pipeline, HTML email renderer (600px / inline CSS / liquid tags / no em-dashes), top-5 campaigns' HTML backfill during sync, 4 sandbox tools, sandbox→Railway HTTP tool-bridge + `agent_events` log, `klaviyo_draft_created` SSE + frontend deep-link card, per-email billing, orchestrator Flow B prompt + Mailer SOP. 136 tests passing, frontend builds clean. PR opened for human review + manual QA inside Klaviyo. |
 | 29 | 2026-04-21 | **Full QA run + Loop RLS fix + cinematic redesign kickoff**. End-to-end Playwright QA as a fresh single-store merchant: signup → Shopify connect → Loop connect → `/v2/home` with real $14.9k / 384 orders / $42.61 AOV. Found + fixed Loop's `store_connection` anon-key RLS bug mid-run (commit 5f49fea, same pattern as Shopify PR 28). Added RLS lesson to CLAUDE.md. Shipped XS row: Loop onboarding copy fix ("API & Integrations" → "API tokens"), `/v2` default now routes to `/v2/chat`, login/signup/post-onboarding all land in v2 cinematic chat. Wrote three plan docs for the next arc: cinematic-chat UX, sandbox persistent-daemon, daily-plays generator. |
 | 30 | 2026-04-24 | **E2B fully removed — native Anthropic tool_use is the only runtime**. Phases 8 + 11 shipped: `use_native_tool_use` + `native_mutations_allowed` flipped to True defaults then removed as fields; `backend/app/sandbox/` deleted (5,789-line executor.py gone); `_CONTEXT_CACHE` + `_build_business_context` + `invalidate_business_context` + `SandboxEvent` extracted to `app/chat/business_context.py` + `app/chat/events_schema.py`; 9 `sandbox_manager.destroy` call sites swapped to `invalidate_business_context`; `e2b` + `e2b-code-interpreter` dropped from requirements.txt; frontend Planner sandbox pipeline (dashboard-store/sandbox-execution-panel/pages/dashboard.tsx) deleted as dead code. Net: +1,809 / -9,145 lines. Also shipped: `cache_control: ephemeral` on the full `TOOL_SCHEMAS` prefix (prompt-cache win, ~1,648 tokens/turn avoided on hits) and migration 060 (`shopify_orders` composite index on `user_id, order_created_at DESC`, ~60% expected p95 reduction on dashboard `/stats`). Sandbox-persistent-daemon plan obsoleted — replaced by Operations Layer path. Backend: 889 tests pass; one pre-existing failure on main unchanged. Frontend: build green in 223ms. |
+| 31 | 2026-04-26 | **Production brand-owner browser QA: data chat + ad generation.** Production bot answered real Shopify/Meta pulse check and generated HashiAid ads, but found P0/P1 issues: bot/dashboard metric mismatch, skipped product-image verification, 3-ad request rendered 4 ready assets after regen, old ad strip leaked into a fresh chat, fresh-chat 3-ad plan reused the same 2pm-fatigue/offer creative spine, self-critique hallucinated image details, supplement/Meta policy risks, 1254x1254 outputs, em-dash leakage, unclear review-gallery CTA, and streaming chunk spacing bugs. Patched local chat-store reset + hardened diversity context. Full report: `docs/qa-runs/2026-04-26-brand-owner-ad-bot-qa.md`. |
 
 ### Session 23 Detail
 
