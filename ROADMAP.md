@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-27 (Session 54)**
+> **Last updated: 2026-04-27 (Session 55)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 54 reframed the public URL-first funnel from a low-value "kit" into a complete acquisition system: ads drive entry pages, entry pages warm buyers into an offer page, and email flows target conversion rate, LTV, and AOV. Next pass should make those acquisition-system assets downloadable/editable as first-class rows after signup, then add production browser QA around the Google claim handoff.
+> **What To Do Next:** Session 55 wired the public URL-first preview to Kie GPT-5.5 so the magnet can return real brand-specific acquisition recommendations from the scrape. Next pass should make those assets downloadable/editable as first-class rows after signup, then do production browser QA around Google claim handoff and live chat continuation.
 
 ---
 
@@ -37,9 +37,11 @@
 - [x] Preserve store URL through email-link and Google signup callbacks
 - [x] Add Settings control to replace URL-first brand source and wipe old scraped context
 - [x] Apply migration `066_url_first_brand_kits.sql` to live Supabase DB
+- [x] Wire Kie GPT-5.5 into public preview, claim, and URL replacement acquisition manifests
+- [x] Add GPT-5.5 URL-first asset planner tests
 - [ ] Persist generated landing pages, emails, and digital products as first-class asset rows
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
-- [ ] Add GPT-5.5 URL-first asset planner tests and browser QA
+- [ ] Add production browser QA around preview analysis, Google claim, and first chat continuation
 
 ### Priority 0: Founding Member Quest (Session 25) — ✅ SHIPPED
 - [x] 5-step activation quest: Connect Shopify → Welcome Audit → First Ad → Rate Ad → Invite Friend
@@ -265,6 +267,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 52 | 2026-04-27 | **Settings URL replacement.** Added authenticated `/api/brand-kits/replace` to scrape a new website URL, delete the user's old URL-first brand kit and claimed preview-session rows, insert the fresh brand kit, and return a new asset manifest. Added a Settings → Brand "Website URL source" card with current domain/products/colors, Replace URL CTA, local chat-context refresh, and pending-migration warning when persistence is unavailable. Verification: frontend production build, full frontend tests, backend compile/import checks passed. |
 | 53 | 2026-04-27 | **Liquid-glass cold-traffic asset magnet + live schema.** Rebuilt the public preview page into a conversion-focused liquid-glass magnet for cold Meta traffic: URL-first promise, product/photo/color scan, visible generated-style previews for ads, landing pages, emails, and digital products, plus a Google-first unlock that preserves scraped context into chat. Public previews now record `preview_sessions` when the schema exists, and claimed sessions save the asset manifest for the signed-in user. Applied migration 066 live in Supabase and verified `brand_kits` plus `preview_sessions` both return 200 from REST. Verification: frontend production build, full frontend tests, brand-kit backend tests, Python compile, and `git diff --check` passed. |
 | 54 | 2026-04-27 | **Reframed preview value as an acquisition system.** Removed the low-value "kit" framing from the public magnet and repositioned the promise as an entire acquisition system built from the store URL. The preview now tells the funnel story directly: traffic ads feed entry pages, entry pages pre-sell into the offer page, and the email system includes conversion-rate checkout recovery, a 6-12 month LTV education flow, and an AOV post-purchase upsell flow. Backend manifests now return those same acquisition-system labels and first prompt. Verification: frontend production build, full frontend tests, brand-kit backend tests, Python compile, and `git diff --check` passed. |
+| 55 | 2026-04-27 | **Kie GPT-5.5 acquisition strategy preview.** Added a Kie `/codex/v1/responses` GPT-5.5 strategy generator for URL-first previews, claims, and URL replacements, with a deterministic fallback when Kie is missing or slow. The manifest now carries strategy summary, primary offer, positioning, ad hooks, funnel stages, visual directions, entry-page promises, offer-page sections, email subjects, CPA/LTV/AOV goals, and digital-product formats. The public preview UI now shows the strategy readout and richer brand-specific recommendations. Verification: Python compile, brand-kit/test-config pytest, frontend production build, full frontend vitest suite, and `git diff --check` passed. |
 
 ### Session 23 Detail
 
