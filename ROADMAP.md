@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-27 (Session 52)**
+> **Last updated: 2026-04-27 (Session 53)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 52 added a Settings → Brand website-source card so merchants can replace their URL at any time. The new authenticated `/api/brand-kits/replace` endpoint scrapes the new URL, deletes the user's previous URL-first brand-kit/preview-session rows, inserts the fresh brand kit, and returns the new asset manifest for chat handoff. Migration `066_url_first_brand_kits.sql` still needs to be applied to the live Supabase database so claimed/replaced brand kits persist instead of returning `persisted=false`. Next pass should apply that migration live, then make generated landing pages, emails, digital products, and ad batches first-class asset rows in the split workspace.
+> **What To Do Next:** Session 53 made the cold-traffic URL-first page the actual liquid-glass asset magnet: URL input, brand/product scan, visible ad/page/email/digital-product previews, and Google-first unlock into chat. Migration `066_url_first_brand_kits.sql` is now applied live and verified via Supabase REST for `brand_kits` and `preview_sessions`. Next pass should make generated landing pages, emails, digital products, and ad batches first-class asset rows in the split workspace and add production browser QA around the Google claim handoff.
 
 ---
 
@@ -36,7 +36,7 @@
 - [x] Add public pre-signup brand preview endpoint and asset-plan manifest
 - [x] Preserve store URL through email-link and Google signup callbacks
 - [x] Add Settings control to replace URL-first brand source and wipe old scraped context
-- [ ] Apply migration `066_url_first_brand_kits.sql` to live Supabase DB
+- [x] Apply migration `066_url_first_brand_kits.sql` to live Supabase DB
 - [ ] Persist generated landing pages, emails, and digital products as first-class asset rows
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Add GPT-5.5 URL-first asset planner tests and browser QA
@@ -263,6 +263,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 50 | 2026-04-27 | **URL-first asset onboarding foundation.** Added `brand_kits` and `preview_sessions` migration, backend URL scraper/brand-kit API, native chat tools for scraping/reusing brand kits, GPT-5.5/GPT Image 2 model constants/config for the new asset path, URL-first orchestrator instructions, Dashboard nav copy, and a new asset-tab chat opener with a split output workspace. Pushed a safety patch so live `/api/brand-kits/scrape` returns scraped context instead of 500ing while the DB migration is pending. |
 | 51 | 2026-04-27 | **URL-first lead magnet funnel.** Made `/` and `/preview` a real pre-signup value flow: public `/api/brand-kits/preview`, generated asset-plan manifest, landing page result panel with products/colors/model stack, email-link signup for URL-preview users, Google/email callback URL preservation, authenticated `/api/brand-kits/claim`, and chat-side claiming that marks URL-first onboarding complete and hydrates the asset opener with the captured brand context. Verification: frontend production build, targeted chat opener tests, backend compile, and live scrape/manifest smoke passed. |
 | 52 | 2026-04-27 | **Settings URL replacement.** Added authenticated `/api/brand-kits/replace` to scrape a new website URL, delete the user's old URL-first brand kit and claimed preview-session rows, insert the fresh brand kit, and return a new asset manifest. Added a Settings → Brand "Website URL source" card with current domain/products/colors, Replace URL CTA, local chat-context refresh, and pending-migration warning when persistence is unavailable. Verification: frontend production build, full frontend tests, backend compile/import checks passed. |
+| 53 | 2026-04-27 | **Liquid-glass cold-traffic asset magnet + live schema.** Rebuilt the public preview page into a conversion-focused liquid-glass magnet for cold Meta traffic: URL-first promise, product/photo/color scan, visible generated-style previews for ads, landing pages, emails, and digital products, plus a Google-first unlock that preserves scraped context into chat. Public previews now record `preview_sessions` when the schema exists, and claimed sessions save the asset manifest for the signed-in user. Applied migration 066 live in Supabase and verified `brand_kits` plus `preview_sessions` both return 200 from REST. Verification: frontend production build, full frontend tests, brand-kit backend tests, Python compile, and `git diff --check` passed. |
 
 ### Session 23 Detail
 
