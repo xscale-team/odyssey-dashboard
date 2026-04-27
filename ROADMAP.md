@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-27 (Session 49)**
+> **Last updated: 2026-04-27 (Session 50)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Production ad generation passes the explicit stress path from Session 46: new live chat `44655229-5558-419f-80ba-494ee7041bcd` generated 5 TOF ads, then a second 5 BOF batch, all 10 creatives rendered in chat and survived reload. Session 49 fixed Meta setup copy after a support ticket showed a merchant could not find the Valid OAuth Redirect URI field. Next QA/fix pass should focus on owner-polish: product-image confirmation options rendered as a markdown list in the in-app browser instead of buttons, long 5-ad streams still take several minutes before the final saved assistant message appears, TOF visual diversity claims need stricter final-slot validation, and supplement compliance still lets symptom/energy language through.
+> **What To Do Next:** Session 50 started the URL-first lead-magnet/app rebuild: `brand_kits` + `preview_sessions` schema, authenticated `/api/brand-kits/scrape`, native chat tools for `scrape_brand_url` / `get_latest_brand_kit`, URL-first orchestrator instructions, Dashboard nav rename, and an Emergent-style asset-tab chat shell with a split output pane. Next pass should connect the public preview landing page to Odyssey signup/claiming, migrate the core chat engine itself from the legacy Anthropic driver to GPT-5.5, and expand generated asset persistence for landing pages, emails, and digital products.
 
 ---
 
@@ -24,6 +24,18 @@
 ---
 
 ## What's Next — Priority Order
+
+### Priority A: URL-First Asset Onboarding
+- [x] Add `brand_kits` / `preview_sessions` schema foundation for URL-scraped brand context
+- [x] Add authenticated URL scrape endpoint that captures identity, colors, fonts, product photos, products, claims, and voice
+- [x] Add native chat tools so Ody can scrape/use a website URL before integrations
+- [x] Replace empty chat starter surface with asset tabs: Ads, Landing Pages, Emails, Digital Products
+- [x] Add split chat/output workspace for generated assets
+- [x] Rename Home nav label to Dashboard
+- [ ] Wire public Odyssey preview landing page into Odyssey signup/claim flow
+- [ ] Persist generated landing pages, emails, and digital products as first-class asset rows
+- [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
+- [ ] Add GPT-5.5 URL-first asset planner tests and browser QA
 
 ### Priority 0: Founding Member Quest (Session 25) — ✅ SHIPPED
 - [x] 5-step activation quest: Connect Shopify → Welcome Audit → First Ad → Rate Ad → Invite Friend
@@ -244,6 +256,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 47 | 2026-04-27 | **Brand mark/profile image refresh.** Replaced the v2 `Ody1Mark` SVG sigil with the supplied `Odyssey Logo Icon2 (1).jpg` orb, used it for Ody's chat header/profile image, updated the legacy chat assistant avatar, and regenerated `odyssey-icon.png`, `favicon-32.png`, and `favicon-64.png` from the same source. Frontend production build passed. |
 | 48 | 2026-04-27 | **Chat starter prompts.** Added three owner-friendly quick actions to the v2 empty chat opener: "Make me a batch of ads", "Audit my Meta account", and "Do my full business welcome audit". The buttons use lucide icons, send the exact prompt through the existing chat-store `sendMessage` path, and are covered by a `CinematicOpener` click test. Verification: targeted opener tests and frontend production build passed. |
 | 49 | 2026-04-27 | **Meta redirect setup support-ticket fix.** Recent support ticket reported the merchant reached Meta setup step 7 but could not find the Valid OAuth Redirect URI field. Verified the callback route exists at `https://api.runodyssey.io/api/integrations/meta/callback`; root cause was stale UI copy pointing users to Marketing API settings, where Meta often does not show Client OAuth fields. Updated Settings > Meta setup with a dedicated redirect-URI copy card, guidance to add/open Facebook Login for Business or Authentication and account creation settings, Client/Web OAuth toggle instructions, and a warning that Marketing API settings is the wrong panel for this field. Frontend production build passed. |
+| 50 | 2026-04-27 | **URL-first asset onboarding foundation.** Added `brand_kits` and `preview_sessions` migration, backend URL scraper/brand-kit API, native chat tools for scraping/reusing brand kits, GPT-5.5/GPT Image 2 model constants/config for the new asset path, URL-first orchestrator instructions, Dashboard nav copy, and a new asset-tab chat opener with a split output workspace. |
 
 ### Session 23 Detail
 
