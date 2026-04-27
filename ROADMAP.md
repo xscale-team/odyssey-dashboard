@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-27 (Session 51)**
+> **Last updated: 2026-04-27 (Session 52)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 51 wired the URL-first lead magnet into the actual signup/chat funnel: public `/api/brand-kits/preview`, richer `/preview` and `/` landing page with a pre-signup asset plan, email-link signup for URL-preview users, Google/email callback URL preservation, authenticated `/api/brand-kits/claim`, and chat-side claiming that marks URL-first onboarding complete and hydrates the Emergent-style asset opener. Migration `066_url_first_brand_kits.sql` still needs to be applied to the live Supabase database so claimed brand kits persist instead of returning `persisted=false`. Next pass should apply that migration live, then make generated landing pages, emails, digital products, and ad batches first-class asset rows in the split workspace.
+> **What To Do Next:** Session 52 added a Settings → Brand website-source card so merchants can replace their URL at any time. The new authenticated `/api/brand-kits/replace` endpoint scrapes the new URL, deletes the user's previous URL-first brand-kit/preview-session rows, inserts the fresh brand kit, and returns the new asset manifest for chat handoff. Migration `066_url_first_brand_kits.sql` still needs to be applied to the live Supabase database so claimed/replaced brand kits persist instead of returning `persisted=false`. Next pass should apply that migration live, then make generated landing pages, emails, digital products, and ad batches first-class asset rows in the split workspace.
 
 ---
 
@@ -35,6 +35,7 @@
 - [x] Wire public Odyssey preview landing page into Odyssey signup/claim flow
 - [x] Add public pre-signup brand preview endpoint and asset-plan manifest
 - [x] Preserve store URL through email-link and Google signup callbacks
+- [x] Add Settings control to replace URL-first brand source and wipe old scraped context
 - [ ] Apply migration `066_url_first_brand_kits.sql` to live Supabase DB
 - [ ] Persist generated landing pages, emails, and digital products as first-class asset rows
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
@@ -261,6 +262,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 49 | 2026-04-27 | **Meta redirect setup support-ticket fix.** Recent support ticket reported the merchant reached Meta setup step 7 but could not find the Valid OAuth Redirect URI field. Verified the callback route exists at `https://api.runodyssey.io/api/integrations/meta/callback`; root cause was stale UI copy pointing users to Marketing API settings, where Meta often does not show Client OAuth fields. Updated Settings > Meta setup with a dedicated redirect-URI copy card, guidance to add/open Facebook Login for Business or Authentication and account creation settings, Client/Web OAuth toggle instructions, and a warning that Marketing API settings is the wrong panel for this field. Frontend production build passed. |
 | 50 | 2026-04-27 | **URL-first asset onboarding foundation.** Added `brand_kits` and `preview_sessions` migration, backend URL scraper/brand-kit API, native chat tools for scraping/reusing brand kits, GPT-5.5/GPT Image 2 model constants/config for the new asset path, URL-first orchestrator instructions, Dashboard nav copy, and a new asset-tab chat opener with a split output workspace. Pushed a safety patch so live `/api/brand-kits/scrape` returns scraped context instead of 500ing while the DB migration is pending. |
 | 51 | 2026-04-27 | **URL-first lead magnet funnel.** Made `/` and `/preview` a real pre-signup value flow: public `/api/brand-kits/preview`, generated asset-plan manifest, landing page result panel with products/colors/model stack, email-link signup for URL-preview users, Google/email callback URL preservation, authenticated `/api/brand-kits/claim`, and chat-side claiming that marks URL-first onboarding complete and hydrates the asset opener with the captured brand context. Verification: frontend production build, targeted chat opener tests, backend compile, and live scrape/manifest smoke passed. |
+| 52 | 2026-04-27 | **Settings URL replacement.** Added authenticated `/api/brand-kits/replace` to scrape a new website URL, delete the user's old URL-first brand kit and claimed preview-session rows, insert the fresh brand kit, and return a new asset manifest. Added a Settings → Brand "Website URL source" card with current domain/products/colors, Replace URL CTA, local chat-context refresh, and pending-migration warning when persistence is unavailable. Verification: frontend production build, full frontend tests, backend compile/import checks passed. |
 
 ### Session 23 Detail
 
