@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-27 (Session 50)**
+> **Last updated: 2026-04-27 (Session 51)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 50 started the URL-first lead-magnet/app rebuild: `brand_kits` + `preview_sessions` schema, authenticated `/api/brand-kits/scrape`, native chat tools for `scrape_brand_url` / `get_latest_brand_kit`, URL-first orchestrator instructions, Dashboard nav rename, and an Emergent-style asset-tab chat shell with a split output pane. The code is live and the scrape endpoint now gracefully returns brand context even before persistence, but migration `066_url_first_brand_kits.sql` still needs to be applied to the live Supabase database so `persisted=true`. Next pass should connect the public preview landing page to Odyssey signup/claiming, migrate the core chat engine itself from the legacy Anthropic driver to GPT-5.5, and expand generated asset persistence for landing pages, emails, and digital products.
+> **What To Do Next:** Session 51 wired the URL-first lead magnet into the actual signup/chat funnel: public `/api/brand-kits/preview`, richer `/preview` and `/` landing page with a pre-signup asset plan, email-link signup for URL-preview users, Google/email callback URL preservation, authenticated `/api/brand-kits/claim`, and chat-side claiming that marks URL-first onboarding complete and hydrates the Emergent-style asset opener. Migration `066_url_first_brand_kits.sql` still needs to be applied to the live Supabase database so claimed brand kits persist instead of returning `persisted=false`. Next pass should apply that migration live, then make generated landing pages, emails, digital products, and ad batches first-class asset rows in the split workspace.
 
 ---
 
@@ -32,8 +32,10 @@
 - [x] Replace empty chat starter surface with asset tabs: Ads, Landing Pages, Emails, Digital Products
 - [x] Add split chat/output workspace for generated assets
 - [x] Rename Home nav label to Dashboard
+- [x] Wire public Odyssey preview landing page into Odyssey signup/claim flow
+- [x] Add public pre-signup brand preview endpoint and asset-plan manifest
+- [x] Preserve store URL through email-link and Google signup callbacks
 - [ ] Apply migration `066_url_first_brand_kits.sql` to live Supabase DB
-- [ ] Wire public Odyssey preview landing page into Odyssey signup/claim flow
 - [ ] Persist generated landing pages, emails, and digital products as first-class asset rows
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Add GPT-5.5 URL-first asset planner tests and browser QA
@@ -258,6 +260,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 48 | 2026-04-27 | **Chat starter prompts.** Added three owner-friendly quick actions to the v2 empty chat opener: "Make me a batch of ads", "Audit my Meta account", and "Do my full business welcome audit". The buttons use lucide icons, send the exact prompt through the existing chat-store `sendMessage` path, and are covered by a `CinematicOpener` click test. Verification: targeted opener tests and frontend production build passed. |
 | 49 | 2026-04-27 | **Meta redirect setup support-ticket fix.** Recent support ticket reported the merchant reached Meta setup step 7 but could not find the Valid OAuth Redirect URI field. Verified the callback route exists at `https://api.runodyssey.io/api/integrations/meta/callback`; root cause was stale UI copy pointing users to Marketing API settings, where Meta often does not show Client OAuth fields. Updated Settings > Meta setup with a dedicated redirect-URI copy card, guidance to add/open Facebook Login for Business or Authentication and account creation settings, Client/Web OAuth toggle instructions, and a warning that Marketing API settings is the wrong panel for this field. Frontend production build passed. |
 | 50 | 2026-04-27 | **URL-first asset onboarding foundation.** Added `brand_kits` and `preview_sessions` migration, backend URL scraper/brand-kit API, native chat tools for scraping/reusing brand kits, GPT-5.5/GPT Image 2 model constants/config for the new asset path, URL-first orchestrator instructions, Dashboard nav copy, and a new asset-tab chat opener with a split output workspace. Pushed a safety patch so live `/api/brand-kits/scrape` returns scraped context instead of 500ing while the DB migration is pending. |
+| 51 | 2026-04-27 | **URL-first lead magnet funnel.** Made `/` and `/preview` a real pre-signup value flow: public `/api/brand-kits/preview`, generated asset-plan manifest, landing page result panel with products/colors/model stack, email-link signup for URL-preview users, Google/email callback URL preservation, authenticated `/api/brand-kits/claim`, and chat-side claiming that marks URL-first onboarding complete and hydrates the asset opener with the captured brand context. Verification: frontend production build, targeted chat opener tests, backend compile, and live scrape/manifest smoke passed. |
 
 ### Session 23 Detail
 
