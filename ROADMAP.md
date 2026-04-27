@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-27 (Session 53)**
+> **Last updated: 2026-04-27 (Session 54)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 53 made the cold-traffic URL-first page the actual liquid-glass asset magnet: URL input, brand/product scan, visible ad/page/email/digital-product previews, and Google-first unlock into chat. Migration `066_url_first_brand_kits.sql` is now applied live and verified via Supabase REST for `brand_kits` and `preview_sessions`. Next pass should make generated landing pages, emails, digital products, and ad batches first-class asset rows in the split workspace and add production browser QA around the Google claim handoff.
+> **What To Do Next:** Session 54 reframed the public URL-first funnel from a low-value "kit" into a complete acquisition system: ads drive entry pages, entry pages warm buyers into an offer page, and email flows target conversion rate, LTV, and AOV. Next pass should make those acquisition-system assets downloadable/editable as first-class rows after signup, then add production browser QA around the Google claim handoff.
 
 ---
 
@@ -264,6 +264,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 51 | 2026-04-27 | **URL-first lead magnet funnel.** Made `/` and `/preview` a real pre-signup value flow: public `/api/brand-kits/preview`, generated asset-plan manifest, landing page result panel with products/colors/model stack, email-link signup for URL-preview users, Google/email callback URL preservation, authenticated `/api/brand-kits/claim`, and chat-side claiming that marks URL-first onboarding complete and hydrates the asset opener with the captured brand context. Verification: frontend production build, targeted chat opener tests, backend compile, and live scrape/manifest smoke passed. |
 | 52 | 2026-04-27 | **Settings URL replacement.** Added authenticated `/api/brand-kits/replace` to scrape a new website URL, delete the user's old URL-first brand kit and claimed preview-session rows, insert the fresh brand kit, and return a new asset manifest. Added a Settings → Brand "Website URL source" card with current domain/products/colors, Replace URL CTA, local chat-context refresh, and pending-migration warning when persistence is unavailable. Verification: frontend production build, full frontend tests, backend compile/import checks passed. |
 | 53 | 2026-04-27 | **Liquid-glass cold-traffic asset magnet + live schema.** Rebuilt the public preview page into a conversion-focused liquid-glass magnet for cold Meta traffic: URL-first promise, product/photo/color scan, visible generated-style previews for ads, landing pages, emails, and digital products, plus a Google-first unlock that preserves scraped context into chat. Public previews now record `preview_sessions` when the schema exists, and claimed sessions save the asset manifest for the signed-in user. Applied migration 066 live in Supabase and verified `brand_kits` plus `preview_sessions` both return 200 from REST. Verification: frontend production build, full frontend tests, brand-kit backend tests, Python compile, and `git diff --check` passed. |
+| 54 | 2026-04-27 | **Reframed preview value as an acquisition system.** Removed the low-value "kit" framing from the public magnet and repositioned the promise as an entire acquisition system built from the store URL. The preview now tells the funnel story directly: traffic ads feed entry pages, entry pages pre-sell into the offer page, and the email system includes conversion-rate checkout recovery, a 6-12 month LTV education flow, and an AOV post-purchase upsell flow. Backend manifests now return those same acquisition-system labels and first prompt. Verification: frontend production build, full frontend tests, brand-kit backend tests, Python compile, and `git diff --check` passed. |
 
 ### Session 23 Detail
 
