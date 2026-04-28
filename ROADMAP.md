@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-28 (Session 89)**
+> **Last updated: 2026-04-28 (Session 90)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 89 expanded the public preview full-system reveal so each lever shows the full value stack founders get before signup: CPA assets, AOV builders, and LTV retention systems. Next build should centralize landing/digital-product/email text generation behind GPT-5.5, then add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
+> **What To Do Next:** Session 90 tied the CPA/AOV/LTV color system into the first preview cards and added streaming preview ads so generated images can appear one at a time while all three are queued together. Next build should centralize landing/digital-product/email text generation behind GPT-5.5, then add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
 
 ---
 
@@ -57,6 +57,7 @@
 - [x] Color-code the preview asset reveal by CPA, AOV, and LTV so value is easier to parse
 - [x] Align preview assets into proper CPA, AOV, and LTV columns
 - [x] Expand preview lever columns into full acquisition-system value stacks: CPA ads/quiz/listicle/advertorial/cart recovery, AOV offer/upsell/post-purchase/digital products, and LTV subscription/retargeting/education/winback
+- [x] Tie the preview lever color system into the hero and scan cards, replace raw color codes with swatches, and stream preview ads as each concurrent image finishes
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Centralize landing page, email, and digital product card text generation behind GPT-5.5 asset builders, not ad hoc chat prose
 - [ ] Build a supplement inspiration library from scraped brand systems (Seed, AG1, Primal Queen, etc.) for reusable page, email, offer, and creative patterns
@@ -236,6 +237,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 90 | 2026-04-28 | **Preview color system and streaming ad reveal.** Pulled the successful CPA/AOV/LTV color language into the first public `/preview` card with three compact colored lever tiles, upgraded the scan card so each discovery block is color-coded by job, and replaced raw `#hex` output with actual captured brand swatches. Added `/api/brand-kits/preview/ads/stream` so the backend still queues all three GPT Image 2 preview ads concurrently but streams each finished ad to the frontend immediately, letting the page reveal ads one at a time instead of waiting for the whole batch response. |
 | 89 | 2026-04-28 | **Preview value-stack expansion.** Expanded the `/preview` full-system reveal from a minimal lever demo into a concrete acquisition-system stack: Lower CPA now shows ads, quiz, listicle, advertorial, and abandoned-flow assets; Lift AOV shows offer page, upsell page, post-purchase flow, and higher-value digital products like masterclasses/ebooks; Grow LTV shows subscription offers, retargeting ads, long-term education flow, and winback emails. Increased asset labels, tightened card sizing, and added a short-height mobile fallback so the no-scroll card remains usable on smaller phones. |
 | 88 | 2026-04-28 | **Preview lever column alignment.** Reworked the `/preview` full-system reveal from a row-major six-card grid into true CPA/AOV/LTV columns. Ads sit under CPA, landing page + quiz + offer page sit under AOV, and digital product + email sit under LTV, so the lever colors now line up with the growth jobs they represent. |
 | 87 | 2026-04-28 | **Preview growth-lever color coding.** Updated the `/preview` full-system reveal so CPA, AOV, and LTV are visually distinct instead of all green: CPA assets use a cyan/blue system, AOV uses amber/orange, and LTV uses violet/rose. The same lever colors now carry through the asset preview cards, icons, borders, glows, and mini mockup accents so founders can quickly understand which assets lower acquisition cost, lift order value, or grow retention. |
