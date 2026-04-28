@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-28 (Session 75)**
+> **Last updated: 2026-04-28 (Session 76)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 75 verified production landing-page, email, and digital-product assets are persisted as cards and generated_assets rows, and fixed Review Gallery layout, approval refresh, and digital-product outline rendering. Next QA pass should add a tablet/mobile Asset Output drawer so the asset side is reachable when the split pane is hidden, then run one fresh end-to-end owner chat after the deploy finishes.
+> **What To Do Next:** Session 76 restored every free signup to 2,500 tokens and backfilled all existing balances below that floor. Next QA pass should add a tablet/mobile Asset Output drawer so the asset side is reachable when the split pane is hidden, then run one fresh end-to-end owner chat after the deploy finishes.
 
 ---
 
@@ -296,6 +296,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 67 | 2026-04-28 | **Connected-store status truth fix.** Removed the backend `/api/integrations/status` process cache so reconnects/support fixes show immediately, keyed the frontend integration-status cache by signed-in user, invalidated it after Shopify connect/disconnect, and fixed the older chat prompt path to read `connected_services` with the caller's JWT instead of a bare anon client. Verification: integration-status hook tests, demo-mode tests, integration health tests, and frontend production build passed. |
 | 68 | 2026-04-28 | **Durable assets + CAPI foundation.** Mirrored non-ad `create_review_batch` card variants into `generated_assets` rows for landing pages, emails, digital products, offers, plans, and reports; expanded the asset cockpit filters and Review Gallery renderers for the new asset kinds; enabled the landing-page Builder SOP; added Odyssey Pixel server-side CAPI for standard `Lead` and `CompleteRegistration`; and fixed local preview CORS plus vertical scroll clipping found during in-app browser QA. Verification: targeted frontend tests, chat/review backend tests, Python compile, frontend production build, and local `/preview` browser QA passed. |
 | 75 | 2026-04-28 | **Production asset-output QA.** Added a $25 manual QA top-up to the live test account, verified live Supabase has landing, email, and digital-product card/generated_asset rows for the Hiker's Blend thread, and opened each Review Gallery in the in-app browser. Fixed the Review Gallery responsive layout so advertorials do not clip at narrow desktop widths, made approve/decline update local state immediately and bypass stale GET cache, and taught the digital-product renderer to display string-list outlines plus delivery/use-case/next-step details. Verification: focused review/card tests, frontend production build, live landing approve, live email approve persistence, and live digital-product review DOM passed. |
+| 76 | 2026-04-28 | **Restored 2,500 free signup tokens.** Reversed the earlier $2 anti-abuse free grant: backend fallback now creates $25/2,500-token balances, migration 068 restores the live `auto_create_credit_balance` trigger and `credit_balances` defaults to 2,500, and the live DB was backfilled so every current balance/allocation below 2,500 was brought up to 2,500 with a `credit_transactions` grant ledger row. Verification: live Supabase SQL success, REST check showed 0 balances below 2,500, screenshot users now all show at least 2,500 tokens, starting-balance tests passed, and v2 top-bar tests passed. |
 
 ### Session 23 Detail
 
