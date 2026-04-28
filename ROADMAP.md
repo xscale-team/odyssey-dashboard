@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-27 (Session 62)**
+> **Last updated: 2026-04-28 (Session 63)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 62 made URL-first Meta Pixel tracking explicit for URL submit, email entry, Google signup start, and completed Signup. Next pass should add server-side Meta Conversions API for more reliable attribution, then persist generated preview ads as first-class rows after signup.
+> **What To Do Next:** Session 63 upgraded store URL submission into a standard Meta `Lead` event and forced Google OAuth's account chooser after logout. Next pass should add server-side Meta Conversions API for more reliable attribution, then persist generated preview ads as first-class rows after signup.
 
 ---
 
@@ -44,6 +44,7 @@
 - [x] Generate real pre-signup ad preview images instead of styled product-photo placeholders
 - [x] Track URL-first preview funnel events for Meta optimization
 - [x] Add explicit Meta Pixel events for preview email entry and completed Signup
+- [x] Track store URL submission as a standard Meta Lead and force Google account chooser on OAuth
 - [ ] Persist generated landing pages, emails, and digital products as first-class asset rows
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Add production browser QA around preview analysis, Google claim, and first chat continuation
@@ -280,6 +281,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 60 | 2026-04-27 | **Collaborative asset starter prompts.** Replaced the asset-tab button prompts with guided workflows that ask for product/offer choice, require product-image confirmation for ads, propose angle/persona or page/email/product concepts, and wait for merchant approval before generation. Removed the preview manifest `recommended_first_prompt` shortcut so saved strategy never forces a hard asset command from the opener. Added orchestrator guardrails and opener regression tests. |
 | 61 | 2026-04-27 | **Asset starter menu and preview CTA polish.** Expanded asset tabs into concrete guided options: single ad, ad batch, quiz, listicle, advertorial, offer page, abandoned checkout, LTV education, post-purchase upsell, welcome flow, lead magnet, masterclass, and offer bonus. Updated orchestrator rules to honor those subtypes while still requiring guided approval. Replaced the public preview "Refresh system" CTA with "Generate all assets" that opens Google signup after a preview exists, and split CPA, AOV, and LTV into their own core growth-lever line on the magnet hero. |
 | 62 | 2026-04-27 | **Explicit Meta Pixel signup funnel events.** Confirmed URL submit already fires `PreviewUrlSubmitted`, then added no-PII email-entry tracking (`PreviewEmailEntered` / `SignupEmailEntered` plus standard `Lead`), Google signup-start intent tracking, and completed signup tracking as both standard `CompleteRegistration` and custom `Signup`, deduped per user. Updated preview claim, onboarding, and signup form paths plus regression tests. |
+| 63 | 2026-04-28 | **Meta Lead optimization + Google account chooser.** Store URL submission now fires a standard Meta `Lead` plus the `PreviewUrlSubmitted` custom event without sending the URL value. Google OAuth now requests `prompt=select_account`, so users who log out can choose a different Google account instead of being silently signed back into the previous one. Verification: targeted frontend tests, production build, and `git diff --check` passed. |
 
 ### Session 23 Detail
 
