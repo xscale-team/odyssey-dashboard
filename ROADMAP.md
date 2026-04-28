@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-27 (Session 60)**
+> **Last updated: 2026-04-27 (Session 61)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 60 made the chat asset starter buttons collaborative instead of hard generation prompts. Next pass should add server-side Meta Conversions API for more reliable attribution, then persist generated preview ads as first-class rows after signup.
+> **What To Do Next:** Session 61 expanded the asset starter buttons into concrete guided options and tightened the preview CTA/value framing. Next pass should add server-side Meta Conversions API for more reliable attribution, then persist generated preview ads as first-class rows after signup.
 
 ---
 
@@ -31,6 +31,7 @@
 - [x] Add native chat tools so Ody can scrape/use a website URL before integrations
 - [x] Replace empty chat starter surface with asset tabs: Ads, Landing Pages, Emails, Digital Products
 - [x] Make asset starter buttons launch guided product/offer discovery instead of hard generation commands
+- [x] Add multiple guided starter options per asset tab: single ad, batch, quiz, listicle, advertorial, email flows, and digital products
 - [x] Add split chat/output workspace for generated assets
 - [x] Rename Home nav label to Dashboard
 - [x] Wire public Odyssey preview landing page into Odyssey signup/claim flow
@@ -276,6 +277,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 58 | 2026-04-27 | **Real preview ad generation.** Added public `/api/brand-kits/preview/ads`, which safely re-scrapes the URL, uses the acquisition manifest, downloads product/site image references, and generates up to three actual GPT Image 2 preview ads before signup. The preview page now runs strategy first, then image generation, shows skeletons while ads render, displays only real generated images as ad previews, and falls back to honest planned ad chips instead of product-photo text overlays. Chat claim now preserves generated preview ads in local storage after signup. Verification: Python compile, brand-kit pytest, and frontend production build passed locally before deploy. |
 | 59 | 2026-04-27 | **Meta Pixel preview funnel tracking.** Confirmed the browser Meta Pixel initializes both Xscale and Odyssey pixel IDs after cookie consent. Added URL-first funnel tracking for `PreviewUrlSubmitted`, `PreviewAdsGenerated`, `PreviewGoogleClaim` as a standard Lead plus custom event, `PreviewClaimed`, and URL-first `CompleteRegistration` when a non-onboarded preview signup is claimed into chat. Verification: frontend production build and `git diff --check` passed locally before deploy. |
 | 60 | 2026-04-27 | **Collaborative asset starter prompts.** Replaced the asset-tab button prompts with guided workflows that ask for product/offer choice, require product-image confirmation for ads, propose angle/persona or page/email/product concepts, and wait for merchant approval before generation. Removed the preview manifest `recommended_first_prompt` shortcut so saved strategy never forces a hard asset command from the opener. Added orchestrator guardrails and opener regression tests. |
+| 61 | 2026-04-27 | **Asset starter menu and preview CTA polish.** Expanded asset tabs into concrete guided options: single ad, ad batch, quiz, listicle, advertorial, offer page, abandoned checkout, LTV education, post-purchase upsell, welcome flow, lead magnet, masterclass, and offer bonus. Updated orchestrator rules to honor those subtypes while still requiring guided approval. Replaced the public preview "Refresh system" CTA with "Generate all assets" that opens Google signup after a preview exists, and split CPA, AOV, and LTV into their own core growth-lever line on the magnet hero. |
 
 ### Session 23 Detail
 
