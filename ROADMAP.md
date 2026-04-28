@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-27 (Session 59)**
+> **Last updated: 2026-04-27 (Session 60)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 59 confirmed the Xscale/Odyssey browser pixel is installed and patched URL-first funnel tracking. Next pass should add server-side Meta Conversions API for more reliable attribution, then persist generated preview ads as first-class rows after signup.
+> **What To Do Next:** Session 60 made the chat asset starter buttons collaborative instead of hard generation prompts. Next pass should add server-side Meta Conversions API for more reliable attribution, then persist generated preview ads as first-class rows after signup.
 
 ---
 
@@ -30,6 +30,7 @@
 - [x] Add authenticated URL scrape endpoint that captures identity, colors, fonts, product photos, products, claims, and voice
 - [x] Add native chat tools so Ody can scrape/use a website URL before integrations
 - [x] Replace empty chat starter surface with asset tabs: Ads, Landing Pages, Emails, Digital Products
+- [x] Make asset starter buttons launch guided product/offer discovery instead of hard generation commands
 - [x] Add split chat/output workspace for generated assets
 - [x] Rename Home nav label to Dashboard
 - [x] Wire public Odyssey preview landing page into Odyssey signup/claim flow
@@ -274,6 +275,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 57 | 2026-04-27 | **Preview generated-ad magnet.** Visual QA showed the public preview still felt like a long strategy document, so the generated state now puts three visual ad drafts immediately after the loaded-context line, built from the scraped product photos, brand colors, and ad hooks. Entry pages, offer page, email flows, and digital products are now compact locked modules under the ad previews, with Google signup positioned as the unlock to generate the full editable acquisition system. Product chips were shortened to the top three products so the preview feels like assets, not a catalog. Verification: frontend production build passed locally before deploy. |
 | 58 | 2026-04-27 | **Real preview ad generation.** Added public `/api/brand-kits/preview/ads`, which safely re-scrapes the URL, uses the acquisition manifest, downloads product/site image references, and generates up to three actual GPT Image 2 preview ads before signup. The preview page now runs strategy first, then image generation, shows skeletons while ads render, displays only real generated images as ad previews, and falls back to honest planned ad chips instead of product-photo text overlays. Chat claim now preserves generated preview ads in local storage after signup. Verification: Python compile, brand-kit pytest, and frontend production build passed locally before deploy. |
 | 59 | 2026-04-27 | **Meta Pixel preview funnel tracking.** Confirmed the browser Meta Pixel initializes both Xscale and Odyssey pixel IDs after cookie consent. Added URL-first funnel tracking for `PreviewUrlSubmitted`, `PreviewAdsGenerated`, `PreviewGoogleClaim` as a standard Lead plus custom event, `PreviewClaimed`, and URL-first `CompleteRegistration` when a non-onboarded preview signup is claimed into chat. Verification: frontend production build and `git diff --check` passed locally before deploy. |
+| 60 | 2026-04-27 | **Collaborative asset starter prompts.** Replaced the asset-tab button prompts with guided workflows that ask for product/offer choice, require product-image confirmation for ads, propose angle/persona or page/email/product concepts, and wait for merchant approval before generation. Removed the preview manifest `recommended_first_prompt` shortcut so saved strategy never forces a hard asset command from the opener. Added orchestrator guardrails and opener regression tests. |
 
 ### Session 23 Detail
 
