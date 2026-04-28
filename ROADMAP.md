@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-28 (Session 83)**
+> **Last updated: 2026-04-28 (Session 84)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 83 tightened the public lead magnet mobile funnel around conversion value, with a stronger first-card promise, clearer unlimited asset unlock, and a slimmer Odyssey Pixel consent banner. Next build should centralize landing/digital-product/email text generation behind GPT-5.5, then add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
+> **What To Do Next:** Session 84 brought the public lead magnet card funnel to desktop too, with polished liquid-glass cards, desktop auto-advance after URL submit, and verified 390px mobile centering. Next build should centralize landing/digital-product/email text generation behind GPT-5.5, then add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
 
 ---
 
@@ -51,6 +51,7 @@
 - [x] Mobile-optimize the public preview into staged full-screen sections and block signup while preview ads are still generating
 - [x] Rebuild the public preview mobile experience as a card-based, one-screen-at-a-time lead magnet funnel
 - [x] Tune the public preview mobile funnel for cold-traffic conversion and maximum perceived asset value
+- [x] Bring the public preview card funnel to desktop and verify mobile card centering
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Centralize landing page, email, and digital product card text generation behind GPT-5.5 asset builders, not ad hoc chat prose
 - [ ] Build a supplement inspiration library from scraped brand systems (Seed, AG1, Primal Queen, etc.) for reusable page, email, offer, and creative patterns
@@ -230,6 +231,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 84 | 2026-04-28 | **Desktop lead-magnet card funnel.** Promoted the public `/preview` card-based acquisition-system funnel from mobile-only to the desktop experience too, replacing the split hero/workspace surface with centered liquid-glass cards and vertical snap sections. Desktop now auto-advances to the scan/ad cards after a URL submit, tablet widths use safer card grids, and mobile cards are explicitly center-aligned with equal 16px side gutters at 390px. Verification: frontend production build, `git diff --check`, in-app browser QA, 1440px desktop screenshot QA, and Chrome DevTools 390px mobile emulation metrics/screenshot passed. |
 | 83 | 2026-04-28 | **Conversion-focused mobile lead magnet.** Tightened the mobile `/preview` funnel for cold Meta traffic: the first card now leads with the full acquisition-system outcome, shows the asset flow as Ads → Entry pages → Offer → Emails → Digital product, promises real ad previews before signup, and frames Google signup as the unlock for unlimited asset generation. The scan, ad, system, and unlock cards now reinforce product-image-backed ads, no integration requirement, CPA/AOV/LTV levers, download/edit value, and optional integrations later. Slimmed the consent banner and changed it from "Meta Pixel" copy to Odyssey Pixel copy so it takes less mobile screen space and feels less intimidating. Verification: frontend production build, `git diff --check`, and 390px local Chrome visual QA passed. |
 | 82 | 2026-04-28 | **Mobile lead-magnet card funnel.** Rebuilt `/preview` on phones into a dedicated card-by-card acquisition-system funnel instead of compressing the desktop asset wall: URL entry, brand extraction, ad plan/preview generation, full acquisition system, then Google/email unlock. The mobile flow now owns the phone viewport, hides the desktop hero on mobile, uses liquid-glass cards with scroll snap, prevents horizontal clipping at 390px, and keeps signup gated until preview ads finish. Verification: local Vite DOM QA, 390px headless Chrome visual QA, frontend production build, and `git diff --check` passed. |
 | 81 | 2026-04-28 | **Lead magnet admin and mobile funnel polish.** Added durable preview-ad completion tracking into `preview_sessions.lead_context` when the public preview ad pass finishes, then exposed a new admin Lead Magnet tab with URL submission, acquisition-plan, preview-ads-ready, email capture, signup claim, drop-off, domain, and recent-session metrics. Updated the public preview so Google/email claim actions are disabled while ad previews are still generating and the CTA explains that the first ad pass is finishing. Reworked the mobile preview CSS into staged full-screen sections with sticky nav, horizontal ad-card swiping, and liquid-glass section cards for a cleaner Meta-ad mobile flow. Verification: backend compile, brand-kit/image-provider tests, frontend production build, `git diff --check`, and in-app browser visual QA on local `/preview` passed. |
