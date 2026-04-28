@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-28 (Session 76)**
+> **Last updated: 2026-04-28 (Session 77)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 76 restored every free signup to 2,500 tokens and backfilled all existing balances below that floor. Next QA pass should add a tablet/mobile Asset Output drawer so the asset side is reachable when the split pane is hidden, then run one fresh end-to-end owner chat after the deploy finishes.
+> **What To Do Next:** Session 77 hardened the asset generation pipeline so product photos feed TOF ads, non-ad cards can receive GPT Image 2 product-backed visuals, and production email design uses GPT-5.5 text plus GPT Image 2 slots. Next QA pass should run fresh production owner chats for ad batch, landing page, email, and digital product after deploy, then add a tablet/mobile Asset Output drawer so the asset side is reachable when the split pane is hidden.
 
 ---
 
@@ -297,6 +297,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 68 | 2026-04-28 | **Durable assets + CAPI foundation.** Mirrored non-ad `create_review_batch` card variants into `generated_assets` rows for landing pages, emails, digital products, offers, plans, and reports; expanded the asset cockpit filters and Review Gallery renderers for the new asset kinds; enabled the landing-page Builder SOP; added Odyssey Pixel server-side CAPI for standard `Lead` and `CompleteRegistration`; and fixed local preview CORS plus vertical scroll clipping found during in-app browser QA. Verification: targeted frontend tests, chat/review backend tests, Python compile, frontend production build, and local `/preview` browser QA passed. |
 | 75 | 2026-04-28 | **Production asset-output QA.** Added a $25 manual QA top-up to the live test account, verified live Supabase has landing, email, and digital-product card/generated_asset rows for the Hiker's Blend thread, and opened each Review Gallery in the in-app browser. Fixed the Review Gallery responsive layout so advertorials do not clip at narrow desktop widths, made approve/decline update local state immediately and bypass stale GET cache, and taught the digital-product renderer to display string-list outlines plus delivery/use-case/next-step details. Verification: focused review/card tests, frontend production build, live landing approve, live email approve persistence, and live digital-product review DOM passed. |
 | 76 | 2026-04-28 | **Restored 2,500 free signup tokens.** Reversed the earlier $2 anti-abuse free grant: backend fallback now creates $25/2,500-token balances, migration 068 restores the live `auto_create_credit_balance` trigger and `credit_balances` defaults to 2,500, and the live DB was backfilled so every current balance/allocation below 2,500 was brought up to 2,500 with a `credit_transactions` grant ledger row. Verification: live Supabase SQL success, REST check showed 0 balances below 2,500, screenshot users now all show at least 2,500 tokens, starting-balance tests passed, and v2 top-bar tests passed. |
+| 77 | 2026-04-28 | **Product-backed asset generation hardening.** Fixed the ad generator so TOF ads still receive the verified product photo as a GPT Image 2 reference instead of silently dropping it, while preserving visual-archetype diversity. Added best-effort GPT Image 2 hero/cover generation for production landing, email, and digital-product cards when a product image is available from the variant or latest URL-first brand kit. Production Klaviyo/email design now routes text through Kie GPT-5.5 and image slots through GPT Image 2, with local/dev fallback retained for tests and emergency rollback. Updated the orchestrator card contract to require `product_image_url` on non-ad product assets. Verification: 67 targeted backend tests passed, Python compile passed, and `git diff --check` passed. |
 
 ### Session 23 Detail
 
