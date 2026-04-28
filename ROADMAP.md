@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-28 (Session 63)**
+> **Last updated: 2026-04-28 (Session 65)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 63 upgraded store URL submission into a standard Meta `Lead` event and forced Google OAuth's account chooser after logout. Next pass should add server-side Meta Conversions API for more reliable attribution, then persist generated preview ads as first-class rows after signup.
+> **What To Do Next:** Session 65 removed the Xscale browser pixel so Odyssey is the only initialized Meta Pixel. Next pass should QA the paused text-first ads in Meta previews, activate with the intended budget when Austin approves, then add server-side Meta Conversions API for more reliable attribution.
 
 ---
 
@@ -45,6 +45,7 @@
 - [x] Track URL-first preview funnel events for Meta optimization
 - [x] Add explicit Meta Pixel events for preview email entry and completed Signup
 - [x] Track store URL submission as a standard Meta Lead and force Google account chooser on OAuth
+- [x] Remove Xscale browser pixel so only Odyssey receives Pixel events
 - [ ] Persist generated landing pages, emails, and digital products as first-class asset rows
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Add production browser QA around preview analysis, Google claim, and first chat continuation
@@ -282,6 +283,8 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 61 | 2026-04-27 | **Asset starter menu and preview CTA polish.** Expanded asset tabs into concrete guided options: single ad, ad batch, quiz, listicle, advertorial, offer page, abandoned checkout, LTV education, post-purchase upsell, welcome flow, lead magnet, masterclass, and offer bonus. Updated orchestrator rules to honor those subtypes while still requiring guided approval. Replaced the public preview "Refresh system" CTA with "Generate all assets" that opens Google signup after a preview exists, and split CPA, AOV, and LTV into their own core growth-lever line on the magnet hero. |
 | 62 | 2026-04-27 | **Explicit Meta Pixel signup funnel events.** Confirmed URL submit already fires `PreviewUrlSubmitted`, then added no-PII email-entry tracking (`PreviewEmailEntered` / `SignupEmailEntered` plus standard `Lead`), Google signup-start intent tracking, and completed signup tracking as both standard `CompleteRegistration` and custom `Signup`, deduped per user. Updated preview claim, onboarding, and signup form paths plus regression tests. |
 | 63 | 2026-04-28 | **Meta Lead optimization + Google account chooser.** Store URL submission now fires a standard Meta `Lead` plus the `PreviewUrlSubmitted` custom event without sending the URL value. Google OAuth now requests `prompt=select_account`, so users who log out can choose a different Google account instead of being silently signed back into the previous one. Verification: targeted frontend tests, production build, and `git diff --check` passed. |
+| 64 | 2026-04-28 | **Text-first Meta ad launch.** Imported the 30-creatives folder `Odyssey text-first ads 2026-04-27 v2`, built page-aligned copy for `https://runodyssey.io/preview`, connected the Austin OAuth token to the X Scale ad account, and created 30 paused ads in `Odyssey Waitlist \| ABO \| 03-19-26` under six ODY ad sets. Replaced all creatives after launch so every ad uses `/preview` and verified via Graph API: 30 checked, 30 paused, 0 wrong URLs. Local artifacts: `meta_copy_plan_2026-04-28.csv`, `meta_launch_result_2026-04-28.json`, `meta_verify_result_2026-04-28.json`. |
+| 65 | 2026-04-28 | **Odyssey-only Meta Pixel.** Removed the Xscale browser pixel from the frontend Meta Pixel initializer so Odyssey is the only pixel receiving PageView, Lead, signup, and preview events. Added a regression assertion that initialization emits exactly one `init` call for the Odyssey pixel. Verification: pixel tests, frontend production build, old-pixel-ID search, and `git diff --check` passed. |
 
 ### Session 23 Detail
 
