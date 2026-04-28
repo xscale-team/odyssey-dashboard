@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-28 (Session 67)**
+> **Last updated: 2026-04-28 (Session 68)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 67 fixed stale/mis-scoped Shopify connected-state reads. Next pass should monitor production after deploy, verify the affected account no longer shows "not connected" in chat/dashboard, then continue watching early spend and conversion signals on the 50 active onboarding ads.
+> **What To Do Next:** Session 68 shipped the durable asset ledger layer for non-ad review cards, server-side Odyssey Pixel CAPI foundation, and preview QA fixes. Next pass should apply migration 067 live if it has not been applied yet, verify production `/preview` generates Hiker's Blend output after deploy, then run a signed-in chat QA pass that creates landing-page, email, and digital-product cards and confirms they appear in Assets.
 
 ---
 
@@ -46,7 +46,7 @@
 - [x] Add explicit Meta Pixel events for preview email entry and completed Signup
 - [x] Track store URL submission as a standard Meta Lead and force Google account chooser on OAuth
 - [x] Remove Xscale browser pixel so only Odyssey receives Pixel events
-- [ ] Persist generated landing pages, emails, and digital products as first-class asset rows
+- [x] Persist generated landing pages, emails, and digital products as first-class asset rows
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Add production browser QA around preview analysis, Google claim, and first chat continuation
 
@@ -287,6 +287,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 65 | 2026-04-28 | **Odyssey-only Meta Pixel.** Removed the Xscale browser pixel from the frontend Meta Pixel initializer so Odyssey is the only pixel receiving PageView, Lead, signup, and preview events. Added a regression assertion that initialization emits exactly one `init` call for the Odyssey pixel. Verification: pixel tests, frontend production build, old-pixel-ID search, and `git diff --check` passed. |
 | 66 | 2026-04-28 | **Kie GPT Image 2 onboarding ad expansion.** Captured real Odyssey preview and in-app screenshots, generated 20 distinct Kie GPT Image 2 concepts with custom conversion copy, composited polished 1080x1080 final ads, and launched `ODY-1.31` through `ODY-1.50` as active ads into `Odyssey \| New Onboarding \| URL Only` under `ODY-1 \| Acquisition Preview \| Ecommerce Brands \| 2026-04-28 - Copy`. Replaced the initial crowded composites with fixed creatives before final verification. Verification: 20 checked, 20 active, 0 wrong URLs, all point to `https://runodyssey.io/preview` in ad set `120244798473120443`. Local artifacts: `kie_onboarding_screenshots_2026-04-28/`, `kie_onboarding_ads_2026-04-28/launch_result.json`, `kie_onboarding_ads_2026-04-28/fixed/contact_sheet_fixed.jpg`. |
 | 67 | 2026-04-28 | **Connected-store status truth fix.** Removed the backend `/api/integrations/status` process cache so reconnects/support fixes show immediately, keyed the frontend integration-status cache by signed-in user, invalidated it after Shopify connect/disconnect, and fixed the older chat prompt path to read `connected_services` with the caller's JWT instead of a bare anon client. Verification: integration-status hook tests, demo-mode tests, integration health tests, and frontend production build passed. |
+| 68 | 2026-04-28 | **Durable assets + CAPI foundation.** Mirrored non-ad `create_review_batch` card variants into `generated_assets` rows for landing pages, emails, digital products, offers, plans, and reports; expanded the asset cockpit filters and Review Gallery renderers for the new asset kinds; enabled the landing-page Builder SOP; added Odyssey Pixel server-side CAPI for standard `Lead` and `CompleteRegistration`; and fixed local preview CORS plus vertical scroll clipping found during in-app browser QA. Verification: targeted frontend tests, chat/review backend tests, Python compile, frontend production build, and local `/preview` browser QA passed. |
 
 ### Session 23 Detail
 
