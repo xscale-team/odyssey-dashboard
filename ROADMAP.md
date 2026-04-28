@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-27 (Session 57)**
+> **Last updated: 2026-04-27 (Session 58)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 57 shifted the public preview from a strategy-wall into generated ad drafts plus locked follow-on assets. Next pass should persist those previewed ad drafts/downloadable assets as first-class rows after signup, then keep testing the Google claim handoff and first chat continuation.
+> **What To Do Next:** Session 58 replaced fake product-photo overlays with real preview ad generation. Next pass should persist those generated preview ads as first-class rows after signup, then keep testing image quality, Google claim handoff, and first chat continuation.
 
 ---
 
@@ -39,6 +39,7 @@
 - [x] Apply migration `066_url_first_brand_kits.sql` to live Supabase DB
 - [x] Wire Kie GPT-5.5 into public preview, claim, and URL replacement acquisition manifests
 - [x] Add GPT-5.5 URL-first asset planner tests
+- [x] Generate real pre-signup ad preview images instead of styled product-photo placeholders
 - [ ] Persist generated landing pages, emails, and digital products as first-class asset rows
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Add production browser QA around preview analysis, Google claim, and first chat continuation
@@ -270,6 +271,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 55 | 2026-04-27 | **Kie GPT-5.5 acquisition strategy preview.** Added a Kie `/codex/v1/responses` GPT-5.5 strategy generator for URL-first previews, claims, and URL replacements, with a deterministic fallback when Kie is missing or slow. The manifest now carries strategy summary, primary offer, positioning, ad hooks, funnel stages, visual directions, entry-page promises, offer-page sections, email subjects, CPA/LTV/AOV goals, and digital-product formats. The public preview UI now shows the strategy readout and richer brand-specific recommendations. Production smoke found Kie works on simple URLs and heavier ecommerce pages need more time/cleaner context, so the strategy context now filters checkout boilerplate and allows longer Kie completion. Verification: Python compile, brand-kit/test-config pytest, frontend production build, full frontend vitest suite, and `git diff --check` passed. |
 | 56 | 2026-04-27 | **Preview asset blueprint UX.** Removed customer-facing provider/model language from the public preview and reframed the output as Ody1's strategy. Replaced the wall-of-text strategy panel with compact visual cards: 5 ad concepts, 3 entry points, 1 offer page, 3 email flows, and 2 digital products. Added button spacing for the build/refresh CTA, tightened copy-length instructions for strategy generation, expanded landing-page planning to three entry points plus an offer page, filtered scraped age-gate/checkout boilerplate from the brand-system copy, ranked real sellable hero products above free gifts/stickers, cleaned legal/store suffixes from public brand names, and compacted email goal badges for narrow layouts. Verification: Python compile, brand-kit/test-config pytest, frontend production build, full frontend vitest suite, and `git diff --check` passed before deploy. |
 | 57 | 2026-04-27 | **Preview generated-ad magnet.** Visual QA showed the public preview still felt like a long strategy document, so the generated state now puts three visual ad drafts immediately after the loaded-context line, built from the scraped product photos, brand colors, and ad hooks. Entry pages, offer page, email flows, and digital products are now compact locked modules under the ad previews, with Google signup positioned as the unlock to generate the full editable acquisition system. Product chips were shortened to the top three products so the preview feels like assets, not a catalog. Verification: frontend production build passed locally before deploy. |
+| 58 | 2026-04-27 | **Real preview ad generation.** Added public `/api/brand-kits/preview/ads`, which safely re-scrapes the URL, uses the acquisition manifest, downloads product/site image references, and generates up to three actual GPT Image 2 preview ads before signup. The preview page now runs strategy first, then image generation, shows skeletons while ads render, displays only real generated images as ad previews, and falls back to honest planned ad chips instead of product-photo text overlays. Chat claim now preserves generated preview ads in local storage after signup. Verification: Python compile, brand-kit pytest, and frontend production build passed locally before deploy. |
 
 ### Session 23 Detail
 
