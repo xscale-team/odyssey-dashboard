@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-27 (Session 58)**
+> **Last updated: 2026-04-27 (Session 59)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 58 replaced fake product-photo overlays with real preview ad generation. Next pass should persist those generated preview ads as first-class rows after signup, then keep testing image quality, Google claim handoff, and first chat continuation.
+> **What To Do Next:** Session 59 confirmed the Xscale/Odyssey browser pixel is installed and patched URL-first funnel tracking. Next pass should add server-side Meta Conversions API for more reliable attribution, then persist generated preview ads as first-class rows after signup.
 
 ---
 
@@ -40,6 +40,7 @@
 - [x] Wire Kie GPT-5.5 into public preview, claim, and URL replacement acquisition manifests
 - [x] Add GPT-5.5 URL-first asset planner tests
 - [x] Generate real pre-signup ad preview images instead of styled product-photo placeholders
+- [x] Track URL-first preview funnel events for Meta optimization
 - [ ] Persist generated landing pages, emails, and digital products as first-class asset rows
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Add production browser QA around preview analysis, Google claim, and first chat continuation
@@ -272,6 +273,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 | 56 | 2026-04-27 | **Preview asset blueprint UX.** Removed customer-facing provider/model language from the public preview and reframed the output as Ody1's strategy. Replaced the wall-of-text strategy panel with compact visual cards: 5 ad concepts, 3 entry points, 1 offer page, 3 email flows, and 2 digital products. Added button spacing for the build/refresh CTA, tightened copy-length instructions for strategy generation, expanded landing-page planning to three entry points plus an offer page, filtered scraped age-gate/checkout boilerplate from the brand-system copy, ranked real sellable hero products above free gifts/stickers, cleaned legal/store suffixes from public brand names, and compacted email goal badges for narrow layouts. Verification: Python compile, brand-kit/test-config pytest, frontend production build, full frontend vitest suite, and `git diff --check` passed before deploy. |
 | 57 | 2026-04-27 | **Preview generated-ad magnet.** Visual QA showed the public preview still felt like a long strategy document, so the generated state now puts three visual ad drafts immediately after the loaded-context line, built from the scraped product photos, brand colors, and ad hooks. Entry pages, offer page, email flows, and digital products are now compact locked modules under the ad previews, with Google signup positioned as the unlock to generate the full editable acquisition system. Product chips were shortened to the top three products so the preview feels like assets, not a catalog. Verification: frontend production build passed locally before deploy. |
 | 58 | 2026-04-27 | **Real preview ad generation.** Added public `/api/brand-kits/preview/ads`, which safely re-scrapes the URL, uses the acquisition manifest, downloads product/site image references, and generates up to three actual GPT Image 2 preview ads before signup. The preview page now runs strategy first, then image generation, shows skeletons while ads render, displays only real generated images as ad previews, and falls back to honest planned ad chips instead of product-photo text overlays. Chat claim now preserves generated preview ads in local storage after signup. Verification: Python compile, brand-kit pytest, and frontend production build passed locally before deploy. |
+| 59 | 2026-04-27 | **Meta Pixel preview funnel tracking.** Confirmed the browser Meta Pixel initializes both Xscale and Odyssey pixel IDs after cookie consent. Added URL-first funnel tracking for `PreviewUrlSubmitted`, `PreviewAdsGenerated`, `PreviewGoogleClaim` as a standard Lead plus custom event, `PreviewClaimed`, and URL-first `CompleteRegistration` when a non-onboarded preview signup is claimed into chat. Verification: frontend production build and `git diff --check` passed locally before deploy. |
 
 ### Session 23 Detail
 
