@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-28 (Session 93)**
+> **Last updated: 2026-04-28 (Session 94)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 93 removed the extra mobile unlock screen from `/preview`; the CPA/AOV/LTV system page now carries the download plus unlimited-generation promise and sends the Google signup CTA directly into OAuth. Next build should centralize landing/digital-product/email text generation behind GPT-5.5, then add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
+> **What To Do Next:** Session 94 made public preview ad generation resilient to mobile browser sleep/reopen by moving generation behind a backend start/status flow, saving each completed preview ad URL into `preview_sessions`, hydrating saved ads back into `/preview`, and carrying those promised assets into the first in-app asset-builder context for brand-new signups only. Next build should centralize landing/digital-product/email text generation behind GPT-5.5, then add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
 
 ---
 
@@ -58,6 +58,7 @@
 - [x] Align preview assets into proper CPA, AOV, and LTV columns
 - [x] Expand preview lever columns into full acquisition-system value stacks: CPA ads/quiz/listicle/advertorial/cart recovery, AOV offer/upsell/post-purchase/digital products, and LTV subscription/retargeting/education/winback
 - [x] Tie the preview lever color system into the hero and scan cards, replace raw color codes with swatches, and stream preview ads as each concurrent image finishes
+- [x] Make public preview ad generation resumable across mobile browser sleep/reopen and hand saved preview ads into the first signup chat context
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Centralize landing page, email, and digital product card text generation behind GPT-5.5 asset builders, not ad hoc chat prose
 - [ ] Build a supplement inspiration library from scraped brand systems (Seed, AG1, Primal Queen, etc.) for reusable page, email, offer, and creative patterns
@@ -237,6 +238,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 94 | 2026-04-28 | **Resumable preview ads and signup handoff.** Replaced the public `/preview` ad stream dependency with durable `/preview/ads/start` and `/preview/ads/status` endpoints so GPT Image 2 preview ads continue server-side when a phone sleeps or Chrome reopens. Each completed ad URL is saved into `preview_sessions.lead_context.generated_ads`, `/preview` hydrates saved progress from localStorage plus backend polling, and the claim flow carries those promised preview ads into the first in-app asset-builder context. The “preview ads saved” chat-opener treatment is gated to brand-new preview signups only, so returning users do not see the cold-signup handoff message. Verification: targeted brand-kit tests, Python compile, frontend production build, and `git diff --check` passed. |
 | 93 | 2026-04-28 | **Preview direct-signup CTA.** Removed the final mobile unlock card from the public `/preview` lead magnet. The CPA/AOV/LTV acquisition-system page now explains that signup unlocks downloads plus unlimited generations across ads, pages, emails, offers, upsells, and digital products, and its CTA goes straight to Google signup instead of advancing to another screen. Cleaned up the dead mobile unlock styles and verified the frontend production build plus a local browser smoke. |
 | 92 | 2026-04-28 | **Preview system column balance.** Combined the CPA column's separate Listicle and Advertorial cards into one "Listicle / Advertorial" asset card so the Lower CPA, Lift AOV, and Grow LTV columns all have four assets. Gave the visual preview tiles slightly more room across desktop, tablet, and mobile breakpoints so the final value-stack card feels cleaner and less cramped. |
 | 91 | 2026-04-28 | **Preview ad completion copy.** Tightened the `/preview` ad-generation state so final output says "Your first 3 ads are ready" and the streaming state counts progress toward the first three ads, reinforcing that signup unlocks much more than the initial preview. |
