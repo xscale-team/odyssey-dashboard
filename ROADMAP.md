@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-28 (Session 90)**
+> **Last updated: 2026-04-28 (Session 91)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 90 tied the CPA/AOV/LTV color system into the first preview cards and added streaming preview ads so generated images can appear one at a time while all three are queued together. Next build should centralize landing/digital-product/email text generation behind GPT-5.5, then add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
+> **What To Do Next:** Session 91 tightened the preview-ad completion copy to frame the output as the first 3 ads, making the post-signup promise feel bigger. Next build should centralize landing/digital-product/email text generation behind GPT-5.5, then add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
 
 ---
 
@@ -237,6 +237,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 91 | 2026-04-28 | **Preview ad completion copy.** Tightened the `/preview` ad-generation state so final output says "Your first 3 ads are ready" and the streaming state counts progress toward the first three ads, reinforcing that signup unlocks much more than the initial preview. |
 | 90 | 2026-04-28 | **Preview color system and streaming ad reveal.** Pulled the successful CPA/AOV/LTV color language into the first public `/preview` card with three compact colored lever tiles, upgraded the scan card so each discovery block is color-coded by job, and replaced raw `#hex` output with actual captured brand swatches. Added `/api/brand-kits/preview/ads/stream` so the backend still queues all three GPT Image 2 preview ads concurrently but streams each finished ad to the frontend immediately, letting the page reveal ads one at a time instead of waiting for the whole batch response. |
 | 89 | 2026-04-28 | **Preview value-stack expansion.** Expanded the `/preview` full-system reveal from a minimal lever demo into a concrete acquisition-system stack: Lower CPA now shows ads, quiz, listicle, advertorial, and abandoned-flow assets; Lift AOV shows offer page, upsell page, post-purchase flow, and higher-value digital products like masterclasses/ebooks; Grow LTV shows subscription offers, retargeting ads, long-term education flow, and winback emails. Increased asset labels, tightened card sizing, and added a short-height mobile fallback so the no-scroll card remains usable on smaller phones. |
 | 88 | 2026-04-28 | **Preview lever column alignment.** Reworked the `/preview` full-system reveal from a row-major six-card grid into true CPA/AOV/LTV columns. Ads sit under CPA, landing page + quiz + offer page sit under AOV, and digital product + email sit under LTV, so the lever colors now line up with the growth jobs they represent. |
