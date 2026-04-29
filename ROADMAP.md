@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-29 (Session 98)**
+> **Last updated: 2026-04-29 (Session 99)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 98 removed the preview-ad generation gate from the `/preview` Google/email claim CTAs, so visitors can continue as soon as the brand plan exists while preview ads keep saving in the background. Next build should continue production QA for signup-to-chat continuation, then centralize landing/digital-product/email text generation behind GPT-5.5 and add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
+> **What To Do Next:** Session 99 completed the v2 mobile app sweep for chat, dashboard, and Review Gallery/asset pages without changing the desktop split workspace. Next build should continue production QA for signup-to-chat continuation, then centralize landing/digital-product/email text generation behind GPT-5.5 and add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
 
 ---
 
@@ -118,7 +118,7 @@
 - [ ] Supabase Realtime (replace planner polling)
 
 ### Priority 7: Pre-Launch Polish
-- [ ] Mobile responsive pass
+- [x] Mobile responsive pass
 - [ ] Loading skeletons for async operations
 - [ ] Per-user token spending cap per action
 
@@ -243,6 +243,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 99 | 2026-04-29 | **V2 mobile app sweep.** Made the main v2 app responsive without degrading the desktop chat split view: mobile top bar wraps cleanly, dashboard cards stack into one column with a cleaner demo/connect banner, chat keeps desktop output pane on wide screens but adds a mobile Asset drawer, Review Gallery stacks into a mobile flow with horizontal variant rail and full-width approve/decline controls, and landing/email HTML previews use viewport-capped iframe heights. Verification: frontend production build, `git diff --check`, mocked 390x844 dashboard QA, chat asset-drawer QA, and Review Gallery top/bottom mobile QA all passed with `scrollWidth === clientWidth`. |
 | 98 | 2026-04-29 | **Instant preview claim CTA.** Confirmed the "Continue with Google" delay came from the frontend intentionally disabling claim actions while `generatingAds` was true. Removed that gate from Google/email claim handlers, desktop CTA disabled state, mobile system-card `canClaim`, and the desktop unlock bar, so users can continue as soon as the brand plan exists while durable preview ads keep saving in the background. Verification: frontend production build, `git diff --check`, and mocked 390x844 browser QA confirmed the final Google CTA is enabled even when `/preview/ads/status` is still `generating`. |
 | 97 | 2026-04-29 | **Lead-magnet first-card value promise.** Removed all pre-URL signup framing from the public `/preview` first card, replacing the old "before you sign up" and "Unlocks after FREE signup" language with a pure lead-magnet promise. Added a compact CPA/AOV/LTV mini value stack on the first card so cold visitors immediately see that Odyssey is about to build ads, quizzes, listicles, cart recovery, offers, upsells, digital products, subscriptions, retargeting, education, and winback assets from one URL. Verification: frontend production build, `git diff --check`, 390x844 mobile browser screenshot/metrics, and in-app browser first-card check passed. |
 | 96 | 2026-04-29 | **No-scroll mobile value-stack columns.** Reworked the final `/preview` mobile acquisition-system card so it shows exactly 3 fixed columns, Lower CPA, Lift AOV, and Grow LTV, with 4 compact rows each and no horizontal side scrolling. Tightened the heading, helper copy, value buttons, column padding, asset labels, and short-height fallback so the CTA remains visible on a 390x844 mobile viewport. Verification: mocked mobile browser flow reached the final card, screenshot confirmed all columns/rows visible, measured `scrollWidth === clientWidth`, card fit passed, frontend production build passed, and `git diff --check` passed. |
