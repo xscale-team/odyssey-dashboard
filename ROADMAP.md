@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-29 (Session 97)**
+> **Last updated: 2026-04-29 (Session 98)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 97 removed signup framing from the first public preview card before URL entry and mirrored the CPA/AOV/LTV value-stack promise there, so cold traffic sees the full acquisition system before any claim step. Next build should continue production QA for signup-to-chat continuation, then centralize landing/digital-product/email text generation behind GPT-5.5 and add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
+> **What To Do Next:** Session 98 removed the preview-ad generation gate from the `/preview` Google/email claim CTAs, so visitors can continue as soon as the brand plan exists while preview ads keep saving in the background. Next build should continue production QA for signup-to-chat continuation, then centralize landing/digital-product/email text generation behind GPT-5.5 and add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
 
 ---
 
@@ -63,6 +63,7 @@
 - [x] Compress the final public preview value-stack card into swipeable mobile lever columns and add "Unlocks after FREE signup" helper copy
 - [x] Restore the final public preview mobile value stack to 3 fixed CPA/AOV/LTV columns with 4 rows each and no side scrolling
 - [x] Remove pre-URL signup language from the public preview first card and mirror the CPA/AOV/LTV asset stack before URL entry
+- [x] Make public preview Google/email claim CTAs clickable while preview ads continue generating in the background
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Centralize landing page, email, and digital product card text generation behind GPT-5.5 asset builders, not ad hoc chat prose
 - [ ] Build a supplement inspiration library from scraped brand systems (Seed, AG1, Primal Queen, etc.) for reusable page, email, offer, and creative patterns
@@ -242,6 +243,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 98 | 2026-04-29 | **Instant preview claim CTA.** Confirmed the "Continue with Google" delay came from the frontend intentionally disabling claim actions while `generatingAds` was true. Removed that gate from Google/email claim handlers, desktop CTA disabled state, mobile system-card `canClaim`, and the desktop unlock bar, so users can continue as soon as the brand plan exists while durable preview ads keep saving in the background. Verification: frontend production build, `git diff --check`, and mocked 390x844 browser QA confirmed the final Google CTA is enabled even when `/preview/ads/status` is still `generating`. |
 | 97 | 2026-04-29 | **Lead-magnet first-card value promise.** Removed all pre-URL signup framing from the public `/preview` first card, replacing the old "before you sign up" and "Unlocks after FREE signup" language with a pure lead-magnet promise. Added a compact CPA/AOV/LTV mini value stack on the first card so cold visitors immediately see that Odyssey is about to build ads, quizzes, listicles, cart recovery, offers, upsells, digital products, subscriptions, retargeting, education, and winback assets from one URL. Verification: frontend production build, `git diff --check`, 390x844 mobile browser screenshot/metrics, and in-app browser first-card check passed. |
 | 96 | 2026-04-29 | **No-scroll mobile value-stack columns.** Reworked the final `/preview` mobile acquisition-system card so it shows exactly 3 fixed columns, Lower CPA, Lift AOV, and Grow LTV, with 4 compact rows each and no horizontal side scrolling. Tightened the heading, helper copy, value buttons, column padding, asset labels, and short-height fallback so the CTA remains visible on a 390x844 mobile viewport. Verification: mocked mobile browser flow reached the final card, screenshot confirmed all columns/rows visible, measured `scrollWidth === clientWidth`, card fit passed, frontend production build passed, and `git diff --check` passed. |
 | 95 | 2026-04-28 | **Immediate preview PageView and mobile value-card fit.** Updated `/preview` so the Odyssey Meta Pixel initializes and fires `PageView` immediately on route mount, giving Meta landing-page-view signal as soon as cold ad traffic loads the lead magnet. Changed the first-card helper under the URL CTA to "Unlocks after FREE signup" and tightened the final CPA/AOV/LTV system card for phones by switching the three lever stacks into horizontal swipe cards with compact copy, hidden mini-previews, short-height fallbacks, and safe viewport sizing. Verification: Meta Pixel funnel tests, frontend production build, and `git diff --check` passed. |
