@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-28 (Session 95)**
+> **Last updated: 2026-04-29 (Session 96)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 95 made the public preview route fire the Odyssey Meta Pixel `PageView` immediately on page load, tightened the first-card helper copy, and compressed the mobile full-system card into swipeable CPA/AOV/LTV value columns so it fits real phone viewports better. Next build should centralize landing/digital-product/email text generation behind GPT-5.5, then add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
+> **What To Do Next:** Session 96 changed the final public preview mobile value stack back to a true no-scroll 3-column layout, one CPA/AOV/LTV column each with 4 compact rows, while preserving the visible CTA. Next build should continue production QA for signup-to-chat continuation, then centralize landing/digital-product/email text generation behind GPT-5.5 and add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
 
 ---
 
@@ -61,6 +61,7 @@
 - [x] Make public preview ad generation resumable across mobile browser sleep/reopen and hand saved preview ads into the first signup chat context
 - [x] Fire Odyssey Meta Pixel PageView immediately when the public preview page loads
 - [x] Compress the final public preview value-stack card into swipeable mobile lever columns and add "Unlocks after FREE signup" helper copy
+- [x] Restore the final public preview mobile value stack to 3 fixed CPA/AOV/LTV columns with 4 rows each and no side scrolling
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Centralize landing page, email, and digital product card text generation behind GPT-5.5 asset builders, not ad hoc chat prose
 - [ ] Build a supplement inspiration library from scraped brand systems (Seed, AG1, Primal Queen, etc.) for reusable page, email, offer, and creative patterns
@@ -240,6 +241,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 96 | 2026-04-29 | **No-scroll mobile value-stack columns.** Reworked the final `/preview` mobile acquisition-system card so it shows exactly 3 fixed columns, Lower CPA, Lift AOV, and Grow LTV, with 4 compact rows each and no horizontal side scrolling. Tightened the heading, helper copy, value buttons, column padding, asset labels, and short-height fallback so the CTA remains visible on a 390x844 mobile viewport. Verification: mocked mobile browser flow reached the final card, screenshot confirmed all columns/rows visible, measured `scrollWidth === clientWidth`, card fit passed, frontend production build passed, and `git diff --check` passed. |
 | 95 | 2026-04-28 | **Immediate preview PageView and mobile value-card fit.** Updated `/preview` so the Odyssey Meta Pixel initializes and fires `PageView` immediately on route mount, giving Meta landing-page-view signal as soon as cold ad traffic loads the lead magnet. Changed the first-card helper under the URL CTA to "Unlocks after FREE signup" and tightened the final CPA/AOV/LTV system card for phones by switching the three lever stacks into horizontal swipe cards with compact copy, hidden mini-previews, short-height fallbacks, and safe viewport sizing. Verification: Meta Pixel funnel tests, frontend production build, and `git diff --check` passed. |
 | 94 | 2026-04-28 | **Resumable preview ads and signup handoff.** Replaced the public `/preview` ad stream dependency with durable `/preview/ads/start` and `/preview/ads/status` endpoints so GPT Image 2 preview ads continue server-side when a phone sleeps or Chrome reopens. Each completed ad URL is saved into `preview_sessions.lead_context.generated_ads`, `/preview` hydrates saved progress from localStorage plus backend polling, and the claim flow carries those promised preview ads into the first in-app asset-builder context. The “preview ads saved” chat-opener treatment is gated to brand-new preview signups only, so returning users do not see the cold-signup handoff message. Verification: targeted brand-kit tests, Python compile, frontend production build, and `git diff --check` passed. |
 | 93 | 2026-04-28 | **Preview direct-signup CTA.** Removed the final mobile unlock card from the public `/preview` lead magnet. The CPA/AOV/LTV acquisition-system page now explains that signup unlocks downloads plus unlimited generations across ads, pages, emails, offers, upsells, and digital products, and its CTA goes straight to Google signup instead of advancing to another screen. Cleaned up the dead mobile unlock styles and verified the frontend production build plus a local browser smoke. |
