@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-04-28 (Session 92)**
+> **Last updated: 2026-04-28 (Session 93)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 92 balanced the final `/preview` acquisition-system reveal by combining Listicle and Advertorial into one CPA card and giving the columns cleaner spacing. Next build should centralize landing/digital-product/email text generation behind GPT-5.5, then add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
+> **What To Do Next:** Session 93 removed the extra mobile unlock screen from `/preview`; the CPA/AOV/LTV system page now carries the download plus unlimited-generation promise and sends the Google signup CTA directly into OAuth. Next build should centralize landing/digital-product/email text generation behind GPT-5.5, then add the scalable supplement inspiration library seeded with brands like Seed, AG1, Primal Queen, and similar operators.
 
 ---
 
@@ -237,6 +237,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 93 | 2026-04-28 | **Preview direct-signup CTA.** Removed the final mobile unlock card from the public `/preview` lead magnet. The CPA/AOV/LTV acquisition-system page now explains that signup unlocks downloads plus unlimited generations across ads, pages, emails, offers, upsells, and digital products, and its CTA goes straight to Google signup instead of advancing to another screen. Cleaned up the dead mobile unlock styles and verified the frontend production build plus a local browser smoke. |
 | 92 | 2026-04-28 | **Preview system column balance.** Combined the CPA column's separate Listicle and Advertorial cards into one "Listicle / Advertorial" asset card so the Lower CPA, Lift AOV, and Grow LTV columns all have four assets. Gave the visual preview tiles slightly more room across desktop, tablet, and mobile breakpoints so the final value-stack card feels cleaner and less cramped. |
 | 91 | 2026-04-28 | **Preview ad completion copy.** Tightened the `/preview` ad-generation state so final output says "Your first 3 ads are ready" and the streaming state counts progress toward the first three ads, reinforcing that signup unlocks much more than the initial preview. |
 | 90 | 2026-04-28 | **Preview color system and streaming ad reveal.** Pulled the successful CPA/AOV/LTV color language into the first public `/preview` card with three compact colored lever tiles, upgraded the scan card so each discovery block is color-coded by job, and replaced raw `#hex` output with actual captured brand swatches. Added `/api/brand-kits/preview/ads/stream` so the backend still queues all three GPT Image 2 preview ads concurrently but streams each finished ad to the frontend immediately, letting the page reveal ads one at a time instead of waiting for the whole batch response. |
