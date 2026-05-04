@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-05-04 (Session 109)**
+> **Last updated: 2026-05-04 (Session 110)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 109 tightened the URL-first activation and ad review UX: first-chat startup now has a visible loading card, duplicate initial thread creation is guarded, ad batches render as durable output groups with per-ad downloads, and review pages use approve/download language instead of shipping. Next build should keep live-testing first-user asset quality and finish the Admin/analytics naming shift from shipped counts to performance-data counts.
+> **What To Do Next:** Session 110 simplified email assets so generated emails show as clean HTML previews with copy controls instead of inbox/sender chrome. Next build should keep live-testing email quality in the new surface and finish the Admin/analytics naming shift from shipped counts to performance-data counts.
 
 ---
 
@@ -36,6 +36,7 @@
 - [x] Add visible first-chat loading state after URL capture on normal signup
 - [x] Keep URL-first ad batches durable in the output panel across multiple batches/messages
 - [x] Replace URL-first ad shipping language with approve/download UX and per-ad downloads
+- [x] Simplify email output/review to clean HTML preview plus Copy, without inbox/sender chrome
 - [x] Rename Home nav label to Dashboard
 - [x] Wire public Odyssey preview landing page into Odyssey signup/claim flow
 - [x] Add public pre-signup brand preview endpoint and asset-plan manifest
@@ -252,6 +253,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 110 | 2026-05-04 | **Clean email HTML output.** Removed email-specific preview chrome from generated email assets so users see the actual rendered HTML email with a direct Copy button, not sender/from labels, inbox labels, or extra preview headers. Review Gallery now hides email send-details metadata and fallback email rendering no longer shows inbox/from chrome. Verification: frontend production build plus EmailRender and ReviewPage Vitest targets passed. |
 | 109 | 2026-05-04 | **URL-first asset output cleanup.** Fixed the new-user URL-to-chat gap with a visible loading card and guarded the initial `/v2/chat` conversation creation race so the opener and first hidden prompt cannot mint duplicate empty threads. Reworked ad batch rendering so chat messages show a compact "Ads are in Output" card while the output panel shows every persisted ad variant in durable batch groups, including broken-image fallbacks and per-ad download buttons. Review Gallery now says "Download all approved" instead of "Ship approved batch", supports approved-ad downloads, and removes leftover shipping benchmark copy from the visible review UI. Verification: frontend production build, backend compile, ReviewPage/PredictedMetrics/CinematicOpener/ChoiceButtons/useReviewBatch Vitest targets, and review/native backend tests passed. |
 | 108 | 2026-05-04 | **Admin asset usage breakdown.** Verified the live asset ledger is tracking non-ad outputs: the QA user has 3 ad images, 1 landing page, 1 email, and 1 digital product in `generated_assets`, with matching review cards. Fixed the Admin dashboard so the overview says "Assets Generated" instead of "Ads Generated", shows separate counts for ad images, landing pages, emails, and digital products, and adds per-user columns for each asset type. The backend now augments `admin_dashboard_metrics` with generated-asset and review-card breakdowns. Verification: backend compile, frontend production build, and live service-role aggregation check passed. |
 | 107 | 2026-05-04 | **Dual pixel signup tracking and chat stream recovery.** Restored Xscale Pixel ID `999625794860501` alongside the Odyssey Pixel ID `922160566890364` for browser-side PageView, signup-page ViewContent, Lead, and CompleteRegistration events, including the basic `/signup` page used by paid traffic. Also hardened native chat SSE attach behavior with heartbeats and shorter stale in-flight recovery so aborted first-user turns do not leave chats looking stuck. Verification: Meta Pixel Vitest suite, frontend production build, native stream attach/hub/heartbeat tests, concurrent send tests, Python compile checks, and `git diff --check` passed. |
