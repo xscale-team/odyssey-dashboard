@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-05-04 (Session 107)**
+> **Last updated: 2026-05-04 (Session 108)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 107 restored dual Meta Pixel browser tracking for paid signup traffic and hardened stuck chat stream recovery. Basic `/signup`, `/preview`, Lead, and CompleteRegistration browser Pixel events now fire to both Odyssey and Xscale IDs, while Odyssey CAPI remains deduped with the same event IDs. Next build should continue first-user activation QA on production, make generated preview/app assets always create review cards, and centralize landing/email/digital-product builders behind GPT-5.5.
+> **What To Do Next:** Session 108 confirmed non-ad assets are persisted but hidden/mislabeled in Admin, then added asset-type breakdowns for ads, landing pages, emails, and digital products. Next build should finish first-user activation QA exports, make every generated preview/app asset create a durable review card, and centralize landing/email/digital-product builders behind GPT-5.5.
 
 ---
 
@@ -249,6 +249,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 108 | 2026-05-04 | **Admin asset usage breakdown.** Verified the live asset ledger is tracking non-ad outputs: the QA user has 3 ad images, 1 landing page, 1 email, and 1 digital product in `generated_assets`, with matching review cards. Fixed the Admin dashboard so the overview says "Assets Generated" instead of "Ads Generated", shows separate counts for ad images, landing pages, emails, and digital products, and adds per-user columns for each asset type. The backend now augments `admin_dashboard_metrics` with generated-asset and review-card breakdowns. Verification: backend compile, frontend production build, and live service-role aggregation check passed. |
 | 107 | 2026-05-04 | **Dual pixel signup tracking and chat stream recovery.** Restored Xscale Pixel ID `999625794860501` alongside the Odyssey Pixel ID `922160566890364` for browser-side PageView, signup-page ViewContent, Lead, and CompleteRegistration events, including the basic `/signup` page used by paid traffic. Also hardened native chat SSE attach behavior with heartbeats and shorter stale in-flight recovery so aborted first-user turns do not leave chats looking stuck. Verification: Meta Pixel Vitest suite, frontend production build, native stream attach/hub/heartbeat tests, concurrent send tests, Python compile checks, and `git diff --check` passed. |
 | 106 | 2026-05-04 | **Direct signup first-chat activation.** Reworked the plain `/signup` to `/v2/chat` activation surface so new paid-traffic users see their 2,500 free credits, enter a store URL, have URL-first brand context persisted before the first chat turn, and receive a guided analysis prompt that pushes them toward ads, landing pages, emails, or digital products without requiring integrations first. Verification: focused CinematicOpener tests and frontend production build passed. |
 | 105 | 2026-04-30 | **Xscale lead-magnet pixel wiring.** Added targeted `trackSingle` Meta Pixel routing so the Xscale Pixel ID `999625794860501` receives only the `/preview` lead-magnet events: PageView on preview landing, Lead on store URL submission, and CompleteRegistration for URL-preview signups. Odyssey events now target the Odyssey pixel explicitly, preventing unrelated app events from leaking into Xscale optimization. Verification: targeted Meta Pixel Vitest suite and frontend production build passed. |
