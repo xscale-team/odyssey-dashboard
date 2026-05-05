@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-05-04 (Session 111)**
+> **Last updated: 2026-05-05 (Session 112)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 111 added live email HTML streaming so finished emails appear in the Output pane one by one with Copy Code controls while the rest of the flow is still building. Next build should keep live-testing email quality in the new surface and finish the Admin/analytics naming shift from shipped counts to performance-data counts.
+> **What To Do Next:** Session 112 started the Emergent-inspired app workspace pass with active chat tabs, asset quick actions, direct output-pane Copy Code, and approved-ad downloads. Next build should continue the scalable workspace shell: proper preview overlays, per-chat token/usage info, a credit purchase surface, and deeper mobile QA on authenticated chat/output states.
 
 ---
 
@@ -254,6 +254,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 112 | 2026-05-05 | **Emergent-inspired chat workspace foundation.** Added active conversation tabs under the v2 chat header so owners can jump between current chats without relying on the Threads dropdown, added reusable asset quick actions for preview/review, Copy Code, and downloads, brought Copy Code directly into persisted landing/email output cards, added output-pane Download Approved for approved ad variants, and softened chat artifact language from "review" to "manage asset" where appropriate. Verification: frontend production build, focused ChatPage/thread and chat-store stream Vitest targets, and `git diff --check` passed. Local browser QA reached the login gate; authenticated visual QA still needs a signed-in local session. |
 | 111 | 2026-05-04 | **Live email draft streaming.** Added a backend `email_generated` SSE event from `generate_email_batch` as soon as each email's HTML is ready, taught the chat store to buffer/dedupe live email drafts across normal streams and attach/reconnect streams, and rendered those drafts immediately in the v2 Output pane as full HTML iframes with Copy Code controls. Verification: frontend chat-store stream tests, chat-store tests, backend Klaviyo compile, frontend production build, and `git diff --check` passed. |
 | 110 | 2026-05-04 | **Clean email HTML output.** Removed email-specific preview chrome from generated email assets so users see the actual rendered HTML email with a direct Copy button, not sender/from labels, inbox labels, or extra preview headers. Review Gallery now hides email send-details metadata and fallback email rendering no longer shows inbox/from chrome. Verification: frontend production build plus EmailRender and ReviewPage Vitest targets passed. |
 | 109 | 2026-05-04 | **URL-first asset output cleanup.** Fixed the new-user URL-to-chat gap with a visible loading card and guarded the initial `/v2/chat` conversation creation race so the opener and first hidden prompt cannot mint duplicate empty threads. Reworked ad batch rendering so chat messages show a compact "Ads are in Output" card while the output panel shows every persisted ad variant in durable batch groups, including broken-image fallbacks and per-ad download buttons. Review Gallery now says "Download all approved" instead of "Ship approved batch", supports approved-ad downloads, and removes leftover shipping benchmark copy from the visible review UI. Verification: frontend production build, backend compile, ReviewPage/PredictedMetrics/CinematicOpener/ChoiceButtons/useReviewBatch Vitest targets, and review/native backend tests passed. |
