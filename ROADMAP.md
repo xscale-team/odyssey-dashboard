@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-05-18 (Session 125)**
+> **Last updated: 2026-05-18 (Session 126)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Continue the ads-first rebuild with the data layer: build the ODY naming parser/lint, add a real Meta CSV paste/upload parser for no-connection accounts, store normalized naming dimensions beside generated/launched/imported ads, and design the dashboard rollups for angle, persona, awareness, format, hook, batch, offer, and layer.
+> **What To Do Next:** Build the manual Meta audit intake: CSV upload/paste plus creative screenshot/preview-link upload, store imported ad performance and visual classifications in Supabase, then build the ODY naming parser/lint and dashboard rollups for angle, persona, awareness, format, hook, batch, offer, and layer.
 
 ---
 
@@ -56,6 +56,8 @@
 - [ ] Add naming preview to every generated ad and launch approval
 - [ ] Add naming lint before launch so unparseable campaign, ad set, or ad names are blocked
 - [ ] Add Meta CSV paste/upload analysis path for accounts without connected Meta
+- [ ] Add manual creative upload/preview-link intake for no-Meta audits, because Meta CSV exports do not reliably include creative body/headline/preview fields
+- [ ] Store manual Meta imports in Supabase with stable `ad_id` dedupe, imported performance rows, visual creative snapshots, OCR/vision classifications, and new/turned-off/ad-status deltas on later imports
 - [ ] Build weekly recommendations grouped by ODY naming dimensions: batch, angle, persona, awareness, format, hook, offer, and layer
 - [ ] Build Ad Lab dashboard for active tests, winners, losers, fatigue, and next batch recommendations
 - [ ] Update monetization around ad cycles, launch, monitoring, and refreshes instead of broad token usage
@@ -302,6 +304,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 126 | 2026-05-18 | **Manual Meta export QA with Crohniva.** Used a separate Chrome profile against real Meta Ads Manager for Crohniva, switched to Ads level, exported the default `MAIN` columns, found the export insufficient, then customized columns through `Columns: MAIN -> Customize columns -> Ad settings` with ad/campaign/ad set IDs and names plus creative fields and URL parameters. Re-exported `Crohniva-Ads-Apr-18-2026-May-17-2026-custom.csv`, pasted it into live Odyssey chat with no Meta connection, and confirmed Odyssey can parse the CSV and produce spend recommendations, but correctly needs creative visuals to finish first-time creative analysis. Found a product gap: Meta CSV did not include selected creative body/headline/preview fields, and Odyssey says "upload screenshots" while the chat UI has no obvious upload control. Evidence and exact steps saved in `qa-output/meta-export-crohniva-20260518/REPORT.md`, with screenshots, CSVs, active-ad thumbnail downloads, and a contact sheet. |
 | 125 | 2026-05-18 | **No-Meta audit QA and fallback hardening.** Ran live production browser QA on `https://runodyssey.io` as QA account `info+qa-assets-20260518-132705@thexscale.com` after confirming the account has no `connected_services` rows. Starting a fresh chat and clicking `Audit my current ads` produced the right behavior: no hard block, Meta connect as the fastest path, manual Meta CSV export instructions with columns, screenshot fallback, and a no-live-data strategy option. Evidence folder: `qa-output/live-nometa-audit-20260518-qa/`. Hardened the dashboard play entry path too by removing stale Shopify/Meta pre-gates from active ad plays, updating the audit play seed prompt and orchestrator instructions so missing Meta routes to connect, CSV, screenshots, or strategy inside chat. Verification: backend play/catalog pytest, frontend focused Vitest, frontend production build, and `git diff --check` passed. |
 | 124 | 2026-05-18 | **Current-user ads-only regression fix.** Reproduced the production bug on `https://runodyssey.io` with the QA account: stale URL-preview state plus `+ NEW` created another `Build my entry page` thread. Fixed ChatPage so pre-pivot preview state cannot auto-start, stale non-ad intents sanitize to ads, and the preview handoff is consumed once per user. Removed active non-ad play launch paths from the frontend/backend play catalogs, dashboard seed plays, and orchestrator prompt so normal users can only plan, create, manage, or optimize ads. Verification: targeted ChatPage/CinematicOpener/PillarTrendCard Vitest, backend play/catalog/dashboard pytest, frontend production build, `git diff --check`, live production browser reproduction before deploy, post-deploy live browser pass showing ads-only starter buttons, and a live 3-ad starter click with no landing/quiz leak. Evidence folder: `qa-output/live-current-user-ads-only-20260518-1625/`. |
 | 123 | 2026-05-18 | **Ad-only acquisition rebuild slice.** Reworked the logged-out landing page and URL preview flow around the ads-first product promise: planning, creating, managing, and optimizing Meta ads. Public CTAs now point to `/previewads`; legacy preview skins for quiz/offer/email/digital redirect to the ad preview. The preview page default intent is ads, non-ad build selectors are hidden from active UX, and visible copy now asks for the first Meta ad test rather than the first generic asset. Added headless Chrome screenshots under `qa-output/ad-first-rebuild-20260518-154714/` and fixed the desktop hero overlap found in browser QA. Verification: focused preview/chat opener/CinematicOpener Vitest, frontend production build, `git diff --check`, and Chrome headless desktop preview pass. |
