@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-05-05 (Session 112)**
+> **Last updated: 2026-05-18 (Session 114)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 112 started the Emergent-inspired app workspace pass with active chat tabs, asset quick actions, direct output-pane Copy Code, and approved-ad downloads. Next build should continue the scalable workspace shell: proper preview overlays, per-chat token/usage info, a credit purchase surface, and deeper mobile QA on authenticated chat/output states.
+> **What To Do Next:** Session 114 fixed URL-preview CPA/AOV/LTV routing for saved manifests and future manifests. Next build should fix the live email-starter compliance bug where Ody can stop after assumptions without calling `create_review_batch`, then rerun production browser QA around URL scan, Google/email claim, and first-chat autostart.
 
 ---
 
@@ -75,6 +75,9 @@
 - [x] Replace poor screenshot/ad-image asset gallery with designed mockups and per-asset unlimited-generation CTAs
 - [x] Convert `/` asset cards into IBD Assist-style generated asset examples with real copy, offers, quiz, email, PDF, and upsell content
 - [x] Add full-screen click-in previews for every `/` landing asset card with enlarged examples and per-asset signup CTAs
+- [x] Convert `/preview` from anonymous pre-signup generation to brand scan, recommended first-build selection, and post-signup generation
+- [x] Preserve selected preview build intent through Google/email signup and auto-start the matching first chat build
+- [x] Point logged-out landing CTAs and legacy `/try-ody` traffic at the new `/preview` scan flow
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Centralize landing page, email, and digital product card text generation behind GPT-5.5 asset builders, not ad hoc chat prose
 - [ ] Build a supplement inspiration library from scraped brand systems (Seed, AG1, Primal Queen, etc.) for reusable page, email, offer, and creative patterns
@@ -163,6 +166,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 ## Known Bugs & Technical Debt
 
 ### P1 — Active
+- [ ] **Email asset starter can stop before creating an Output card** - Session 114 live QA on the Hiker's Blend QA account clicked `Emails -> LTV education flow` and then sent an explicit follow-up asking Ody to call `create_review_batch`; both turns saved assistant assumption text but created zero `cards` rows for conversation `e89a737f-f3ca-47e7-9da1-e8bd7ceb2064`, leaving the Output pane empty. Need a backend postcondition or retry path for starter prompts that include `create_review_batch`, not just stronger frontend prompt wording.
 - [x] **Supabase Advisor hardening needs live DB apply** - Sessions 43-44 applied migrations 063/064/065 live to project `kuugnodksduxuccxkyls` after user confirmation: `review_batches`/`review_variants` are security-invoker views, SECURITY DEFINER functions have explicit `search_path`, server-only/referral RPCs are service-role-only, broad public storage listing policies are removed, card/dashboard RLS policies are explicit, and leaked-password protection is enabled. Backend now calls privileged RPCs with service-role helpers. Advisor now shows 0 errors and 1 warning (`public.pg_net`).
 - [x] **Production login blocked by Supabase Auth/Database degradation** - Session 40 verified `runodyssey.io/login` loaded but Supabase Auth/REST calls against project `kuugnodksduxuccxkyls` hung until timeout, matching Supabase's Apr 27 Auth + Database degraded status and active project-unreachable incidents. Frontend auth timeout patch shipped. Session 41 confirmed project access recovered after the Supabase compute upgrade from nano to small.
 - [ ] **Bot metrics disagree with dashboard metrics** - Session 31 production QA: bot reported 30d revenue `$16,387`, orders `392`, CPA `$65`; dashboard showed Net Sales `$13,327`, orders `346`, CPA `$33.22`. Need one shared metrics contract and labels for gross/net sales, first-order CPA, blended CPA, attribution window, and source filters.
@@ -254,6 +258,8 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 114 | 2026-05-18 | **URL-preview asset column routing.** Fixed public URL-preview asset routing so emails are selected by CPA/AOV/LTV intent or explicit `output_column` instead of array position, added backend manifest `output_column` hints for future URL plans, and made the locked email preview label the CPA/LTV/AOV system instead of reusing only the first email subject. Verification: focused preview Vitest, brand-kit strategy pytest, Python compile, frontend production build, `git diff --check`, git push to main, live `/preview` browser QA with the saved Hiker's Blend URL context, and live `/v2/chat` QA account context check. Follow-up live email-starter QA found a separate `create_review_batch` compliance bug now tracked in P1. |
+| 113 | 2026-05-18 | **Preview scan to first-build handoff.** Reworked `/preview` so anonymous visitors get a brand scan and selectable first-build recommendation instead of pre-signup anonymous asset generation. The selected intent now persists through Google/email signup, claim context, and `/v2/chat`, where Odyssey auto-starts the matching hidden first build prompt after the preview context is saved. Logged-out landing CTAs now point to `/preview`, while legacy `/try-ody` traffic redirects there with query params preserved. Verification: frontend production build and `git diff --check` passed. |
 | 112 | 2026-05-05 | **Emergent-inspired chat workspace foundation.** Added active conversation tabs under the v2 chat header so owners can jump between current chats without relying on the Threads dropdown, added reusable asset quick actions for preview/review, Copy Code, and downloads, brought Copy Code directly into persisted landing/email output cards, added output-pane Download Approved for approved ad variants, and softened chat artifact language from "review" to "manage asset" where appropriate. Verification: frontend production build, focused ChatPage/thread and chat-store stream Vitest targets, and `git diff --check` passed. Local browser QA reached the login gate; authenticated visual QA still needs a signed-in local session. |
 | 111 | 2026-05-04 | **Live email draft streaming.** Added a backend `email_generated` SSE event from `generate_email_batch` as soon as each email's HTML is ready, taught the chat store to buffer/dedupe live email drafts across normal streams and attach/reconnect streams, and rendered those drafts immediately in the v2 Output pane as full HTML iframes with Copy Code controls. Verification: frontend chat-store stream tests, chat-store tests, backend Klaviyo compile, frontend production build, and `git diff --check` passed. |
 | 110 | 2026-05-04 | **Clean email HTML output.** Removed email-specific preview chrome from generated email assets so users see the actual rendered HTML email with a direct Copy button, not sender/from labels, inbox labels, or extra preview headers. Review Gallery now hides email send-details metadata and fallback email rendering no longer shows inbox/from chrome. Verification: frontend production build plus EmailRender and ReviewPage Vitest targets passed. |
