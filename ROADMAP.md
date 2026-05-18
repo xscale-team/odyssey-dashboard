@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-05-18 (Session 124)**
+> **Last updated: 2026-05-18 (Session 125)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Continue the ads-first rebuild with the data layer: build the ODY naming parser/lint, store normalized naming dimensions beside generated/launched/imported ads, and design the dashboard rollups for angle, persona, awareness, format, hook, batch, offer, and layer.
+> **What To Do Next:** Continue the ads-first rebuild with the data layer: build the ODY naming parser/lint, add a real Meta CSV paste/upload parser for no-connection accounts, store normalized naming dimensions beside generated/launched/imported ads, and design the dashboard rollups for angle, persona, awareness, format, hook, batch, offer, and layer.
 
 ---
 
@@ -47,6 +47,7 @@
 - [x] Remove Landing Pages, Emails, and Digital Products tabs from the chat opener
 - [x] Replace opener starter actions with ad workflows: 3-ad starter, 5-ad test, audit current ads, competitor angles, refresh winner, retargeting ads
 - [x] Update orchestrator prompt so non-ad asset requests redirect into ad strategy, destination-page audit, or recommendations instead of generating new non-ad assets
+- [x] Let ad audit and planning plays start without Meta or Shopify, then route users to Meta connect, Meta CSV paste/upload, ad screenshots, URL context, or a no-live-data strategy fallback inside chat
 - [ ] Redesign Review Gallery around ads: feed preview, competitor references, OCR, compliance, metadata, approve, regenerate, download, launch
 - [ ] Build curated competitor ad inspiration library by niche, angle, awareness, and format
 - [ ] Add OCR-based final creative review before any "ship-ready" claim
@@ -301,6 +302,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 125 | 2026-05-18 | **No-Meta audit QA and fallback hardening.** Ran live production browser QA on `https://runodyssey.io` as QA account `info+qa-assets-20260518-132705@thexscale.com` after confirming the account has no `connected_services` rows. Starting a fresh chat and clicking `Audit my current ads` produced the right behavior: no hard block, Meta connect as the fastest path, manual Meta CSV export instructions with columns, screenshot fallback, and a no-live-data strategy option. Evidence folder: `qa-output/live-nometa-audit-20260518-qa/`. Hardened the dashboard play entry path too by removing stale Shopify/Meta pre-gates from active ad plays, updating the audit play seed prompt and orchestrator instructions so missing Meta routes to connect, CSV, screenshots, or strategy inside chat. Verification: backend play/catalog pytest, frontend focused Vitest, frontend production build, and `git diff --check` passed. |
 | 124 | 2026-05-18 | **Current-user ads-only regression fix.** Reproduced the production bug on `https://runodyssey.io` with the QA account: stale URL-preview state plus `+ NEW` created another `Build my entry page` thread. Fixed ChatPage so pre-pivot preview state cannot auto-start, stale non-ad intents sanitize to ads, and the preview handoff is consumed once per user. Removed active non-ad play launch paths from the frontend/backend play catalogs, dashboard seed plays, and orchestrator prompt so normal users can only plan, create, manage, or optimize ads. Verification: targeted ChatPage/CinematicOpener/PillarTrendCard Vitest, backend play/catalog/dashboard pytest, frontend production build, `git diff --check`, live production browser reproduction before deploy, post-deploy live browser pass showing ads-only starter buttons, and a live 3-ad starter click with no landing/quiz leak. Evidence folder: `qa-output/live-current-user-ads-only-20260518-1625/`. |
 | 123 | 2026-05-18 | **Ad-only acquisition rebuild slice.** Reworked the logged-out landing page and URL preview flow around the ads-first product promise: planning, creating, managing, and optimizing Meta ads. Public CTAs now point to `/previewads`; legacy preview skins for quiz/offer/email/digital redirect to the ad preview. The preview page default intent is ads, non-ad build selectors are hidden from active UX, and visible copy now asks for the first Meta ad test rather than the first generic asset. Added headless Chrome screenshots under `qa-output/ad-first-rebuild-20260518-154714/` and fixed the desktop hero overlap found in browser QA. Verification: focused preview/chat opener/CinematicOpener Vitest, frontend production build, `git diff --check`, and Chrome headless desktop preview pass. |
 | 122 | 2026-05-18 | **Ads-first naming spine.** Elevated ODY naming conventions from a launch detail to the required learning schema for ad generation, Meta launch, performance parsing, manual CSV analysis, and weekly recommendations. Updated the ads-first roadmap, orchestrator prompt, and media-buyer prompt so campaigns, ad sets, and ads use parseable names with layer, date, angle, persona, awareness, format, and hook dimensions. Added follow-up tasks for naming preview, naming lint, Meta CSV import, and performance recommendations grouped by ODY dimensions. |
