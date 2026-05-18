@@ -1,13 +1,13 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-05-18 (Session 117)**
+> **Last updated: 2026-05-18 (Session 124)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 117 sharpened the mobile preview result card with more direct-response value props. Next build should fix preview intent being reused on later `+ NEW` chats and the related offer-page starter misroute to quiz, then finish the live email-starter compliance bug where live QA still stalled around `get_latest_brand_kit` and created no card.
+> **What To Do Next:** Deploy verification is in progress for the ads-only current-user fix. After live QA passes, continue the ads-first rebuild with the data layer: build the ODY naming parser/lint, store normalized naming dimensions beside generated/launched/imported ads, and design the dashboard rollups for angle, persona, awareness, format, hook, batch, offer, and layer.
 
 ---
 
-## MVP Definition — ALL COMPLETE
+## Legacy MVP Definition — COMPLETE, NOW PIVOTING
 
 1. ✅ Connect Shopify + Meta Ads + Loop
 2. ✅ Auto-discover offers from Meta ad data
@@ -23,9 +23,44 @@
 
 ---
 
+## Ads-First MVP Definition — ACTIVE
+
+1. ⬜ URL submit or connected account produces a clear first ad test plan
+2. ⬜ New user generates a high-quality 3-ad starter batch in under 5 minutes
+3. ⬜ Every ad has structured metadata: product, offer, angle, persona, awareness, format, hook, reference, destination URL, and final Meta-ready ODY names
+4. ⬜ Review Gallery is an ad command center with full-size preview, feed preview, OCR, compliance, competitor references, approve, download, regenerate, and launch
+5. ⬜ Meta connect joins generated ads to launched ads and performance data
+6. ⬜ Watcher produces kill, keep, scale, and refresh recommendations
+7. ⬜ Weekly next-batch recommendation uses actual performance and competitor movement
+8. ⬜ QA proves generated ads are visually competitive against top references before launch
+
+---
+
 ## What's Next — Priority Order
 
-### Priority A: URL-First Asset Onboarding
+### Priority A: Ads-First Pivot
+- [x] Create source-of-truth ads-first pivot roadmap at `docs/ADS_FIRST_PIVOT_ROADMAP.md`
+- [ ] Declare ads-only product focus in `HANDOFF.md` and `ARCHITECTURE.md`
+- [x] Replace public `/preview` multi-asset pitch with ad-specific promise
+- [x] Make `/previewads` the primary acquisition URL and demote `/previewquiz`, `/previewoffers`, `/previewemail`, and `/previewdigital`
+- [ ] Change first scan result from "choose first build" to "first ad test plan"
+- [x] Remove Landing Pages, Emails, and Digital Products tabs from the chat opener
+- [x] Replace opener starter actions with ad workflows: 3-ad starter, 5-ad test, audit current ads, competitor angles, refresh winner, retargeting ads
+- [x] Update orchestrator prompt so non-ad asset requests redirect into ad strategy, destination-page audit, or recommendations instead of generating new non-ad assets
+- [ ] Redesign Review Gallery around ads: feed preview, competitor references, OCR, compliance, metadata, approve, regenerate, download, launch
+- [ ] Build curated competitor ad inspiration library by niche, angle, awareness, and format
+- [ ] Add OCR-based final creative review before any "ship-ready" claim
+- [ ] Join generated ads to Meta performance by ODY naming and metadata
+- [x] Make ODY naming conventions the required learning spine in the ads-first roadmap and agent prompts
+- [ ] Add naming preview to every generated ad and launch approval
+- [ ] Add naming lint before launch so unparseable campaign, ad set, or ad names are blocked
+- [ ] Add Meta CSV paste/upload analysis path for accounts without connected Meta
+- [ ] Build weekly recommendations grouped by ODY naming dimensions: batch, angle, persona, awareness, format, hook, offer, and layer
+- [ ] Build Ad Lab dashboard for active tests, winners, losers, fatigue, and next batch recommendations
+- [ ] Update monetization around ad cycles, launch, monitoring, and refreshes instead of broad token usage
+- [ ] Run fresh-user ads-only QA against production and store the report in `qa-output/`
+
+### Completed Foundation: URL-First Multi-Asset Onboarding
 - [x] Add `brand_kits` / `preview_sessions` schema foundation for URL-scraped brand context
 - [x] Add authenticated URL scrape endpoint that captures identity, colors, fonts, product photos, products, claims, and voice
 - [x] Add native chat tools so Ody can scrape/use a website URL before integrations
@@ -80,6 +115,9 @@
 - [x] Point logged-out landing CTAs and legacy `/try-ody` traffic at the new `/preview` scan flow
 - [x] Rebuild `/preview` mobile as no-scroll cards/screens and simplify desktop into a single-viewport scan/build flow
 - [x] Add stronger direct-response value props to the mobile preview result card without reintroducing scrolling
+- [x] Add supplement-specific first-screen route skins for `/previewads`, `/previewquiz`, `/previewoffers`, `/previewemail`, and `/previewdigital`
+- [x] Add acquisition funnel tracking docs for page IDs, Meta ad naming, URL parameters, and test logs
+- [x] Add asset visual benchmark QA brain/skill so generated quizzes, offer pages, advertorials, emails, and ads are opened, interacted with, screenshot, and compared to competitor references before approval
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Centralize landing page, email, and digital product card text generation behind GPT-5.5 asset builders, not ad hoc chat prose
 - [ ] Build a supplement inspiration library from scraped brand systems (Seed, AG1, Primal Queen, etc.) for reusable page, email, offer, and creative patterns
@@ -168,9 +206,9 @@ Directional items captured from the old architecture doc future phases. Not comm
 ## Known Bugs & Technical Debt
 
 ### P1 — Active
-- [ ] **Preview first-build intent repeats on later `+ NEW` chats** - Session 116 fresh-user live QA for `info+qa-assets-20260518-132705@thexscale.com` generated the preview-selected Trail Fuel Quiz, then clicked `+ NEW` again and Odyssey auto-started another `Build my entry page` run instead of returning to a neutral asset picker. The preview intent should be consumed after the first authenticated handoff. Evidence folder: `qa-output/new-user-assets-20260518-132705/screenshots`, especially `22-new-thread-asset-builder.png`, `26-new-thread-before-offer-page.png`, and `27-duplicate-quiz-build-stopped.png`.
-- [ ] **Offer-page starter can misroute into quiz planning after stale preview intent** - Session 116 clicked `Landing Pages -> Build an offer page`; the thread title changed to `Build an offer page`, but the assistant planned the Trail Fuel Quiz. Stopping that run and sending an explicit offer-page request generated a correct Landing Page output card. Evidence: `29-offer-page-build-started.png`, `30-offer-starter-misrouted-to-quiz.png`, `31-offer-misroute-stopped.png`, and `37-offer-page-output-after-approval.png`.
-- [ ] **Email asset starter can stop before creating an Output card** - Session 114 live QA on the Hiker's Blend QA account clicked `Emails -> LTV education flow` and then sent explicit follow-ups asking Ody to call `create_review_batch`; runs saved assistant assumption text but created zero `cards` rows for conversations `e89a737f-f3ca-47e7-9da1-e8bd7ceb2064` and `7a4eb99a-2483-42dc-b888-1980a0a87b15`, leaving the Output pane empty. A backend retry guard was added in `native_engine`, but the post-deploy retest stalled on `get_latest_brand_kit` and still produced no card. Need to debug the native tool loop/tool result path, not just prompt wording.
+- [x] **Preview first-build intent repeats on later `+ NEW` chats** - Session 124 fixed the stale URL-preview handoff. Chat auto-start now requires a new v2 signup notice, sanitizes legacy non-ad preview intents to `ads`, consumes the preview handoff once per user instead of once per conversation, and clears the notice before sending. Live production reproduced the bug before deploy in `qa-output/live-current-user-ads-only-20260518-1625/screenshots/04b-live-after-new-chat-stale-state.png`.
+- [x] **Offer-page starter can misroute into quiz planning after stale preview intent** - Session 124 closed the active path by making the product ads-only: legacy non-ad preview routes redirect to `/previewads`, the chat opener exposes ad workflows only, and the backend play catalog no longer has page, offer, or email launchable plays. Old saved non-ad cards remain inspectable only.
+- [x] **Email asset starter can stop before creating an Output card** - Closed by the ads-only pivot in Session 124. Email starter/play routes are no longer launchable, and explicit email requests are redirected into retargeting, past-buyer, or lifecycle ad strategy instead of `generate_email_batch`.
 - [x] **Supabase Advisor hardening needs live DB apply** - Sessions 43-44 applied migrations 063/064/065 live to project `kuugnodksduxuccxkyls` after user confirmation: `review_batches`/`review_variants` are security-invoker views, SECURITY DEFINER functions have explicit `search_path`, server-only/referral RPCs are service-role-only, broad public storage listing policies are removed, card/dashboard RLS policies are explicit, and leaked-password protection is enabled. Backend now calls privileged RPCs with service-role helpers. Advisor now shows 0 errors and 1 warning (`public.pg_net`).
 - [x] **Production login blocked by Supabase Auth/Database degradation** - Session 40 verified `runodyssey.io/login` loaded but Supabase Auth/REST calls against project `kuugnodksduxuccxkyls` hung until timeout, matching Supabase's Apr 27 Auth + Database degraded status and active project-unreachable incidents. Frontend auth timeout patch shipped. Session 41 confirmed project access recovered after the Supabase compute upgrade from nano to small.
 - [ ] **Bot metrics disagree with dashboard metrics** - Session 31 production QA: bot reported 30d revenue `$16,387`, orders `392`, CPA `$65`; dashboard showed Net Sales `$13,327`, orders `346`, CPA `$33.22`. Need one shared metrics contract and labels for gross/net sales, first-order CPA, blended CPA, attribution window, and source filters.
@@ -202,6 +240,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 - [x] **`_active_sandboxes` never reaped idle users** — Fixed: `SandboxManager` now tracks `_last_used` and drops references inactive > 30 min on every `get_or_create` (Session 26)
 
 ### P2 — Medium
+- [ ] **Dashboard can hit a stale JS chunk crash after deploy/navigation** - Session 116 fresh-user live QA clicked `Dashboard` after an offer-page review and hit the app error boundary. Browser console: `TypeError: Failed to fetch dynamically imported module: https://runodyssey.io/assets/HomeHub-FvM9pntL.js`. Direct retry to `/v2/home` loaded successfully, so this likely needs frontend chunk-load recovery or a full-page retry on dynamic import failure. Evidence: `qa-output/new-user-assets-20260518-132705/screenshots/39-fresh-user-dashboard-after-assets.png`, `42-fresh-user-dashboard-direct-retry-visible.png`, and `browser-console-after-dashboard-crash.json`.
 - [ ] **Supabase Advisor still warns on `public.pg_net` extension** - Session 44 left this as the only Security Advisor warning. Live SQL showed `pg_net` is installed in `public` with `extrelocatable = false`, while the extension owns `net.*` objects used by cron functions. Avoid `DROP EXTENSION ... CASCADE` in production because it can remove dependent functions; handle with Supabase support or a planned maintenance migration.
 - [x] **Generated ad images are 1254x1254, not 1080x1080** - Fixed after Session 31 deep QA: native ad generation normalizes provider output to 1080x1080 PNG before upload.
 - [ ] **Em dash rule still leaks into customer-facing chat/ad labels** - Session 31 bot response used multiple em dashes despite the public-facing no-em-dash rule. Frontend v2 chat now sanitizes en/em dashes in rendered text, but Session 33 still showed em dashes in assistant paragraphs and option button labels (`Approved as-is — ...`, `Batch plan — 5 ads`). Backend/prompt/button rendering enforcement still needed.
@@ -262,8 +301,15 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 124 | 2026-05-18 | **Current-user ads-only regression fix.** Reproduced the production bug on `https://runodyssey.io` with the QA account: stale URL-preview state plus `+ NEW` created another `Build my entry page` thread. Fixed ChatPage so pre-pivot preview state cannot auto-start, stale non-ad intents sanitize to ads, and the preview handoff is consumed once per user. Removed active non-ad play launch paths from the frontend/backend play catalogs, dashboard seed plays, and orchestrator prompt so normal users can only plan, create, manage, or optimize ads. Verification before deploy: targeted ChatPage/CinematicOpener/PillarTrendCard Vitest, backend play/catalog/dashboard pytest, frontend production build, `git diff --check`, and live production browser reproduction screenshots in `qa-output/live-current-user-ads-only-20260518-1625/`. |
+| 123 | 2026-05-18 | **Ad-only acquisition rebuild slice.** Reworked the logged-out landing page and URL preview flow around the ads-first product promise: planning, creating, managing, and optimizing Meta ads. Public CTAs now point to `/previewads`; legacy preview skins for quiz/offer/email/digital redirect to the ad preview. The preview page default intent is ads, non-ad build selectors are hidden from active UX, and visible copy now asks for the first Meta ad test rather than the first generic asset. Added headless Chrome screenshots under `qa-output/ad-first-rebuild-20260518-154714/` and fixed the desktop hero overlap found in browser QA. Verification: focused preview/chat opener/CinematicOpener Vitest, frontend production build, `git diff --check`, and Chrome headless desktop preview pass. |
+| 122 | 2026-05-18 | **Ads-first naming spine.** Elevated ODY naming conventions from a launch detail to the required learning schema for ad generation, Meta launch, performance parsing, manual CSV analysis, and weekly recommendations. Updated the ads-first roadmap, orchestrator prompt, and media-buyer prompt so campaigns, ad sets, and ads use parseable names with layer, date, angle, persona, awareness, format, and hook dimensions. Added follow-up tasks for naming preview, naming lint, Meta CSV import, and performance recommendations grouped by ODY dimensions. |
+| 121 | 2026-05-18 | **Ads-first pivot roadmap and first UI slice.** Accepted the strategic pivot away from broad asset generation toward becoming the best ecommerce ad generation and ad management platform. Added `docs/ADS_FIRST_PIVOT_ROADMAP.md`, reframed `ROADMAP.md` around an active Ads-First MVP, and created the implementation checklist. First code slice shipped locally: the first-run chat opener no longer exposes Landing Pages, Emails, or Digital Products tabs, and now offers ad workflows only: 3-ad starter, 5-ad test, current-ad audit, competitor ad angles, winner refresh, and retargeting ads. The orchestrator prompt now treats non-ad requests as ad strategy, destination-page audits, or legacy-confirmed exceptions. Verification: focused CinematicOpener Vitest and frontend production build passed. |
+| 120 | 2026-05-18 | **URL-first QA automation scaffold.** Added `.agents/skills/qa-url-fresh-user-regression/SKILL.md` for production fresh-user QA from a random live/fallback brand URL, plus `.agents/qa-brain/url-regression-fallbacks.md` and QA brain automation guidance. The flow creates a fresh QA account, generates ad/quiz/offer assets, opens and tests review surfaces, runs the visual benchmark skill, verifies DB rows, writes numbered screenshots/report/self-review, and protects real customer accounts. Proposed a paused weekly automation card for review before activation. |
+| 119 | 2026-05-18 | **Supplement acquisition route skins.** Added route-specific first-screen copy and default build intent for `/previewads`, `/previewquiz`, `/previewoffers`, `/previewemail`, and `/previewdigital`, keeping the same underlying `/preview` scan and signup handoff engine. Tightened mobile first-screen value props so supplement owners see the money leak, context, and next build without page scroll. Added `docs/acquisition-funnels/` with page IDs, Meta naming rules, URL parameter joins, and a reusable test log. Verification: frontend production build, local mobile route screenshots for ads, quiz, and offer skins, mobile scroll attempt, desktop route screenshot, and desktop scroll attempt passed. |
+| 118 | 2026-05-18 | **Asset visual benchmark QA brain.** Added `.agents/skills/qa-asset-visual-benchmark/SKILL.md` and `.agents/qa-brain/README.md` so future asset QA runs do more than check card persistence: open the review surface, scroll rendered assets, interact with quizzes/branches, test mobile, pull competitor references from Supabase/local sources, save numbered screenshots, score visual competitiveness, and avoid approval until the asset is actually strong. |
 | 117 | 2026-05-18 | **Preview result value-prop punch-up.** Added direct-response copy to the mobile URL-preview result card so the scan explains why the recommended first build matters: stop paying for clicks before the first page makes sense, skip the blank prompt, and use signup tokens on the actual build. Kept the no-scroll mobile card layout intact. Verification: frontend production build, local 393x852 browser screenshot, mobile scroll test, and `git diff --check` passed. |
-| 116 | 2026-05-18 | **Fresh-user URL asset QA.** Ran production browser QA as a new URL-preview user with `https://hikersblend.com/`, captured 38 screenshots in `qa-output/new-user-assets-20260518-132705/`, completed email-link signup via live Supabase callback, and generated a real ad, Trail Fuel Quiz, and Adventure Pack offer page. Live DB verification found 3 conversations and 4 cards (`ad`, `landing`, `landing`, `landing`) with correct Output columns for generated assets. Found two P1 follow-ups: preview first-build intent repeats on later `+ NEW` chats, and `Build an offer page` can misroute into quiz planning until stopped and explicitly re-requested. |
+| 116 | 2026-05-18 | **Fresh-user URL asset QA.** Ran production browser QA as a new URL-preview user with `https://hikersblend.com/`, captured 42 screenshots/log artifacts in `qa-output/new-user-assets-20260518-132705/`, completed email-link signup via live Supabase callback, and generated a real ad, Trail Fuel Quiz, and Adventure Pack offer page. Live DB verification found 4 conversations and 4 cards (`ad`, `landing`, `landing`, `landing`) with correct Output columns for generated assets. Found two P1 follow-ups: preview first-build intent repeats on later `+ NEW` chats, and `Build an offer page` can misroute into quiz planning until stopped and explicitly re-requested. Also found a P2 stale Dashboard chunk crash that resolves on direct retry. |
 | 115 | 2026-05-18 | **No-scroll preview screen flow.** Rebuilt the active `/preview` experience so mobile uses a dedicated fixed-height card stepper for URL entry, scan state, brand result, first-build selection, and signup CTA instead of shrinking the desktop chat page. Simplified the desktop result pane by removing redundant generated-angle/product-rail sections and fitting brand scan, build choice, and signup CTA inside one viewport. Verification: frontend production build, `git diff --check`, local in-app browser QA at 393x852 for start/brand/build/signup screens, mobile scroll test, desktop 1440x900 loaded-state QA, and desktop scroll test passed. |
 | 114 | 2026-05-18 | **URL-preview asset column routing.** Fixed public URL-preview asset routing so emails are selected by CPA/AOV/LTV intent or explicit `output_column` instead of array position, added backend manifest `output_column` hints for future URL plans, and made the locked email preview label the CPA/LTV/AOV system instead of reusing only the first email subject. Verification: focused preview Vitest, brand-kit strategy pytest, Python compile, frontend production build, `git diff --check`, git push to main, live `/preview` browser QA with the saved Hiker's Blend URL context, and live `/v2/chat` QA account context check. Follow-up live email-starter QA found a separate `create_review_batch` compliance bug now tracked in P1. |
 | 113 | 2026-05-18 | **Preview scan to first-build handoff.** Reworked `/preview` so anonymous visitors get a brand scan and selectable first-build recommendation instead of pre-signup anonymous asset generation. The selected intent now persists through Google/email signup, claim context, and `/v2/chat`, where Odyssey auto-starts the matching hidden first build prompt after the preview context is saved. Logged-out landing CTAs now point to `/preview`, while legacy `/try-ody` traffic redirects there with query params preserved. Verification: frontend production build and `git diff --check` passed. |
