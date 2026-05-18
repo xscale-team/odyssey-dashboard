@@ -1,9 +1,9 @@
 # Odyssey X — Living Roadmap
 
-> **Last updated: 2026-05-18 (Session 114)**
+> **Last updated: 2026-05-18 (Session 115)**
 > Goal-driven, not timeline-driven. Ship MVP when pipeline is bulletproof.
 >
-> **What To Do Next:** Session 114 fixed URL-preview CPA/AOV/LTV routing for saved manifests and future manifests. Next build should finish the live email-starter compliance bug: a backend retry guard was added, but live QA still stalled around `get_latest_brand_kit` and created no card. Then rerun production browser QA around URL scan, Google/email claim, and first-chat autostart.
+> **What To Do Next:** Session 115 rebuilt `/preview` into a no-scroll desktop and mobile screen flow. Next build should rerun production QA after deploy on real iPhone Safari/Chrome, then finish the live email-starter compliance bug where live QA still stalled around `get_latest_brand_kit` and created no card.
 
 ---
 
@@ -78,6 +78,7 @@
 - [x] Convert `/preview` from anonymous pre-signup generation to brand scan, recommended first-build selection, and post-signup generation
 - [x] Preserve selected preview build intent through Google/email signup and auto-start the matching first chat build
 - [x] Point logged-out landing CTAs and legacy `/try-ody` traffic at the new `/preview` scan flow
+- [x] Rebuild `/preview` mobile as no-scroll cards/screens and simplify desktop into a single-viewport scan/build flow
 - [ ] Migrate the core chat model driver from the legacy Anthropic-native implementation to GPT-5.5 end to end
 - [ ] Centralize landing page, email, and digital product card text generation behind GPT-5.5 asset builders, not ad hoc chat prose
 - [ ] Build a supplement inspiration library from scraped brand systems (Seed, AG1, Primal Queen, etc.) for reusable page, email, offer, and creative patterns
@@ -258,6 +259,7 @@ Directional items captured from the old architecture doc future phases. Not comm
 
 | Session | Date | Key Work |
 |---------|------|----------|
+| 115 | 2026-05-18 | **No-scroll preview screen flow.** Rebuilt the active `/preview` experience so mobile uses a dedicated fixed-height card stepper for URL entry, scan state, brand result, first-build selection, and signup CTA instead of shrinking the desktop chat page. Simplified the desktop result pane by removing redundant generated-angle/product-rail sections and fitting brand scan, build choice, and signup CTA inside one viewport. Verification: frontend production build, `git diff --check`, local in-app browser QA at 393x852 for start/brand/build/signup screens, mobile scroll test, desktop 1440x900 loaded-state QA, and desktop scroll test passed. |
 | 114 | 2026-05-18 | **URL-preview asset column routing.** Fixed public URL-preview asset routing so emails are selected by CPA/AOV/LTV intent or explicit `output_column` instead of array position, added backend manifest `output_column` hints for future URL plans, and made the locked email preview label the CPA/LTV/AOV system instead of reusing only the first email subject. Verification: focused preview Vitest, brand-kit strategy pytest, Python compile, frontend production build, `git diff --check`, git push to main, live `/preview` browser QA with the saved Hiker's Blend URL context, and live `/v2/chat` QA account context check. Follow-up live email-starter QA found a separate `create_review_batch` compliance bug now tracked in P1. |
 | 113 | 2026-05-18 | **Preview scan to first-build handoff.** Reworked `/preview` so anonymous visitors get a brand scan and selectable first-build recommendation instead of pre-signup anonymous asset generation. The selected intent now persists through Google/email signup, claim context, and `/v2/chat`, where Odyssey auto-starts the matching hidden first build prompt after the preview context is saved. Logged-out landing CTAs now point to `/preview`, while legacy `/try-ody` traffic redirects there with query params preserved. Verification: frontend production build and `git diff --check` passed. |
 | 112 | 2026-05-05 | **Emergent-inspired chat workspace foundation.** Added active conversation tabs under the v2 chat header so owners can jump between current chats without relying on the Threads dropdown, added reusable asset quick actions for preview/review, Copy Code, and downloads, brought Copy Code directly into persisted landing/email output cards, added output-pane Download Approved for approved ad variants, and softened chat artifact language from "review" to "manage asset" where appropriate. Verification: frontend production build, focused ChatPage/thread and chat-store stream Vitest targets, and `git diff --check` passed. Local browser QA reached the login gate; authenticated visual QA still needs a signed-in local session. |
